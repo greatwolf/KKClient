@@ -2918,8 +2918,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         }
         return e.prototype.action = function(e)
           {
-            return i.AccountListManager.clearAccountList(),
-              a.DeviceClientManager.instance.getActiveClient().then(function(t)
+            return a.DeviceClientManager.instance.getActiveClient().then(function(t)
               {
                 return t.sendPassphrase(e.passphrase)
               }).then(function()
