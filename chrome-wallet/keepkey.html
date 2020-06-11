@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang=en xmlns=http://www.w3.org/1999/html>
+
+<head>
+  <meta charset=UTF-8>
+  <title>KeepKey Client</title>
+  <link rel=stylesheet href=styles/animation.css>
+  <link rel=stylesheet href=styles/angular-csp.css>
+  <link rel=stylesheet href=styles/keepkey.css>
+</head>
+
+<body ng-app=kkTransactions ng-csp ng-strict-di class=container-fluid>
+  <div class="logo upper-left-logo"></div>
+  <uib-tabset class="main-tabs col-xs-12" vertical=true type=pills>
+    <uib-tab heading=Transactions>
+      <section ng-view></section>
+    </uib-tab>
+  </uib-tabset>
+  <script src=lib/angular.min.js></script>
+  <script src=lib/angular-animate.min.js></script>
+  <script src=lib/angular-route.min.js></script>
+  <script src=lib/angular-messages.min.js></script>
+  <script src=lib/ui-bootstrap.js></script>
+  <script src=lib/ui-bootstrap-tpls.js></script>
+  <script src=lib/lodash.min.js></script>
+  <script src=lib/bignumber.min.js></script>
+  <script src=lib/openpgp.js></script>
+  <script src=common.js></script>
+  <script src=transactions.js></script>
+</body>
+
+</html>
