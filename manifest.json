@@ -1,0 +1,49 @@
+{
+   "app":
+   {
+      "background":
+      {
+         "scripts": [ "Background.js" ]
+      }
+   },
+   "description": "A simple cryptocurrency wallet that integrates with the KeepKey device",
+   "icons":
+   {
+      "128": "images/icon.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnvVKonRGafqhrzNMi2BznKjMi4nTtPW/ODyST1Ms/4K7ahCctJWrtU8Hy1nndMwChhWC1wLS2dTjgEiFdYGZ12jM1w9I53z35glYuzcIH5EPBCeIj76qoouF2tzogcGszbQOBWldeXFxmymMAXKHRLvck3DZApL3cPYefpYMMHwRyjZjp1Ilj91BsMrBd1zH9z/VfgwW5Ic+EgxIwJ7F7O500vapylNFNzhs5GNd4DeSAdcu7tfSyCJasycNftYMnJnYbVTFCbmYctVZfM7HXnmoUh6hRETFatRsWat/G3P5+e81jQqxCdmVHCbVYcJ8nhg9HGFNtIv0znlk8iGLGwIDAQAB",
+   "manifest_version": 2,
+   "minimum_chrome_version": "46.0.2490.86",
+   "name": "KeepKey Client",
+   "permissions":
+   [
+     "https://shapeshift.io/*",
+     "https://*.coinquery.com/api/*",
+     "https://coinquery.com/*",
+     "http://*.coinquery.com/api/*",
+     "http://coinquery.com/*",
+     "https://api.blockcypher.com/v1/*",
+     "https://api.etherscan.io/api/*",
+     "https://keepkey-wallet.keepkey.com/*",
+     "https://keepkey.shapeshift.io/*",
+     "https://keepkey.shapeshift.com/*",
+     "https://auth.shapeshift.io/oauth/",
+     "https://bitcoinfees.earn.com/*",
+     "hid", "usb", "identity",
+     {
+        "usbDevices":
+        [
+          {
+             "productId": 1,
+             "vendorId": 11044
+          },
+          {
+             "productId": 2,
+             "vendorId": 11044
+          }
+        ]
+     }
+   ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "6.4.0.1"
+}
