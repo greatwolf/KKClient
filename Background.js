@@ -9959,7 +9959,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return r(t, e),
           t.prototype.computeFee = function(e, t)
           {
-            var n = Math.ceil((e * this.INPUT_SIZE + t * this.OUTPUT_SIZE + this.TRANSACTION_HEADER_SIZE) / 1e3),
+            var n = (e * this.INPUT_SIZE + t * this.OUTPUT_SIZE + this.TRANSACTION_HEADER_SIZE) / 1e3,
               r = this.MIN_FEE.times(n);
             return Promise.resolve(r)
           },
@@ -10244,7 +10244,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
             t.MIN_FEE = new i.default("1000"),
-            t.INSTANTSEND_FEE = 1e5,
+            t.INSTANTSEND_FEE = 1e4,
             t
         }
         return r(t, e),
@@ -10310,7 +10310,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           return t.INPUT_SIZE = 149,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
-            t.MIN_FEE = new i.default("100000000"),
+            t.MIN_FEE = new i.default("1000000"),
             t
         }
         return r(t, e),
@@ -10555,7 +10555,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function t()
         {
           var t = e.call(this, o.CoinName.Litecoin) || this;
-          return t.MIN_FEE = new i.default(2e5),
+          return t.MIN_FEE = new i.default(2e3),
             t.INPUT_SIZE = 149,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
