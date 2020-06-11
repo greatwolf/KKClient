@@ -8337,9 +8337,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             this.coinId)
           {
             case "btc":
+              this.rootUrl = "https://insight.bitpay.com/api";
+              break;
             case "bch":
-            case "ltc":
               this.rootUrl = "https://prod.coinquery.com/api/insight/" + this.coinId;
+              break;
+            case "dash":
+              this.rootUrl = "https://insight.dash.org/api";
+              break;
+            case "ltc":
+              this.rootUrl = "https://insight.litecore.io/api";
               break;
             default:
               this.rootUrl = "https://" + this.coinId + ".coinquery.com/api";
