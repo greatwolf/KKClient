@@ -4017,6 +4017,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   n.push(t.litecoin.loadAccounts(e)),
                   n.push(t.dash.loadAccounts(e)),
                   n.push(t.dogecoin.loadAccounts(e)),
+                  n.push(t.digibyte.loadAccounts(e)),
                   // t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
                   t.bitcoinGold && n.push(t.bitcoinGold.loadAccounts(e))),
                 Promise.all(n)
@@ -4052,6 +4053,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 t.litecoin = new i.InsightAccountListLoader(o.CoinName.Litecoin, "m/44'/" + s.CoinType.get(o.CoinName.Litecoin).coinTypeCode),
                 t.dash = new i.InsightAccountListLoader(o.CoinName.Dash, "m/44'/" + s.CoinType.get(o.CoinName.Dash).coinTypeCode),
                 t.dogecoin = new i.InsightAccountListLoader(o.CoinName.Dogecoin, "m/44'/" + s.CoinType.get(o.CoinName.Dogecoin).coinTypeCode),
+                t.digibyte = new i.InsightAccountListLoader(o.CoinName.DigiByte, "m/44'/" + s.CoinType.get(o.CoinName.DigiByte).coinTypeCode),
                 e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
                 t.bitcoinCashLegacy = e[0],
                 t.bitcoinCash = e[1],
@@ -8347,6 +8349,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             case "ltc":
               this.rootUrl = "https://insight.litecore.io/api";
               break;
+            case "dgb":
+              this.rootUrl = "https://digiexplorer.info/api";
+              break;
             default:
               this.rootUrl = "https://" + this.coinId + ".coinquery.com/api";
           }
@@ -8417,6 +8422,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 break;
               case "doge":
                 t = "https://blockchair.com/dogecoin/transaction/" + e;
+                break;
+              case "dgb":
+                t = "https://digiexplorer.info/tx/" + e;
                 break;
               default:
                 throw "block explorer url is not defined for cointype " + this.coinId;
@@ -8490,6 +8498,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   break;
                 case c.CoinName.BitcoinGold:
                   e.instances[c.CoinName.BitcoinGold] = this.createInsightWalletApi("btg", l.CoinType.get(c.CoinName.BitcoinGold));
+                  break;
+                case c.CoinName.DigiByte:
+                  e.instances[c.CoinName.DigiByte] = this.createInsightWalletApi("dgb", l.CoinType.get(c.CoinName.DigiByte));
                   break;
                 default:
                   throw "No wallet api available for " + c.CoinName[t];
@@ -10456,6 +10467,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       s = e("@keepkey/device-client/dist/global/coin-type"),
       d = e("./dash-fee-service"),
       c = e("./dogecoin-fee-service"),
+      f = e("./digibyte-fee-service"),
       l = e("./ethereum-fee-service"),
       p = e("./litecoin-fee-service"),
       u = function()
@@ -10486,6 +10498,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   case o.CoinName.Dogecoin:
                     e.instances[t] = new c.DogecoinFeeService;
                     break;
+                  case o.CoinName.DigiByte:
+                    e.instances[t] = new f.DigiByteFeeService;
+                    break;
                   case o.CoinName.Ethereum:
                     e.instances[t] = new l.EthereumFeeService;
                     break;
@@ -10510,6 +10525,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./dogecoin-fee-service": 102,
     "./ethereum-fee-service": 103,
     "./litecoin-fee-service": 105,
+    "./digibyte-fee-service": 443,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
   }],
@@ -14995,6 +15011,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e[e.Dogecoin = 3] = "Dogecoin",
         e[e.Dash = 5] = "Dash",
         e[e.Ethereum = 6] = "Ethereum",
+        e[e.DigiByte = 20] = "DigiByte",
         e[e.BitcoinCash = 145] = "BitcoinCash",
         e[e.BitcoinGold = 156] = "BitcoinGold",
         e[e.Zcash = 133] = "Zcash",
@@ -15303,6 +15320,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             name: s.CoinName[s.CoinName.Dash],
             addressFormat: "^[X7][a-km-zA-HJ-NP-Z1-9]{25,34}$",
+            dust: e.oldDustCalculation(10000),
+            defaultDecimals: 8
+          },
+          {
+            name: s.CoinName[s.CoinName.DigiByte],
+            addressFormat: "^D\\w{33}$",
             dust: e.oldDustCalculation(10000),
             defaultDecimals: 8
           },
@@ -78091,6 +78114,63 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t
       }
   },
-  {}]
+  {}],
+  443: [function(e, t, n)
+  {
+    "use strict";
+    var r = this && this.__extends || function()
+    {
+      var e = Object.setPrototypeOf ||
+      {
+        __proto__: []
+      }
+      instanceof Array && function(e, t)
+        {
+          e.__proto__ = t
+        } ||
+        function(e, t)
+        {
+          for (var n in t)
+            t.hasOwnProperty(n) && (e[n] = t[n])
+        };
+      return function(t, n)
+      {
+        function r()
+        {
+          this.constructor = t
+        }
+        e(t, n),
+          t.prototype = null === n ? Object.create(n) : (r.prototype = n.prototype,
+            new r)
+      }
+    }();
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var i = e("bignumber.js"),
+      a = e("./abstract-per-kb-fee-service"),
+      o = e("@keepkey/device-client/dist/global/coin-name"),
+      s = function(e)
+      {
+        function t()
+        {
+          var t = e.call(this, o.CoinName.DigiByte) || this;
+          return t.INPUT_SIZE = 149,
+            t.OUTPUT_SIZE = 34,
+            t.TRANSACTION_HEADER_SIZE = 10,
+            t.MIN_FEE = new i.default("2e3"),
+            t
+        }
+        return r(t, e),
+          t
+      }(a.AbstractPerKbFeeService);
+    n.DigiByteFeeService = s
+  },
+  {
+    "./abstract-per-kb-fee-service": 97,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "bignumber.js": 189
+  }],
 },
 {}, [1]);
