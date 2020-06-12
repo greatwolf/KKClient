@@ -72,6 +72,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'DigiByte',
+      currencySymbol: 'DGB',
+      coinTypeCode: '20\'',
+      coinType: 20,
+      addressFormat: '^D\\w{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'BitcoinCash',
       currencySymbol: 'BCH',
       coinTypeCode: '145\'',
