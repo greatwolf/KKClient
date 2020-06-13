@@ -36,30 +36,35 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
             a.currencySymbol = b.getCurrencySymbol(a.currency),
             angular.isDefined(a.exchangeFormattedAmount) || (a.exchangeFormattedAmount = '...'),
             angular.isDefined(a.exchangeCurrencySymbol) || (a.exchangeCurrencySymbol = 'USD');
-            var d = function(d, e) {
-                if (void 0 !== d && void 0 !== e) {
-                    var f = new XMLHttpRequest;
-                    f.onreadystatechange = function() {
-                        if (4 == f.readyState && 200 == f.status) {
-                            var e = b.formatAmount(a.currency, a.amount)
-                              , g = JSON.parse(f.responseText)['price_' + d.toLowerCase()];
-                            a.exchangeFormattedAmount = (e * g).toFixed(2),
-                            a.hasExchangeRate = c.showFiatBalance,
-                            a.$digest()
-                        }
-                    }
-                    ,
-                    f.open('GET', 'https://coincap.io/page/' + e, !0),
-                    f.send(null)
+            var d = function(fiat, crypto) {
+                if (void 0 === fiat || void 0 === crypto) return
+
+                var assetIds =
+                {
+                  "BitcoinCash" : "bitcoin-cash",
                 }
+                var asset = assetIds[crypto] || crypto.toLowerCase()
+                fiat = fiat.toLowerCase()
+                var f = new XMLHttpRequest;
+                f.onreadystatechange = function() {
+                    if (4 == f.readyState && 200 == f.status) {
+                        var e = b.formatAmount(a.currency, a.amount)
+                          , g = JSON.parse(f.responseText)[asset][fiat];
+                        a.exchangeFormattedAmount = (e * g).toFixed(2),
+                        a.hasExchangeRate = c.showFiatBalance,
+                        a.$digest()
+                    }
+                }
+                ,
+                f.open('GET', 'https://api.coingecko.com/api/v3/simple/price?ids=' + asset + '&vs_currencies=' + fiat, !0),
+                f.send(null)
             };
-            d(a.exchangeCurrencySymbol, a.currencySymbol),
+            d(a.exchangeCurrencySymbol, a.currency),
             a.$watch('amount', function() {
-                d(a.exchangeCurrencySymbol, a.currencySymbol)
+                d(a.exchangeCurrencySymbol, a.currency)
             }),
             a.$watch('currency', function() {
-                a.currencySymbol = b.getCurrencySymbol(a.currency),
-                d(a.exchangeCurrencySymbol, a.currencySymbol)
+                d(a.exchangeCurrencySymbol, a.currency)
             })
         }
         ],
@@ -712,7 +717,7 @@ angular.module('kkCommon').constant('supportsEthereum', !0).constant('confidence
     regularFeeLevel: 'fast',
     maxReceiveAddresses: 10,
     notificationInterval: 12e4,
-    showFiatBalance: !1
+    showFiatBalance: !0
 }).constant('membershipPlatform', {
     url: 'https://auth.shapeshift.io',
     clientId: 'd55063d8-7e56-4e46-bdd0-1163462e1972'
