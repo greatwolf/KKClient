@@ -8406,16 +8406,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             switch (this.coinId)
             {
               case "dash":
-                t = "https://blockchair.com/dash/transaction/" + e;
+                t = "https://insight.dash.org/insight/tx/" + e;
                 break;
               case "ltc":
-                t = "https://blockchair.com/litecoin/transaction/" + e;
+                t = "https://insight.litecore.io/tx/" + e;
                 break;
               case "btc":
-                t = "https://blockchair.com/bitcoin/transaction/" + e;
+                t = "https://explorer.bitcoin.com/btc/tx/" + e;
                 break;
               case "bch":
-                t = "https://blockchair.com/bitcoin-cash/transaction/" + e;
+                t = "https://explorer.bitcoin.com/bch/tx/" + e;
                 break;
               case "btg":
                 t = "https://btgexplorer.com/tx/" + e;
