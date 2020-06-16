@@ -89,7 +89,7 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'BCH',
       coinTypeCode: '145\'',
       coinType: 145,
-      addressFormat: '^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$',
+      addressFormat: '(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^bitcoincash:[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{25,55}$)|(^bitcoincash:[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{25,55}$)',
       dust: 546,
       decimals: 8,
       amountParameters:
