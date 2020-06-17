@@ -4026,7 +4026,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   n.push(t.dash.loadAccounts(e)),
                   n.push(t.dogecoin.loadAccounts(e)),
                   n.push(t.digibyte.loadAccounts(e)),
-                  // t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
+                  t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
                   t.bitcoinGold && n.push(t.bitcoinGold.loadAccounts(e))),
                 Promise.all(n)
             }).then(function() {})
@@ -4045,7 +4045,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.bitcoin.loadAccounts(e).then(function()
             {
               var n = [];
-              return // t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e)),
+              return t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e)),
                 t.bitcoinGoldLegacy && n.push(t.bitcoinGoldLegacy.loadAccounts(e)),
                 Promise.all(n)
             }).then(function() {})
@@ -8099,6 +8099,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = e.derive(t.toString()),
               r = new u.PublicKey(n.toObject().publicKey),
               i = r.toAddress(this.network).toString();
+              if (this.network.name === "bitcoincash")
+                i = bchaddr.toCashAddress(i)
             return {
               address: i,
               path: t,
