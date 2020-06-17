@@ -7951,7 +7951,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = t ? this.walletApi.urlGenerator.dashInstantSendTransactionUrl() : this.walletApi.urlGenerator.sendTransactionUrl();
             return n.then(function(t)
             {
-              return o.HttpClient.post(t, "rawtx=" + e.toHex(), "application/x-www-form-urlencoded")
+              return o.HttpClient.post(t, e.toHex(), "application/x-www-form-urlencoded")
             }).then(function(e)
             {
               return e
@@ -7981,6 +7981,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.walletApi.urlGenerator.getRecentTransactionsUrl(t, e).then(o.HttpClient.get).then(function(e)
             {
               var r = {};
+              e.items = e.items || e.txs;
               return r[t] = {
                   address: t,
                   path: g.NodeVector.fromString("0")
@@ -8036,7 +8037,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     a.push(u.address)
                 }
               }),
-              a.length ? this.getInsightTransactions(a.join(",")).then(function(t)
+              a.length ? this.getInsightTransactions(e.xpub).then(function(t)
               {
                 return t.items.forEach(function(t)
                   {
@@ -8099,7 +8100,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getInsightTransactions = function(e)
           {
             var t = this;
-            return this.walletApi.urlGenerator.getTransactionsUrl(e).then(function(e)
+            return this.walletApi.urlGenerator.getTransactionsUrl(e, 8).then(function(e)
             {
               return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
             }).then(function(n)
@@ -8109,33 +8110,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.getMoreInsightTransactions = function(e, t)
           {
-            for (var n = this, i = [], a = t.totalItems - 50, s = {
-                totalItems: t.totalItems,
-                from: t.to,
-                to: t.to + 50,
-                items: t.items
-              }, d = function(t, i)
+            for (var n = this, i = [], s = {
+                from: 2,
+                to: t.totalPages,
+                items: t.txs
+              }, d = function(t)
               {
-                return n.walletApi.urlGenerator.getAllTransactionsUrl(e, t, i).then(function(e)
+                return n.walletApi.urlGenerator.getAllTransactionsUrl(e, t, 8).then(function(e)
                 {
                   return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
                 }).then(function(e)
                 {
-                  s.items = r.uniqBy(r.union(s.items, e.items), "txid")
+                  s.items = r.uniqBy(r.union(s.items, e.txs), "txid")
                 })
-              }; 0 < a;)
-              if (1 <= a / 50)
-                i.push(d(s.from, s.to)),
-                s.from += 50,
-                s.to += 50,
-                a -= 50;
-              else if (a % 50)
-            {
-              var l = a % 50;
-              a -= 50,
-                s.to = s.from + l,
-                i.push(d(s.from, s.to))
-            }
+              }; s.from <= s.to; ++s.from)
+                i.push(d(s.from));
+
             return Promise.all(i).then(function()
             {
               return s
@@ -8188,9 +8178,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var o = [];
             return r.each(t.vin, function(e)
               {
-                n[e.addr] && o.push(
+                n[e.addresses[0]] && o.push(
                 {
-                  address: e.addr,
+                  address: e.addresses[0],
                   hash: i.fromHex(t.txid),
                   blockHeight: t.blockheight,
                   value: a.floatToAmount(e.value).negated(),
@@ -8221,12 +8211,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     isConfirmed: !!(0 < t.confirmations),
                     confirmations: t.confirmations,
                     dashInstantSend: !!t.txlock,
-                    spent: !!s.spentTxId,
+                    spent: s.spent,
                     vin: r.map(t.vin, function(e)
                     {
                       if (!e.coinbase)
                         return {
-                          address: e.addr,
+                          address: e.addresses[0],
                           hash: i.fromHex(e.txid),
                           blockHeight: t.blockheight,
                           value: a.floatToAmount(e.value).negated(),
@@ -8264,7 +8254,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.isNotOpReturn = function(e)
           {
-            return !e.scriptPubKey.asm.startsWith("OP_RETURN")
+            return !e.scriptPubKey.hex.startsWith("6a") // bytecode for OP_RETURN
           },
           e.gatherAddresses = function(e)
           {
@@ -8287,7 +8277,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.transactionInput = function(e, t)
           {
             return {
-              address: r.get(e, "addr", void 0),
+              address: r.get(e, "addresses.0", void 0),
               outputIndex: e.coinbase ? -1 : r.get(e, "vout"),
               value: t.parseAmount(r.get(e, "valueSat", 0)),
               prevHash: i.fromHex(r.get(e, "txid", "0000000000000000000000000000000000000000000000000000000000000000")),
@@ -8362,19 +8352,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.sendTransactionUrl = function()
           {
-            return Promise.resolve(this.rootUrl + "/tx/send")
+            return Promise.resolve(this.rootUrl + "/sendtx/")
           },
           e.prototype.dashInstantSendTransactionUrl = function()
           {
-            return Promise.resolve(this.rootUrl + "/tx/sendix")
+            return Promise.resolve(this.rootUrl + "/sendtx/")
           },
-          e.prototype.getTransactionsUrl = function(e)
+          e.prototype.getTransactionsUrl = function(e, t)
           {
-            return Promise.resolve(this.rootUrl + "/addrs/" + e + "/txs?from=0&to=50")
+            return this.getAllTransactionsUrl(e, 1, t || 1000)
           },
           e.prototype.getAllTransactionsUrl = function(e, t, n)
           {
-            return Promise.resolve(this.rootUrl + "/addrs/" + e + "/txs?from=" + t + "&to=" + n)
+            return Promise.resolve(this.rootUrl + (e.startsWith("xpub") ? "/xpub/" : "/address/") + e + "?page=" + t + "&pageSize=" + n + "&details=txs")
           },
           e.prototype.getPartialTransactionUrl = function()
           {
