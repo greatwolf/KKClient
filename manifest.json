@@ -18,10 +18,10 @@
    "permissions":
    [
      "https://shapeshift.io/*",
+     "https://*.trezor.io/api/*",
+     "https://*.atomicwallet.io/api/*",
      "https://*.coinquery.com/api/*",
      "https://coinquery.com/*",
-     "http://*.coinquery.com/api/*",
-     "http://coinquery.com/*",
      "https://api.blockcypher.com/v1/*",
      "https://api.etherscan.io/api/*",
      "https://keepkey-wallet.keepkey.com/*",

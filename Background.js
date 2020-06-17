@@ -8323,28 +8323,31 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e(e, t)
         {
-          switch (this.coinId = e,
-            this.metadataUrlGenerator = t,
-            this.coinId)
+          var trezorio =
           {
-            case "btc":
-              this.rootUrl = "https://insight.bitpay.com/api";
-              break;
-            case "bch":
-              this.rootUrl = "https://prod.coinquery.com/api/insight/" + this.coinId;
-              break;
-            case "dash":
-              this.rootUrl = "https://insight.dash.org/api";
-              break;
-            case "ltc":
-              this.rootUrl = "https://insight.litecore.io/api";
-              break;
-            case "dgb":
-              this.rootUrl = "https://digiexplorer.info/api";
-              break;
-            default:
-              this.rootUrl = "https://" + this.coinId + ".coinquery.com/api";
+            "btc" : 5,
+            "bch" : 5,
+            "dash": 5,
+            "ltc" : 5,
+            "dgb" : 2,
+            "doge": 5,
           }
+          this.coinId = e
+          this.metadataUrlGenerator = t
+          if (trezorio[this.coinId])
+          {
+            Object.defineProperty(this, 'rootUrl',
+            {
+              get: function()
+              {
+                var index = 1 + Math.trunc( Math.random() * 100 % trezorio[this.coinId] )
+                return "https://" + this.coinId + index + '.trezor.io/api'
+              }
+            })
+            
+            return;
+          }
+          throw "block indexer not defined for cointype " + this.coinId;
         }
         return e.prototype.getWalletListUrl = function()
           {
