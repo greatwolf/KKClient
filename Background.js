@@ -7989,7 +7989,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.walletApi.urlGenerator.getRecentTransactionsUrl(t, e).then(o.HttpClient.get).then(function(e)
             {
               var r = {};
-              e.items = e.items || e.txs;
+              e.items = e.items || e.txs || [];
               return r[t] = {
                   address: t,
                   path: g.NodeVector.fromString("0")
@@ -8123,7 +8123,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             for (var n = this, i = [], s = {
                 from: 2,
                 to: t.totalPages,
-                items: t.txs
+                items: t.txs || []
               }, d = function(t)
               {
                 return n.walletApi.urlGenerator.getAllTransactionsUrl(e, t, 8).then(function(e)
@@ -8131,7 +8131,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
                 }).then(function(e)
                 {
-                  s.items = r.uniqBy(r.union(s.items, e.txs), "txid")
+                  s.items = r.uniqBy(r.union(s.items, e.txs || []), "txid")
                 })
               }; s.from <= s.to; ++s.from)
                 i.push(d(s.from));
