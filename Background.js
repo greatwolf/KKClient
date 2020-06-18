@@ -7141,7 +7141,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       value: !0
     });
     var r = e("./blockcypher-api-token-service"),
-      i = /btc|ltc|doge/,
+      i = /btc|ltc|dash|doge/,
       a = function()
       {
         function e()
