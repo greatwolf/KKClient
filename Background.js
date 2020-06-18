@@ -7417,8 +7417,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.deleteWallet = function(e)
           {
-            return this.walletApi.updateStoredMetadata(e,
-            {}).then(function()
+            return this.walletApi.deleteStoredMetadata(e).then(function()
             {
               return null
             })
@@ -7950,9 +7949,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return r.get(e, "info.blocks")
           },
-          e.prototype.deleteWallet = function()
+          e.prototype.deleteWallet = function(accountId)
           {
-            return null
+            return this.walletApi.deleteStoredMetadata(accountId).then(function()
+            {
+              return null
+            })
           },
           e.prototype.sendRawTransaction = function(e, t)
           {
@@ -8630,6 +8632,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.urlGenerator.walletMetaDataUrl(e).then(function(e)
             {
               return r.HttpClient.put(e, JSON.stringify(t))
+            })
+          },
+          e.prototype.deleteStoredMetadata = function(e)
+          {
+            return this.urlGenerator.walletMetaDataUrl(e).then(function(e)
+            {
+              return r.HttpClient.delete(e)
             })
           },
           e.prototype.getCurrentBlockHeight = function()
