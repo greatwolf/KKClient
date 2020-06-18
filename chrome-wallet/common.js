@@ -17,7 +17,8 @@ angular.module('kkCommon', []).run(['DeviceBridgeService', 'environmentConfig', 
                 policyName: b,
                 enabled: c
             })
-        }
+        },
+        deleteAccount: a.deleteAccount
     }
 }
 ]),
