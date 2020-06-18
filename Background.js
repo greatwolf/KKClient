@@ -8337,6 +8337,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             "btc" : 5,
             "bch" : 5,
+            "btg" : 5,
             "dash": 5,
             "ltc" : 5,
             "dgb" : 2,
