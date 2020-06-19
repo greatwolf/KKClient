@@ -20,6 +20,7 @@
      "https://shapeshift.io/*",
      "https://*.trezor.io/api/*",
      "https://*.atomicwallet.io/api/*",
+     "https://*.guarda.co/api/*",
      "https://*.coinquery.com/api/*",
      "https://coinquery.com/*",
      "https://api.blockcypher.com/v1/*",
