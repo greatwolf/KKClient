@@ -4835,9 +4835,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t.prototype.initiate = function(e)
           {
             var t = c.DeviceMessageHelper.factory("SignTx");
-            return t.setInputsCount(e.inputs.length),
+            var coinName = l.CoinName[e.coinName];
+            return t.set_version(coinName === 'Dash' ? 2 : 1),
+              t.setInputsCount(e.inputs.length),
               t.setOutputsCount(e.outputs.length),
-              t.setCoinName(l.CoinName[e.coinName]),
+              t.setCoinName(coinName),
               this.client.writeToDevice(t)
           },
           t.prototype.setupRequestHandlers = function(e, t)
@@ -10948,7 +10950,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               t.setPrevHash(e.txHash),
               t.setPrevIndex(e.outputIndex),
               t.setScriptType(0),
-              this.transactionData.coinName === s.CoinName.BitcoinCash ? t.setAmount(e.value.toNumber()) : this.transactionData.coinName === s.CoinName.BitcoinGold && t.setAmount(e.value.toNumber()),
+              t.setAmount(e.value.toNumber()),
               t
           },
           t.prototype.historicalInputToPb = function(e)
