@@ -4027,6 +4027,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   n.push(t.dogecoin.loadAccounts(e)),
                   n.push(t.digibyte.loadAccounts(e)),
                   t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
+                  t.bitcoinSV && n.push(t.bitcoinSV.loadAccounts(e)),
                   t.bitcoinGold && n.push(t.bitcoinGold.loadAccounts(e))),
                 Promise.all(n)
             }).then(function() {})
@@ -4065,6 +4066,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
                 t.bitcoinCashLegacy = e[0],
                 t.bitcoinCash = e[1],
+                e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV)),
+                t.bitcoinSVLegacy = e[0],
+                t.bitcoinSV = e[1],
                 n = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinGold)),
                 t.bitcoinGoldLegacy = n[0],
                 t.bitcoinGold = n[1],
@@ -8362,6 +8366,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             
             return;
           }
+          var guardaco =
+          {
+            "bsv" : "bsvbook",
+          }
+          if (guardaco[this.coinId])
+          {
+            return this.rootUrl = "https://" + guardaco[this.coinId] + '.guarda.co/api'
+          }
           throw "block indexer not defined for cointype " + this.coinId;
         }
         return e.prototype.getWalletListUrl = function()
@@ -8424,6 +8436,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 break;
               case "bch":
                 t = "https://explorer.bitcoin.com/bch/tx/" + e;
+                break;
+              case "bsv":
+                t = "https://blockchair.com/bitcoin-sv/transaction/" + e;
                 break;
               case "btg":
                 t = "https://btgexplorer.com/tx/" + e;
@@ -8503,6 +8518,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   break;
                 case c.CoinName.BitcoinCash:
                   e.instances[c.CoinName.BitcoinCash] = this.createInsightWalletApi("bch", l.CoinType.get(c.CoinName.BitcoinCash));
+                  break;
+                case c.CoinName.BitcoinSV:
+                  e.instances[c.CoinName.BitcoinSV] = this.createInsightWalletApi("bsv", l.CoinType.get(c.CoinName.BitcoinSV));
                   break;
                 case c.CoinName.BitcoinGold:
                   e.instances[c.CoinName.BitcoinGold] = this.createInsightWalletApi("btg", l.CoinType.get(c.CoinName.BitcoinGold));
@@ -10477,6 +10495,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     });
     var r = e("./bitcoin-fee-service"),
       i = e("./bitcoin-cash-fee-service"),
+      g = e("./bitcoin-sv-fee-service"),
       a = e("./bitcoin-gold-fee-service"),
       o = e("@keepkey/device-client/dist/global/coin-name"),
       s = e("@keepkey/device-client/dist/global/coin-type"),
@@ -10503,6 +10522,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     break;
                   case o.CoinName.BitcoinCash:
                     e.instances[t] = new i.BitcoinCashFeeService;
+                    break;
+                  case o.CoinName.BitcoinSV:
+                    e.instances[t] = new g.BitcoinSVFeeService;
                     break;
                   case o.CoinName.BitcoinGold:
                     e.instances[t] = new a.BitcoinGoldFeeService;
@@ -10535,6 +10557,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     "./bitcoin-cash-fee-service": 98,
     "./bitcoin-fee-service": 99,
+    "./bitcoin-sv-fee-service": 444,
     "./bitcoin-gold-fee-service": 100,
     "./dash-fee-service": 101,
     "./dogecoin-fee-service": 102,
@@ -15028,6 +15051,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e[e.Ethereum = 6] = "Ethereum",
         e[e.DigiByte = 20] = "DigiByte",
         e[e.BitcoinCash = 145] = "BitcoinCash",
+        e[e.BitcoinSV = 236] = "BitcoinSV",
         e[e.BitcoinGold = 156] = "BitcoinGold",
         e[e.Zcash = 133] = "Zcash",
         e[e.Aragon = 601] = "Aragon",
@@ -15347,6 +15371,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             name: s.CoinName[s.CoinName.BitcoinCash],
             addressFormat: "(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^bitcoincash:[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{25,55}$)|(^bitcoincash:[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{25,55}$)",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8
+          },
+          {
+            name: s.CoinName[s.CoinName.BitcoinSV],
+            addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8
           },
@@ -78181,6 +78211,63 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t
       }(a.AbstractPerKbFeeService);
     n.DigiByteFeeService = s
+  },
+  {
+    "./abstract-per-kb-fee-service": 97,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "bignumber.js": 189
+  }],
+  444: [function(e, t, n)
+  {
+    "use strict";
+    var r = this && this.__extends || function()
+    {
+      var e = Object.setPrototypeOf ||
+      {
+        __proto__: []
+      }
+      instanceof Array && function(e, t)
+        {
+          e.__proto__ = t
+        } ||
+        function(e, t)
+        {
+          for (var n in t)
+            t.hasOwnProperty(n) && (e[n] = t[n])
+        };
+      return function(t, n)
+      {
+        function r()
+        {
+          this.constructor = t
+        }
+        e(t, n),
+          t.prototype = null === n ? Object.create(n) : (r.prototype = n.prototype,
+            new r)
+      }
+    }();
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var i = e("bignumber.js"),
+      a = e("./abstract-per-kb-fee-service"),
+      o = e("@keepkey/device-client/dist/global/coin-name"),
+      s = function(e)
+      {
+        function t()
+        {
+          var t = e.call(this, o.CoinName.BitcoinSV) || this;
+          return t.INPUT_SIZE = 149,
+            t.OUTPUT_SIZE = 34,
+            t.TRANSACTION_HEADER_SIZE = 10,
+            t.MIN_FEE = new i.default("1e3"),
+            t
+        }
+        return r(t, e),
+          t
+      }(a.AbstractPerKbFeeService);
+    n.BitcoinSVFeeService = s
   },
   {
     "./abstract-per-kb-fee-service": 97,

@@ -98,6 +98,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'BitcoinSV',
+      currencySymbol: 'BSV',
+      coinTypeCode: '0\'',
+      coinType: 0,
+      addressFormat: '^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'BitcoinGold',
       currencySymbol: 'BTG',
       coinTypeCode: '156\'',
