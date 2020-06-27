@@ -1435,7 +1435,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
                 pin: e.pin
               }),
               e.pin = '',
-              e.successRoute && n.go(e.successRoute)
+              n.goToPrevious()
           },
           e.$watch('pin', function()
           {
@@ -1573,8 +1573,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.sendPassphrase = function()
       {
+        var prevRoute = n.getPreviousRoute().toString()
         return !!e.form.$valid && void(t.sendPassphrase(e.userInput.passphrase),
-          n.go('/walletlist', 'cross-fade'),
+          prevRoute === '' ? n.go('/walletlist') : n.goToPrevious('slideRight'),
           e.userInput.passphrase = '',
           e.userInput.confirmPassphrase = '')
       }
