@@ -18,7 +18,10 @@ This project is a best-effort attempt at trying to rectify that problem.
 
  - Install the latest version of the original KeepKey Client. See [instructions here](https://keepkey.zendesk.com/hc/en-us/articles/360001411570-Getting-Started-Initializing-Your-KeepKey-Device).
  - Download the [zip file](https://github.com/greatwolf/KKClient/archive/master.zip) for this repo.
- - Extract the files into the browser extension's path(eg. ../Extensions/idgiipeogajjpkgheijapngmlbohdhjg/6.4.0.1_0) replace and overwrite any existing files.
- - Open the browser and goto `chrome://extensions`. Click on `Load Unpacked` on the upper left corner.
+ - Extract the files into Chrome's extension path(eg. ../Extensions/idgiipeogajjpkgheijapngmlbohdhjg/6.4.0.1_0) replace and overwrite any existing files.
+ - Open Chrome and goto `chrome://extensions`. Make sure 'developer mode' is toggled on.
+ - Click on the `Load Unpacked` button on the upper left corner.
  - Find the extension path '../Extensions/idgiipeogajjpkgheijapngmlbohdhjg/6.4.0.1_0' and click `Select Folder` to reload the extension.
  - Finally start the extension by going to `chrome://apps`.
+
+This should also work for Brave as well.
