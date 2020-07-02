@@ -3211,6 +3211,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   message: "Transaction sent"
                 })
+              }).then(this.delay(3e3)).then(function()
+              {
+                return s.AccountListManager.clearAccountList(),
+                       a.MessageDispatcher.execute("GetWalletNodes", e)
               })
           },
           e.prototype.sendToAddress = function(e, t)
@@ -3247,6 +3251,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return n.transaction = e,
                 i.signTransaction(e)
             })
+          },
+          e.prototype.delay = function(e)
+          {
+            return function()
+            {
+              return new Promise(function(t)
+              {
+                setTimeout(t, e)
+              })
+            }
           },
           e
       }();
