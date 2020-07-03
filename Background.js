@@ -31939,8 +31939,17 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         },
         r.prototype.toBuffer = function()
         {
-          var e = new n([this.network[this.type]]),
-            t = n.concat([e, this.hashBuffer]);
+          var pubkeyhash_view = new DataView(new ArrayBuffer(4))
+          var pubkeyhash = new Uint8Array(pubkeyhash_view.buffer)
+          var arrsize = pubkeyhash.byteLength, leadzero = true
+          pubkeyhash_view.setUint32(0, this.network[this.type], false)
+          
+          var e = new n(pubkeyhash.filter( (i) =>
+                                            {
+                                              return i > 0 && (leadzero = false),
+                                                    --arrsize == 0 || !leadzero
+                                            } )),
+              t = n.concat([e, this.hashBuffer]);
           return t
         },
         r.prototype.toObject = r.prototype.toJSON = function()
