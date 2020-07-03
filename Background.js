@@ -18391,6 +18391,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           type: "uint32",
           name: "version_group_id",
           id: 8
+        },
+        {
+          rule: "optional",
+          type: "uint32",
+          name: "branch_id",
+          id: 10
         }]
       },
       {
