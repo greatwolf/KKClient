@@ -4040,6 +4040,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   n.push(t.dash.loadAccounts(e)),
                   n.push(t.dogecoin.loadAccounts(e)),
                   n.push(t.digibyte.loadAccounts(e)),
+                  n.push(t.zcash.loadAccounts(e)),
                   t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
                   t.bitcoinSV && n.push(t.bitcoinSV.loadAccounts(e)),
                   t.bitcoinGold && n.push(t.bitcoinGold.loadAccounts(e))),
@@ -4077,6 +4078,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 t.dash = new i.InsightAccountListLoader(o.CoinName.Dash, "m/44'/" + s.CoinType.get(o.CoinName.Dash).coinTypeCode),
                 t.dogecoin = new i.InsightAccountListLoader(o.CoinName.Dogecoin, "m/44'/" + s.CoinType.get(o.CoinName.Dogecoin).coinTypeCode),
                 t.digibyte = new i.InsightAccountListLoader(o.CoinName.DigiByte, "m/44'/" + s.CoinType.get(o.CoinName.DigiByte).coinTypeCode),
+                t.zcash = new i.InsightAccountListLoader(o.CoinName.Zcash, "m/44'/" + s.CoinType.get(o.CoinName.Zcash).coinTypeCode),
                 e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
                 t.bitcoinCashLegacy = e[0],
                 t.bitcoinCash = e[1],
@@ -4854,8 +4856,21 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             var t = c.DeviceMessageHelper.factory("SignTx");
             var coinName = l.CoinName[e.coinName];
-            return t.set_version(coinName === 'Dash' ? 2 : 1),
-              t.setInputsCount(e.inputs.length),
+            switch(coinName)
+            {
+              case 'Dash':
+                t.setVersion(2)
+                break;
+              case 'Zcash':
+                t.setVersion(4)
+                t.setOverwintered(true)
+                t.setVersionGroupId(0x892f2085)
+                t.setBranchId(0x2bb40e60)
+                break;
+              default:
+                t.setVersion(1)
+            }
+            return t.setInputsCount(e.inputs.length),
               t.setOutputsCount(e.outputs.length),
               t.setCoinName(coinName),
               this.client.writeToDevice(t)
@@ -8364,6 +8379,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             "ltc" : 5,
             "dgb" : 2,
             "doge": 5,
+            "zec": 5,
           }
           this.coinId = e
           this.metadataUrlGenerator = t
@@ -8463,6 +8479,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               case "dgb":
                 t = "https://digiexplorer.info/tx/" + e;
                 break;
+              case "zec":
+                t = "https://blockchair.com/zcash/transaction/" + e;
+                break;
               default:
                 throw "block explorer url is not defined for cointype " + this.coinId;
             }
@@ -8541,6 +8560,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   break;
                 case c.CoinName.DigiByte:
                   e.instances[c.CoinName.DigiByte] = this.createInsightWalletApi("dgb", l.CoinType.get(c.CoinName.DigiByte));
+                  break;
+                case c.CoinName.Zcash:
+                  e.instances[c.CoinName.Zcash] = this.createInsightWalletApi("zec", l.CoinType.get(c.CoinName.Zcash));
                   break;
                 default:
                   throw "No wallet api available for " + c.CoinName[t];
@@ -10516,6 +10538,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       d = e("./dash-fee-service"),
       c = e("./dogecoin-fee-service"),
       f = e("./digibyte-fee-service"),
+      z = e("./zcash-fee-service"),
       l = e("./ethereum-fee-service"),
       p = e("./litecoin-fee-service"),
       u = function()
@@ -10552,6 +10575,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   case o.CoinName.DigiByte:
                     e.instances[t] = new f.DigiByteFeeService;
                     break;
+                  case o.CoinName.Zcash:
+                    e.instances[t] = new z.ZcashFeeService;
+                    break;
                   case o.CoinName.Ethereum:
                     e.instances[t] = new l.EthereumFeeService;
                     break;
@@ -10578,6 +10604,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./ethereum-fee-service": 103,
     "./litecoin-fee-service": 105,
     "./digibyte-fee-service": 443,
+    "./zcash-fee-service": 445,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
   }],
@@ -78297,6 +78324,63 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t
       }(a.AbstractPerKbFeeService);
     n.BitcoinSVFeeService = s
+  },
+  {
+    "./abstract-per-kb-fee-service": 97,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "bignumber.js": 189
+  }],
+  445: [function(e, t, n)
+  {
+    "use strict";
+    var r = this && this.__extends || function()
+    {
+      var e = Object.setPrototypeOf ||
+      {
+        __proto__: []
+      }
+      instanceof Array && function(e, t)
+        {
+          e.__proto__ = t
+        } ||
+        function(e, t)
+        {
+          for (var n in t)
+            t.hasOwnProperty(n) && (e[n] = t[n])
+        };
+      return function(t, n)
+      {
+        function r()
+        {
+          this.constructor = t
+        }
+        e(t, n),
+          t.prototype = null === n ? Object.create(n) : (r.prototype = n.prototype,
+            new r)
+      }
+    }();
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var i = e("bignumber.js"),
+      a = e("./abstract-per-kb-fee-service"),
+      o = e("@keepkey/device-client/dist/global/coin-name"),
+      s = function(e)
+      {
+        function t()
+        {
+          var t = e.call(this, o.CoinName.Zcash) || this;
+          return t.INPUT_SIZE = 148,
+            t.OUTPUT_SIZE = 34,
+            t.TRANSACTION_HEADER_SIZE = 29,
+            t.MIN_FEE = new i.default("1e3"),
+            t
+        }
+        return r(t, e),
+          t
+      }(a.AbstractPerKbFeeService);
+    n.ZcashFeeService = s
   },
   {
     "./abstract-per-kb-fee-service": 97,

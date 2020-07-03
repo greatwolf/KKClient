@@ -124,6 +124,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Zcash',
+      currencySymbol: 'ZEC',
+      coinTypeCode: '133\'',
+      coinType: 133,
+      addressFormat: '^t1[a-km-zA-HJ-NP-Z1-9]{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Aragon',
       currencySymbol: 'ANT',
       coinTypeCode: '60\'',
