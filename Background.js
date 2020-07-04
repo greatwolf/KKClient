@@ -7935,9 +7935,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function e(e, t)
         {
           this.walletApi = e,
-            this.coinType = t,
-            this.xpubRegistry = d.InsightXpubRegistry.instance,
-            this.transactionSummaryCache = {}
+          this.coinType = t,
+          this.xpubRegistry = d.InsightXpubRegistry.instance,
+          this.txPageSize = 8,
+          this.transactionSummaryCache = {}
         }
         return Object.defineProperty(e.prototype, "network",
           {
@@ -8150,7 +8151,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getInsightTransactions = function(e)
           {
             var t = this;
-            return this.walletApi.urlGenerator.getTransactionsUrl(e, 8).then(function(e)
+            return this.walletApi.urlGenerator.getTransactionsUrl(e, this.txPageSize).then(function(e)
             {
               return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
             }).then(function(n)
@@ -8166,7 +8167,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 items: t.txs || []
               }, d = function(t)
               {
-                return n.walletApi.urlGenerator.getAllTransactionsUrl(e, t, 8).then(function(e)
+                return n.walletApi.urlGenerator.getAllTransactionsUrl(e, t, n.txPageSize).then(function(e)
                 {
                   return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
                 }).then(function(e)
