@@ -124,6 +124,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Komodo',
+      currencySymbol: 'KMD',
+      coinTypeCode: '141\'',
+      coinType: 141,
+      addressFormat: '^R\\w{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Zcash',
       currencySymbol: 'ZEC',
       coinTypeCode: '133\'',
