@@ -10116,7 +10116,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function t()
         {
           var t = e.call(this, a.CoinName.BitcoinCash) || this;
-          return t.INPUT_SIZE = 149,
+          return t.INPUT_SIZE = 148,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
             t.MIN_FEE = new i.default("1000"),
@@ -10178,7 +10178,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         {
           var t = e.call(this, l.CoinName.Bitcoin) || this;
           return t.feeUrl = o.Configuration.feeServiceUrl,
-            t.maxInputSize = 149,
+            t.maxInputSize = 148,
             t.outputSize = 34,
             t.transactionOverheadSize = 10,
             t
@@ -10340,7 +10340,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function t()
         {
           var t = e.call(this, o.CoinName.Dash) || this;
-          return t.INPUT_SIZE = 149,
+          return t.INPUT_SIZE = 148,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
             t.MIN_FEE = new i.default("1000"),
@@ -10407,7 +10407,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function t()
         {
           var t = e.call(this, o.CoinName.Dogecoin) || this;
-          return t.INPUT_SIZE = 149,
+          return t.INPUT_SIZE = 148,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
             t.MIN_FEE = new i.default("1000000"),
@@ -78359,7 +78359,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function t()
         {
           var t = e.call(this, o.CoinName.BitcoinSV) || this;
-          return t.INPUT_SIZE = 149,
+          return t.INPUT_SIZE = 148,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
             t.MIN_FEE = new i.default("1e3"),
