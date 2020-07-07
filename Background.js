@@ -6630,7 +6630,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             get: function e()
             {
-              return t.config.EtherscanApiToken
+              t.EStokenIndex = ++t.EStokenIndex % t.config.EtherscanApiToken.length
+              return t.config.EtherscanApiToken[t.EStokenIndex]
             },
             enumerable: !0,
             configurable: !0
@@ -6668,6 +6669,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           }),
           t.config = e("../../../dist/config.json"),
           t.BIP44_MAX_ADDRESS_GAP = 20,
+          t.EStokenIndex = 0,
           t
       }();
     n.Configuration = a
@@ -12023,7 +12025,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       TransactionTimeout: 6e5,
       ShapeShiftApiPublicKey: "6ad5831b778484bb849da45180ac35047848e5cac0fa666454f4ff78b8c7399fea6a8ce2c7ee6287bcd78db6610ca3f538d6b3e90ca80c8e6368b6021445950b",
       ShapeShiftSignatureKey: "1HxFWu1wM88q1aLkfUmpZBjhTWcdXGB6gT",
-      EtherscanApiToken: "8VMWZ17XJ3KQIGS4J2NFUS4YBHHZJSG65P",
+      EtherscanApiToken: ["8VMWZ17XJ3KQIGS4J2NFUS4YBHHZJSG65P"],
       firmware:
       {
         repository: "keepkey-firmware",
