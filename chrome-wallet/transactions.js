@@ -137,6 +137,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Qtum',
+      currencySymbol: 'QTUM',
+      coinTypeCode: '2301\'',
+      coinType: 2301,
+      addressFormat: '^Q\\w{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Ravencoin',
       currencySymbol: 'RVN',
       coinTypeCode: '175\'',
