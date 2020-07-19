@@ -12760,9 +12760,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               if (a.initialized)
               {
+                var mask_harden = 0x7fffffff
                 var o = i.DeviceMessageHelper.factory("GetPublicKey");
-                return o.setAddressN(r.NodeVector.fromString(t).toArray()),
-                  o.setShowDisplay(n),
+                o.setAddressN(r.NodeVector.fromString(t).toArray());
+                switch ((o.address_n[1] || 0) & mask_harden)
+                {
+                  // identify altcoins by SLIP0044 index
+                  case 17:
+                    o.setEcdsaCurveName('secp256k1-groestl')
+                }
+                return o.setShowDisplay(n),
                   e.writeToDevice(o)
               }
               return Promise.reject("getPublicKey: device not initialized")
