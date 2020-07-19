@@ -12944,7 +12944,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   {}, e.DEFAULT_OPTIONS, n),
                   o = i.DeviceMessageHelper.factory("ResetDevice");
                 return o.setDisplayRandom(s.display_random),
-                  o.setStrength(s.strength || e.wordCount2KeyStrength(a.defaultMnemonicSeedLength) || 128),
+                  o.setStrength(s.strength || e.wordCount2KeyStrength(s.word_count) || 128),
                   o.setPassphraseProtection(s.passphrase_protection),
                   o.setPinProtection(s.pin_protection),
                   o.setLanguage(s.language),
