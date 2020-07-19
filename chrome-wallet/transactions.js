@@ -124,6 +124,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Groestlcoin',
+      currencySymbol: 'GRS',
+      coinTypeCode: '17\'',
+      coinType: 17,
+      addressFormat: '^F\\w{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Komodo',
       currencySymbol: 'KMD',
       coinTypeCode: '141\'',
