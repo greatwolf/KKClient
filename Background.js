@@ -32092,7 +32092,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         },
         r.prototype.toString = function()
         {
-          return s.encode(this.toBuffer())
+          return s.encode(this.toBuffer(), this.network.name)
         },
         r.prototype.inspect = function()
         {
@@ -33084,6 +33084,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             r.createHash("sha512").update(e).digest()
         },
         i.sha512.blocksize = 1024,
+        i.groestl = function(e)
+        {
+          return o.checkArgument(a.isBuffer(e)),
+            r.createHash("groestl").update(e).digest()
+        },
+        i.groestl2 = function(e)
+        {
+          return i.groestl(i.groestl(e))
+        },
         i.hmac = function(e, t, r)
         {
           o.checkArgument(a.isBuffer(t)),
@@ -33554,7 +33563,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       var r = e("lodash"),
         i = e("./base58"),
         a = e("buffer"),
-        o = e("../crypto/hash").sha256sha256,
+        cryptohash = e("../crypto/hash"),
         s = function e(t)
         {
           if (!(this instanceof e))
@@ -33592,22 +33601,29 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             throw new Error("Input string too short");
           var r = t.slice(0, -4),
             a = t.slice(-4),
-            s = o(r),
-            d = s.slice(0, 4);
-          if (a.toString("hex") !== d.toString("hex"))
-            throw new Error("Checksum mismatch");
-          return r
+            d = s.checksum(r);
+          if (a.toString("hex") === d.toString("hex")) return r
+
+          d = s.checksum(r, "groestl2")
+          if (a.toString("hex") === d.toString("hex")) return r
+
+          throw new Error("Checksum mismatch");
         },
-        s.checksum = function(e)
+        s.checksum = function(e, hashType)
         {
-          return o(e).slice(0, 4)
+          return cryptohash[hashType || "sha256sha256"](e).slice(0, 4)
         },
-        s.encode = function(e)
+        s.encode = function(e, coinType)
         {
+          var hashType;
+          switch (coinType)
+          {
+            case "groestlcoin": hashType = "groestl2"; break;
+          }
           if (!n.isBuffer(e))
             throw new Error("Input must be a buffer");
           var t = new n(e.length + 4),
-            r = s.checksum(e);
+            r = s.checksum(e, hashType);
           return e.copy(t),
             r.copy(t, e.length),
             i.encode(t)
@@ -57696,6 +57712,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       i = e("md5.js"),
       a = e("ripemd160"),
       o = e("sha.js"),
+      groestl = e("groestl.js"),
       s = e("cipher-base");
     r(n, s),
       n.prototype._update = function(e)
@@ -57709,7 +57726,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       t.exports = function(e)
       {
         return e = e.toLowerCase(),
-          "md5" === e ? new i : "rmd160" === e || "ripemd160" === e ? new a : new n(o(e))
+          "md5" === e ? new i :
+          "rmd160" === e || "ripemd160" === e ? new a :
+          "groestl" === e ? new n(groestl()):
+          new n(o(e))
       }
   },
   {
@@ -57717,7 +57737,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     inherits: 358,
     "md5.js": 370,
     ripemd160: 412,
-    "sha.js": 423
+    "sha.js": 423,
+    "groestl.js": 450,
   }],
   307: [function(e, t)
   {
@@ -78711,6 +78732,960 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./abstract-per-kb-fee-service": 97,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "bignumber.js": 189
+  }],
+  450: [function(require, module, exports)
+  {
+    /////////////////////////////////////
+    ////////////  groestl ///////////////
+
+    //// Written by Quantum Explorer ////
+    ////////// Dash Foundation //////////
+    //  Released under the MIT License //
+    /////////////////////////////////////
+
+    var o = require('groestl-op.js');
+    var h = require('groestl-helper.js');
+
+    var T0 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T1 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T2 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T3 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T4 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T5 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T6 = h.bytes2Int64Buffer(h.b64Decode("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"));
+    var T7 = h.bytes2Int64Buffer(h.b64Decode("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"));
+
+
+    var B64 = function(n, x)
+    {
+      n = 7 - n
+      var bytes = n > 3 ? x.hi : x.lo;
+      bytes >>>= (n % 4) * 8;
+      return bytes & 0xFF;
+    }
+
+    var j64 = [o.u(0, 0), o.u(0, 0x10), o.u(0, 0x20), o.u(0, 0x30), o.u(0, 0x40), o.u(0, 0x50), o.u(0, 0x60),
+      o.u(0, 0x70), o.u(0, 0x80), o.u(0, 0x90), o.u(0, 0xA0), o.u(0, 0xB0), o.u(0, 0xC0),
+      o.u(0, 0xD0), o.u(0, 0xE0), o.u(0, 0xF0)
+    ];
+
+    var nj64 = [o.u(0xFFFFFFFF, 0xFFFFFFFF), o.u(0xFFFFFFFF, 0xFFFFFFEF), o.u(0xFFFFFFFF, 0xFFFFFFDF), o.u(0xFFFFFFFF, 0xFFFFFFCF), o.u(0xFFFFFFFF, 0xFFFFFFBF), o.u(0xFFFFFFFF, 0xFFFFFFAF), o.u(0xFFFFFFFF, 0xFFFFFF9F),
+      o.u(0xFFFFFFFF, 0xFFFFFF8F), o.u(0xFFFFFFFF, 0xFFFFFF7F), o.u(0xFFFFFFFF, 0xFFFFFF6F), o.u(0xFFFFFFFF, 0xFFFFFF5F), o.u(0xFFFFFFFF, 0xFFFFFF4F), o.u(0xFFFFFFFF, 0xFFFFFF3F),
+      o.u(0xFFFFFFFF, 0xFFFFFF2F), o.u(0xFFFFFFFF, 0xFFFFFF1F), o.u(0xFFFFFFFF, 0xFFFFFF0F)
+    ];
+
+    var r64 =
+    [
+      o.u(0, 0), o.u(0, 1), o.u(0, 2), o.u(0, 3), o.u(0, 4), o.u(0, 5), o.u(0, 6), o.u(0, 7),
+      o.u(0, 8), o.u(0, 9), o.u(0, 10), o.u(0, 11), o.u(0, 12), o.u(0, 13)
+    ];
+
+    var compress = function(int64buf, state) {
+      var g = new Array(16);
+      var m = new Array(16);
+      for (var u = 0; u < 16; u++)
+      {
+        m[u] = int64buf[u];
+        g[u] = m[u].xor(state[u]);
+      }
+      var t = new Array(16);
+      for (var r = 0; r < 14; r++)
+      {
+        for (var i = 0; i < 16; i++)
+          g[i].setxor64(j64[i].plus(r64[r]).setShiftLeft(56));
+
+        for (var u = 0; u < 16; u++)
+        {
+          t[u] = o.xor64(T0[B64(0, g[u])], T1[B64(1, g[(u + 1) & 0xF])], T2[B64(2, g[(u + 2) & 0xF])], T3[B64(3, g[(u + 3) & 0xF])], T4[B64(4, g[(u + 4) & 0xF])], T5[B64(5, g[(u + 5) & 0xF])], T6[B64(6, g[(u + 6) & 0xF])], T7[B64(7, g[(u + 11) & 0xF])]);
+        }
+        var temp = g;
+        g = t;
+        t = temp;
+      }
+      for (var r = 0; r < 14; r++)
+      {
+        for (var i = 0; i < 16; i++)
+          m[i].setxor64(r64[r], nj64[i]);
+
+        for (var u = 0; u < 16; u++)
+        {
+          t[u] = o.xor64(T0[B64(0, m[(u + 1) & 0xF])], T1[B64(1, m[(u + 3) & 0xF])], T2[B64(2, m[(u + 5) & 0xF])], T3[B64(3, m[(u + 11) & 0xF])], T4[B64(4, m[(u + 0) & 0xF])], T5[B64(5, m[(u + 2) & 0xF])], T6[B64(6, m[(u + 4) & 0xF])], T7[B64(7, m[(u + 6) & 0xF])]);
+        }
+        var temp = m;
+        m = t;
+        t = temp;
+      }
+      for (var u = 0; u < 16; u++)
+      {
+        state[u].setxor64(g[u], m[u]);
+      }
+    }
+
+    var final = function(state)
+    {
+      var g = new Array(16);
+      o.bufferInsert64(g, 0, state, 16);
+      var t = new Array(16);
+      for (var r = 0; r < 14; r++)
+      {
+        for (var i = 0; i < 16; i++)
+        {
+          g[i].setxor64(j64[i].plus(r64[r]).setShiftLeft(56));
+        }
+
+        for (var u = 0; u < 16; u++)
+        {
+          t[u] = o.xor64(T0[B64(0, g[u])], T1[B64(1, g[(u + 1) & 0xF])], T2[B64(2, g[(u + 2) & 0xF])], T3[B64(3, g[(u + 3) & 0xF])], T4[B64(4, g[(u + 4) & 0xF])], T5[B64(5, g[(u + 5) & 0xF])], T6[B64(6, g[(u + 6) & 0xF])], T7[B64(7, g[(u + 11) & 0xF])]);
+        }
+        var temp = g;
+        g = t;
+        t = temp;
+      }
+      for (var u = 0; u < 16; u++)
+        state[u].setxor64(g[u]);
+    }
+
+    function groestl()
+    {
+      this.ctx = {};
+      var ctx = this.ctx;
+      ctx.state = new Array(16);
+      for (var i = 0; i < 15; i++)
+      {
+        ctx.state[i] = new o.u64(0, 0);
+      }
+      ctx.state[15] = new o.u64(0, 512);
+      ctx.ptr = 0;
+      ctx.count = new o.u64(0,0);
+      ctx.buffer = new Array(128);
+    }
+
+    groestl.prototype.update = function(data)
+    {
+      var ctx = this.ctx
+      var buf, ptr;
+      var len = data.length;
+      //create a local copy of states
+      var V = new Array(16);
+      buf = ctx.buffer;
+      ptr = ctx.ptr;
+      if (len < ctx.buffer.length - ptr)
+      {
+        o.bufferInsert(buf, ptr, data, data.length);
+        ptr += data.length;
+        ctx.ptr = ptr;
+        return this;
+      }
+      //perform a deep copy of current state
+      o.bufferInsert(V, 0, ctx.state, 16);
+      while (len > 0)
+      {
+        var clen = ctx.buffer.length - ptr;
+        if (clen > len) clen = len;
+        o.bufferInsert(buf, ptr, data, clen);
+        ptr += clen;
+        data = data.slice(clen);
+        len -= clen;
+        if (ptr === ctx.buffer.length)
+        {
+          var int64Buf = h.bytes2Int64Buffer(buf);
+          compress(int64Buf, V);
+          ctx.count.addOne();
+          ptr = 0;
+        }
+      }
+      ctx.state = V;
+      ctx.ptr = ptr;
+      return this;
+    }
+
+    groestl.prototype.digest = function()
+    {
+      var ctx = this.ctx;
+      var buf = ctx.buffer;
+      var ptr = ctx.ptr;
+      var pad = new Array(136);
+      var len = buf.length;
+      var padLen;
+      var count;
+      pad[0] = 0x80;
+      if (ptr < 120)
+      {
+        padLen = 128 - ptr;
+        count = ctx.count.plus(o.u(0, 1));
+      }
+      else
+      {
+        padLen = 256 - ptr;
+        count = ctx.count.plus(o.u(0, 2));
+      }
+      o.bufferSet(pad, 1, 0, padLen - 9);
+      h.bufferEncode64(pad, padLen - 8, count);
+      this.update(pad, padLen);
+      final(ctx.state);
+      var out = new Array(16);
+      for (var u = 0, v = 8; u < 8; u++, v++)
+      {
+        out[2 * u] = ctx.state[v].hi;
+        out[2 * u + 1] = ctx.state[v].lo;
+      }
+      var bufType = require('buffer').Buffer
+      return bufType(h.int32Buffer2Bytes(out));
+    }
+
+    module.exports = function()
+    {
+      return new groestl();
+    }
+  },
+  {
+    'groestl-op.js': 451,
+    'groestl-helper.js': 452,
+    buffer: 299
+  }],
+  451: [function(require, module, exports)
+  {
+    'use strict';
+    //the right shift is important, it has to do with 32 bit operations in javascript, it will make things faster
+    function u64(h, l)
+    {
+      this.hi = h >>> 0;
+      this.lo = l >>> 0;
+    }
+
+    u64.prototype.set = function(oWord)
+    {
+      this.lo = oWord.lo;
+      this.hi = oWord.hi;
+    }
+
+    u64.prototype.add = function(oWord)
+    {
+      var lowest, lowMid, highMid, highest; //four parts of the whole 64 bit number..
+
+      //need to add the respective parts from each number and the carry if on is present..
+      lowest = (this.lo & 0XFFFF) + (oWord.lo & 0XFFFF);
+      lowMid = (this.lo >>> 16) + (oWord.lo >>> 16) + (lowest >>> 16);
+      highMid = (this.hi & 0XFFFF) + (oWord.hi & 0XFFFF) + (lowMid >>> 16);
+      highest = (this.hi >>> 16) + (oWord.hi >>> 16) + (highMid >>> 16);
+
+      //now set the hgih and the low accordingly..
+      this.lo = (lowMid << 16) | (lowest & 0XFFFF);
+      this.hi = (highest << 16) | (highMid & 0XFFFF);
+
+      return this; //for chaining..
+    }
+
+    u64.prototype.addOne = function()
+    {
+      if (this.lo === -1 || this.lo === 0xFFFFFFFF)
+      {
+        this.lo = 0;
+        this.hi++;
+      }
+      else this.lo++;
+    }
+
+    u64.prototype.plus = function(oWord)
+    {
+      var c = new u64(0, 0);
+      var lowest, lowMid, highMid, highest; //four parts of the whole 64 bit number..
+
+      //need to add the respective parts from each number and the carry if on is present..
+      lowest = (this.lo & 0XFFFF) + (oWord.lo & 0XFFFF);
+      lowMid = (this.lo >>> 16) + (oWord.lo >>> 16) + (lowest >>> 16);
+      highMid = (this.hi & 0XFFFF) + (oWord.hi & 0XFFFF) + (lowMid >>> 16);
+      highest = (this.hi >>> 16) + (oWord.hi >>> 16) + (highMid >>> 16);
+
+      //now set the hgih and the low accordingly..
+      c.lo = (lowMid << 16) | (lowest & 0XFFFF);
+      c.hi = (highest << 16) | (highMid & 0XFFFF);
+
+      return c; //for chaining..
+    }
+
+    u64.prototype.not = function()
+    {
+      return new u64(~this.hi, ~this.lo);
+    }
+
+    u64.prototype.one = function()
+    {
+      return new u64(0x0, 0x1);
+    }
+
+    u64.prototype.zero = function()
+    {
+      return new u64(0x0, 0x0);
+    }
+
+    u64.prototype.neg = function()
+    {
+      return this.not().plus(this.one());
+    }
+
+    u64.prototype.minus = function(oWord)
+    {
+      return this.plus(oWord.neg());
+    }
+
+    u64.prototype.isZero = function()
+    {
+      return (this.lo === 0) && (this.hi === 0);
+    }
+
+    function isLong(obj)
+    {
+      return (obj && obj["__isLong__"]) === true;
+    }
+
+    function fromNumber(value)
+    {
+      if (isNaN(value) || !isFinite(value))
+        return this.zero();
+      var pow32 = (1 << 32);
+      return new u64((value % pow32) | 0, (value / pow32) | 0);
+    }
+
+    u64.prototype.multiply = function(multiplier)
+    {
+      if (this.isZero())
+        return this.zero();
+      if (!isLong(multiplier))
+        multiplier = fromNumber(multiplier);
+      if (multiplier.isZero())
+        return this.zero();
+
+      // Divide each long into 4 chunks of 16 bits, and then add up 4x4 products.
+      // We can skip products that would overflow.
+
+      var a48 = this.hi >>> 16;
+      var a32 = this.hi & 0xFFFF;
+      var a16 = this.lo >>> 16;
+      var a00 = this.lo & 0xFFFF;
+
+      var b48 = multiplier.hi >>> 16;
+      var b32 = multiplier.hi & 0xFFFF;
+      var b16 = multiplier.lo >>> 16;
+      var b00 = multiplier.lo & 0xFFFF;
+
+      var c48 = 0,
+        c32 = 0,
+        c16 = 0,
+        c00 = 0;
+      c00 += a00 * b00;
+      c16 += c00 >>> 16;
+      c00 &= 0xFFFF;
+      c16 += a16 * b00;
+      c32 += c16 >>> 16;
+      c16 &= 0xFFFF;
+      c16 += a00 * b16;
+      c32 += c16 >>> 16;
+      c16 &= 0xFFFF;
+      c32 += a32 * b00;
+      c48 += c32 >>> 16;
+      c32 &= 0xFFFF;
+      c32 += a16 * b16;
+      c48 += c32 >>> 16;
+      c32 &= 0xFFFF;
+      c32 += a00 * b32;
+      c48 += c32 >>> 16;
+      c32 &= 0xFFFF;
+      c48 += a48 * b00 + a32 * b16 + a16 * b32 + a00 * b48;
+      c48 &= 0xFFFF;
+      return new u64((c48 << 16) | c32, (c16 << 16) | c00);
+    }
+
+    u64.prototype.shiftLeft = function(bits)
+    {
+      bits = bits % 64;
+      var c = new u64(0, 0);
+      if (bits === 0)
+      {
+        return this.clone();
+      }
+      else if (bits > 31)
+      {
+        c.lo = 0;
+        c.hi = this.lo << (bits - 32);
+      }
+      else
+      {
+        var toMoveUp = this.lo >>> 32 - bits;
+        c.lo = this.lo << bits;
+        c.hi = (this.hi << bits) | toMoveUp;
+      }
+      return c; //for chaining..
+    }
+
+    u64.prototype.setShiftLeft = function(bits)
+    {
+      if (bits === 0)
+      {
+        return this;
+      }
+      if (bits > 63)
+      {
+        bits = bits % 64;
+      }
+      
+      if (bits > 31)
+      {
+        this.hi = this.lo << (bits - 32);
+        this.lo = 0;
+      }
+      else
+      {
+        var toMoveUp = this.lo >>> 32 - bits;
+        this.lo <<= bits;
+        this.hi = (this.hi << bits) | toMoveUp;
+      }
+      return this; //for chaining..
+    }
+    //Shifts this word by the given number of bits to the right (max 32)..
+    u64.prototype.shiftRight = function(bits)
+    {
+      bits = bits % 64;
+      var c = new u64(0, 0);
+      if (bits === 0)
+      {
+        return this.clone();
+      }
+      else if (bits >= 32)
+      {
+        c.hi = 0;
+        c.lo = this.hi >>> (bits - 32);
+      }
+      else
+      {
+        var bitsOff32 = 32 - bits,
+          toMoveDown = this.hi << bitsOff32 >>> bitsOff32;
+        c.hi = this.hi >>> bits;
+        c.lo = this.lo >>> bits | (toMoveDown << bitsOff32);
+      }
+      return c; //for chaining..
+    }
+    //Rotates the bits of this word round to the left (max 32)..
+    u64.prototype.rotateLeft = function(bits)
+    {
+      if (bits > 32)
+      {
+        return this.rotateRight(64 - bits);
+      }
+      var c = new u64(0, 0);
+      if (bits === 0)
+      {
+        c.lo = this.lo >>> 0;
+        c.hi = this.hi >>> 0;
+      }
+      else if (bits === 32)
+      { //just switch high and low over in this case..
+        c.lo = this.hi;
+        c.hi = this.lo;
+      }
+      else
+      {
+        c.lo = (this.lo << bits) | (this.hi >>> (32 - bits));
+        c.hi = (this.hi << bits) | (this.lo >>> (32 - bits));
+      }
+      return c; //for chaining..
+    }
+
+    u64.prototype.setRotateLeft = function(bits)
+    {
+      if (bits > 32)
+      {
+        return this.setRotateRight(64 - bits);
+      }
+      var newHigh;
+      if (bits === 0)
+      {
+        return this;
+      }
+      else if (bits === 32)
+      { //just switch high and low over in this case..
+        newHigh = this.lo;
+        this.lo = this.hi;
+        this.hi = newHigh;
+      }
+      else
+      {
+        newHigh = (this.hi << bits) | (this.lo >>> (32 - bits));
+        this.lo = (this.lo << bits) | (this.hi >>> (32 - bits));
+        this.hi = newHigh;
+      }
+      return this; //for chaining..
+    }
+    //Rotates the bits of this word round to the right (max 32)..
+    u64.prototype.rotateRight = function(bits)
+    {
+      if (bits > 32)
+      {
+        return this.rotateLeft(64 - bits);
+      }
+      var c = new u64(0, 0);
+      if (bits === 0)
+      {
+        c.lo = this.lo >>> 0;
+        c.hi = this.hi >>> 0;
+      }
+      else if (bits === 32)
+      { //just switch high and low over in this case..
+        c.lo = this.hi;
+        c.hi = this.lo;
+      }
+      else
+      {
+        c.lo = (this.hi << (32 - bits)) | (this.lo >>> bits);
+        c.hi = (this.lo << (32 - bits)) | (this.hi >>> bits);
+      }
+      return c; //for chaining..
+    }
+    u64.prototype.setFlip = function()
+    {
+      var newHigh;
+      newHigh = this.lo;
+      this.lo = this.hi;
+      this.hi = newHigh;
+      return this;
+    }
+    //Rotates the bits of this word round to the right (max 32)..
+    u64.prototype.setRotateRight = function(bits)
+    {
+      if (bits > 32)
+      {
+        return this.setRotateLeft(64 - bits);
+      }
+
+      if (bits === 0)
+      {
+        return this;
+      }
+      else if (bits === 32)
+      { //just switch high and low over in this case..
+        var newHigh;
+        newHigh = this.lo;
+        this.lo = this.hi;
+        this.hi = newHigh;
+      }
+      else
+      {
+        newHigh = (this.lo << (32 - bits)) | (this.hi >>> bits);
+        this.lo = (this.hi << (32 - bits)) | (this.lo >>> bits);
+        this.hi = newHigh;
+      }
+      return this; //for chaining..
+    }
+    //Xors this word with the given other..
+    u64.prototype.xor = function(oWord)
+    {
+      var c = new u64(0, 0);
+      c.hi = this.hi ^ oWord.hi;
+      c.lo = this.lo ^ oWord.lo;
+      return c; //for chaining..
+    }
+    //Xors this word with the given other..
+    u64.prototype.setxorOne = function(oWord)
+    {
+      this.hi ^= oWord.hi;
+      this.lo ^= oWord.lo;
+      return this; //for chaining..
+    }
+    //Ands this word with the given other..
+    u64.prototype.and = function(oWord)
+    {
+      var c = new u64(0, 0);
+      c.hi = this.hi & oWord.hi;
+      c.lo = this.lo & oWord.lo;
+      return c; //for chaining..
+    }
+
+    //Creates a deep copy of this Word..
+    u64.prototype.clone = function()
+    {
+      return new u64(this.hi, this.lo);
+    }
+
+    u64.prototype.setxor64 = function()
+    {
+      var a = arguments;
+      var i = a.length;
+      while (i--)
+      {
+        this.hi ^= a[i].hi;
+        this.lo ^= a[i].lo;
+      }
+      return this;
+    }
+
+    var exports = module.exports = {};
+    exports.u64 = u64;
+
+    exports.u = function(h, l)
+    {
+      return new u64(h, l);
+    }
+
+    exports.xor64 = function()
+    {
+      var a = arguments,
+        h = a[0].hi,
+        l = a[0].lo;
+          var i = a.length-1;
+      do
+      {
+        h ^= a[i].hi;
+        l ^= a[i].lo;
+        i--;
+      } while (i>0);
+      return new this.u64(h, l);
+    }
+
+    exports.clone64Array = function(array)
+    {
+      var i = 0;
+      var len = array.length;
+      var a = new Array(len);
+      while(i<len)
+      {
+        a[i] = array[i];
+        i++;
+      }
+      return a;
+    }
+
+    //this shouldn't be a problem, but who knows in the future javascript might support 64bits
+    exports.t32 = function(x)
+    {
+      return (x & 0xFFFFFFFF)
+    }
+
+    exports.rotl32 = function(x, c)
+    {
+      return (((x) << (c)) | ((x) >>> (32 - (c)))) & (0xFFFFFFFF);
+    }
+
+    exports.rotr32 = function(x, c)
+    {
+      return this.rotl32(x, (32 - (c)));
+    }
+
+    exports.swap32 = function(val)
+    {
+      return ((val & 0xFF) << 24) |
+        ((val & 0xFF00) << 8) |
+        ((val >>> 8) & 0xFF00) |
+        ((val >>> 24) & 0xFF);
+    }
+
+    exports.swap32Array = function(a)
+    {
+      //can't do this with map because of support for IE8 (Don't hate me plz).
+      var i = 0, len = a.length;
+      var r = new Array(i);
+      while (i<len)
+      {
+        r[i] = (this.swap32(a[i]));
+        i++;
+      }
+      return r;
+    }
+
+    exports.xnd64 = function(x, y, z)
+    {
+      return new this.u64(x.hi ^ ((~y.hi) & z.hi), x.lo ^ ((~y.lo) & z.lo));
+    }
+
+    exports.bufferInsert = function(buffer, bufferOffset, data, len, dataOffset)
+    {
+      dataOffset = dataOffset | 0;
+      var i = 0;
+      while (i < len)
+      {
+        buffer[i + bufferOffset] = data[i + dataOffset];
+        i++;
+      }
+    }
+
+    exports.bufferInsert64 = function(buffer, bufferOffset, data, len)
+    {
+      var i = 0;
+      while (i < len)
+      {
+        buffer[i + bufferOffset] = data[i].clone();
+        i++;
+      }
+    }
+
+    exports.bufferInsertBackwards = function(buffer, bufferOffset, data, len)
+    {
+      var i = 0;
+      while (i < len)
+      {
+        buffer[i + bufferOffset] = data[len - 1 - i];
+        i++;
+      }
+    }
+
+    exports.bufferSet = function(buffer, bufferOffset, value, len)
+    {
+      var i = 0;
+      while (i < len)
+      {
+        buffer[i + bufferOffset] = value;
+        i++;
+      }
+    }
+
+    exports.bufferXORInsert = function(buffer, bufferOffset, data, dataOffset, len)
+    {
+      var i = 0;
+      while (i < len)
+      {
+        buffer[i + bufferOffset] ^= data[i + dataOffset];
+        i++;
+      }
+    }
+
+    exports.xORTable = function(d, s1, s2, len)
+    {
+      var i = 0;
+      while (i < len)
+      {
+        d[i] = s1[i] ^ s2[i];
+        i++
+      }
+    }
+  }, {}],
+  452: [function(require, module, exports)
+  {
+    'use strict';
+    // String functions
+
+    var op = require('groestl-op.js');
+    var exports = module.exports = {};
+
+    exports.int8ArrayToHexString = function toString(array)
+    {
+      var string = '';
+
+      for (var i = 0; i < array.length; i++)
+      {
+        if (array[i] < 16) string += '0'
+
+        string += array[i].toString(16);
+      }
+      return string;
+    }
+
+    exports.int32ArrayToHexString = function toString(array)
+    {
+      var string = '';
+      var len = array.length;
+      for (var i = 0; i < len; i++)
+      {
+        var s = array[i];
+        if (s < 0)
+        {
+          s = 0xFFFFFFFF + array[i] + 1;
+        }
+        var l = s.toString(16);
+        var padding = 8;
+        while (l.length < padding)
+        {
+          l = "0" + l;
+        }
+        string += l;
+      }
+      return string;
+    }
+
+    exports.hex2string = function toString(s)
+    {
+      for (var c = [], len = s.length, i = 0; i < len; i += 2)
+        c.push(String.fromCharCode(parseInt(s.substring(i, i + 2), 16)));
+      return c.join('');
+    }
+
+    exports.hex2bytes = function toString(s)
+    {
+      for (var c = [], len = s.length, i = 0; i < len; i += 2)
+        c.push(parseInt(s.substring(i, i + 2), 16));
+      return c;
+    }
+
+    exports.string2bytes = function(s)
+    {
+      var len = s.length;
+      var b = new Array(len);
+      var i = 0;
+      while (i < len)
+      {
+        b[i] = s.charCodeAt(i);
+        i++;
+      }
+      return b;
+    }
+
+    exports.bytes2Int32Buffer = function(b)
+    {
+      if (!b) return [];
+      var len = b.length ? (((b.length - 1) >>> 2) + 1) : 0;
+      var buffer = new Array(len);
+      var j = 0;
+      while (j < len)
+      {
+        buffer[j] = (b[j * 4] << 24) | (b[j * 4 + 1] << 16) | (b[j * 4 + 2] << 8) | b[j * 4 + 3];
+        j++;
+      }
+      return buffer;
+    }
+
+    exports.bytes2Int64Buffer = function(b)
+    {
+      if (!b) return [];
+      var len = b.length ? (((b.length - 1) >>> 3) + 1) : 0;
+      var buffer = new Array(len);
+      var j = 0;
+      while (j < len)
+      {
+        buffer[j] = new op.u64((b[j * 8] << 24) | (b[j * 8 + 1] << 16) | (b[j * 8 + 2] << 8) | b[j * 8 + 3], (b[j * 8 + 4] << 24) | (b[j * 8 + 5] << 16) | (b[j * 8 + 6] << 8) | b[j * 8 + 7]);
+        j++;
+      }
+      return buffer;
+    }
+
+    exports.bytes2Int64BufferLeAligned = function(b)
+    {
+      if (!b) return [];
+      var len =  b.length ? ((( b.length - 1) >>> 3) + 1) : 0;
+      var buffer = new Array(len);
+      var j = 0;
+      while (j < len)
+      {
+        buffer[j] = new op.u64((b[j * 8 + 7] << 24) | (b[j * 8 + 6] << 16) | (b[j * 8 + 5] << 8) | b[j * 8 + 4], (b[j * 8 + 3] << 24) | (b[j * 8 + 2] << 16) | (b[j * 8 + 1] << 8) | b[j * 8]);
+        j++;
+      }
+      return buffer;
+    }
+
+    exports.bufferEncode64leAligned = function(buffer, offset, uint64)
+    {
+      buffer[offset + 7] = uint64.hi >>> 24;
+      buffer[offset + 6] = uint64.hi >>> 16 & 0xFF;
+      buffer[offset + 5] = uint64.hi >>> 8 & 0xFF;
+      buffer[offset + 4] = uint64.hi & 0xFF;
+      buffer[offset + 3] = uint64.lo >>> 24;
+      buffer[offset + 2] = uint64.lo >>> 16 & 0xFF;
+      buffer[offset + 1] = uint64.lo >>> 8 & 0xFF;
+      buffer[offset + 0] = uint64.lo & 0xFF;
+    }
+
+    exports.bufferEncode64 = function(buffer, offset, uint64)
+    {
+      buffer[offset] = uint64.hi >>> 24;
+      buffer[offset + 1] = uint64.hi >>> 16 & 0xFF;
+      buffer[offset + 2] = uint64.hi >>> 8 & 0xFF;
+      buffer[offset + 3] = uint64.hi & 0xFF;
+      buffer[offset + 4] = uint64.lo >>> 24;
+      buffer[offset + 5] = uint64.lo >>> 16 & 0xFF;
+      buffer[offset + 6] = uint64.lo >>> 8 & 0xFF;
+      buffer[offset + 7] = uint64.lo & 0xFF;
+    }
+
+    exports.int32Buffer2Bytes = function(b)
+    {
+      var buffer = new Array(b.length);
+      var len = b.length;
+      var i = 0;
+      while (i < len)
+      {
+        buffer[i * 4] = (b[i] & 0xFF000000) >>> 24;
+        buffer[i * 4 + 1] = (b[i] & 0x00FF0000) >>> 16;
+        buffer[i * 4 + 2] = (b[i] & 0x0000FF00) >>> 8;
+        buffer[i * 4 + 3] = (b[i] & 0x000000FF);
+        i++;
+      }
+      return buffer;
+    }
+
+    exports.string2Int32Buffer = function(s)
+    {
+      return this.bytes2Int32Buffer(this.string2bytes(s));
+    }
+
+    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+    exports.b64Encode = function(input)
+    {
+      var output = "";
+      var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+      var i = 0;
+
+      while (i < input.length)
+      {
+        chr1 = input[i++];
+        chr2 = input[i++];
+        chr3 = input[i++];
+
+        enc1 = chr1 >> 2;
+        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+        enc4 = chr3 & 63;
+
+        if (isNaN(chr2))
+        {
+          enc3 = enc4 = 64;
+        }
+        else if (isNaN(chr3))
+        {
+          enc4 = 64;
+        }
+
+        output +=
+          keyStr.charAt(enc1) + keyStr.charAt(enc2) +
+          keyStr.charAt(enc3) + keyStr.charAt(enc4);
+      }
+
+      return output;
+    }
+
+    exports.b64Decode = function(input)
+    {
+      var output = [];
+      var chr1, chr2, chr3;
+      var enc1, enc2, enc3, enc4;
+      var i = 0;
+
+      input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+      while (i < input.length)
+      {
+        enc1 = keyStr.indexOf(input.charAt(i++));
+        enc2 = keyStr.indexOf(input.charAt(i++));
+        enc3 = keyStr.indexOf(input.charAt(i++));
+        enc4 = keyStr.indexOf(input.charAt(i++));
+
+        chr1 = (enc1 << 2) | (enc2 >> 4);
+        chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+        chr3 = ((enc3 & 3) << 6) | enc4;
+
+        output.push(chr1);
+
+        if (enc3 != 64)
+        {
+          output.push(chr2);
+        }
+        if (enc4 != 64)
+        {
+          output.push(chr3);
+        }
+      }
+      return output;
+    }
+  },
+  {
+    "groestl-op.js": 451
   }],
 },
 {}, [1]);
