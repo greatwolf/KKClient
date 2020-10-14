@@ -4872,7 +4872,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 t.setVersion(2)
                 break;
               case 'Zcash':
-                t.setBranchId(0x2bb40e60)
+                /**
+                 * Zcash Consensus Branch Id. For latest upgrade
+                 * see: github.com/zcash/zcash/blob/master/src/consensus/upgrades.cpp#L11
+                 */
+                // t.setBranchId(0x2bb40e60) // Blossom
+                t.setBranchId(0xf5b9230b) // Heartwood
               case 'Komodo':
                 t.setVersion(4)
                 t.setOverwintered(true)
