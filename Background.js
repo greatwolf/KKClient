@@ -6944,6 +6944,36 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e
       }();
     n.HttpClient = i
+    var cached_response = {}
+    n.CachedHttpClient =
+    {
+      'get': function(t, n)
+      {
+        if (t in cached_response)
+        {
+          return Promise.resolve(cached_response[t])
+        }
+        return i.get(t, n).then((resp) => { cached_response[t] = resp ; return resp })
+      },
+      'put': function(t, n, r)
+      {
+        if (t in cached_response) delete cached_response[t]
+
+        return i.put(t, n, r)
+      },
+      'post': function(t, n, r, i, a)
+      {
+        if (t in cached_response) delete cached_response[t]
+
+        return i.post(t, n, r, i, a)
+      },
+      'delete': function(t)
+      {
+        if (t in cached_response) delete cached_response[t]
+
+        return i.delete(t)
+      },
+    }
   },
   {
     lodash: 368
@@ -7152,6 +7182,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       a = e("sleep-promise"),
       o = function()
       {
+        function retry(fn, retries = 3, err = null)
+        {
+          if (retries < 1) return Promise.reject(err);
+
+          return fn().catch(err =>
+            {
+              console.warn("retrying metadata request, reattempt #" + retries)
+              return retry(fn, retries - 1, err);
+            });
+        }
         function e()
         {}
         return e.get = function(t, n)
@@ -7163,25 +7203,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return r = t,
                 e.tryAgain(
                 {}, r)
-            }).then(function(t)
-            {
-              return e.tryAgain(t, r, 1)
-            }).then(function(t)
-            {
-              return e.tryAgain(t, r, 2)
             })
           },
           e.tryAgain = function(e, t, n)
           {
-            if (!e.encrypted_name || !e.encrypted_node_path)
+            if (!e || !e.encrypted_name || !e.encrypted_node_path)
             {
-              var r = Promise.resolve();
-              return n && (r = a(500),
-                  console.warn("retrying metadata request, reattempt #" + n)),
-                r.then(function()
-                {
-                  return i.HttpClient.get(t)
-                })
+              return retry(() => i.CachedHttpClient.get(t), 100)
             }
             return Promise.resolve(e)
           },
@@ -8743,14 +8771,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return this.urlGenerator.walletMetaDataUrl(e).then(function(e)
             {
-              return r.HttpClient.put(e, JSON.stringify(t))
+              return r.CachedHttpClient.put(e, JSON.stringify(t))
             })
           },
           e.prototype.deleteStoredMetadata = function(e)
           {
             return this.urlGenerator.walletMetaDataUrl(e).then(function(e)
             {
-              return r.HttpClient.delete(e)
+              return r.CachedHttpClient.delete(e)
             })
           },
           e.prototype.getCurrentBlockHeight = function()
