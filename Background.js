@@ -1,4 +1,13 @@
 "use strict";
+
+/**
+ * Create your own blockcypher API token at blockcypher.com.
+ */
+var blockcypherUserApiToken = "ENTER YOUR BLOCKCYPHER TOKEN HERE";
+/**
+ * Modify the line above and set it to your new token surrounded with double quotes.
+ */
+
 /**
  * @license
  * https://github.com/ealmansi/bchaddrjs
@@ -7111,7 +7120,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 var t = o.TokenApiUrlGenerator.createApiTokenUrl(),
                   n = o.TokenApiUrlGenerator.createApiTokenPayload(e);
-                return s.HttpClient.post(t, n)
+                return JSON.parse(n)
               }).then(function(e)
               {
                 return e.token
@@ -7193,7 +7202,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       value: !0
     });
-    var r = e("./blockcypher-api-token-service"),
+    var r = e("../../Configuration"),
       i = /btc|ltc|dash|doge/,
       a = function()
       {
@@ -7203,7 +7212,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             var n = this;
             return console.assert(e, "a wallet name is required to create a Blockcypher metadata url"),
-              r.BlockcypherApiTokenService.apiTokenPromise.then(function(r)
+              Promise.resolve(r.Configuration.blockcypherMasterApiToken).then(function(r)
               {
                 console.assert(r, "an api token is required to create a Blockcypher metadata url");
                 var i = t && n.isSupportedCoinType(t) ? t.symbol.toLowerCase() : "btc";
@@ -7219,7 +7228,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     n.BlockcypherWalletMetadataUrlGenerator = a
   },
   {
-    "./blockcypher-api-token-service": 70
+    "../../Configuration": 62
   }],
   73: [function(e, t, n)
   {
@@ -12052,7 +12061,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       }],
       cliLogLevel: "warn",
       chromeLogLevel: "info",
-      blockcypherMasterApiToken: "d9a5e85023faa87914a191f6a741a2c4",
+      blockcypherMasterApiToken: blockcypherUserApiToken,
       transactionReloadThrottle: 3e4,
       feeReloadThrottle: 1e4,
       ValueTransferGasLimit: 36e3,
