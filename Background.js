@@ -16291,7 +16291,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "PublicKey",
         rejectMessage: "Failure",
-        interstitialMessages: ["PassphraseRequest", "PinMatrixRequest"],
+        interstitialMessages: ["ButtonRequest", "PassphraseRequest", "PinMatrixRequest"],
         userInteractionRequired: !0
       }),
       s.register(
@@ -16454,7 +16454,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "Success",
         rejectMessage: "Failure",
-        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest"],
+        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest", "ButtonRequest"],
         userInteractionRequired: !1
       }),
       s.register(
@@ -16473,7 +16473,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "EncryptedMessage",
         rejectMessage: "Failure",
-        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest"],
+        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest", "ButtonRequest"],
         userInteractionRequired: !1
       }),
       s.register(
@@ -16492,7 +16492,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "Success",
         rejectMessage: "Failure",
-        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest"],
+        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest", "ButtonRequest"],
         userInteractionRequired: !1
       }),
       s.register(
@@ -16511,7 +16511,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "CipheredKeyValue",
         rejectMessage: "Failure",
-        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest"],
+        interstitialMessages: ["PinMatrixRequest", "PassphraseRequest", "ButtonRequest"],
         userInteractionRequired: !1
       }),
       s.register(
@@ -16559,7 +16559,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "TxRequest",
         rejectMessage: "Failure",
-        interstitialMessages: ["PassphraseRequest", "PinMatrixRequest"],
+        interstitialMessages: ["PassphraseRequest", "PinMatrixRequest", "ButtonRequest"],
         userInteractionRequired: !0
       }),
       s.register(

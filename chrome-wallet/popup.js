@@ -1921,7 +1921,8 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.when('PassphraseRequest', t('/passphrase')),
       e.when('ButtonRequest', ['$injector', 'NavigationService', function(e)
       {
-        if ('ButtonRequest_Address' !== this.request.message.code)
+        if ('ButtonRequest_Address' !== this.request.message.code &&
+            'ButtonRequest_Other' !== this.request.message.code)
         {
           var n, a = _.get(this, 'request.message.data');
           a ? (n = a.split(':'),
