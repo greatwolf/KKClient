@@ -6877,7 +6877,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         {}
         return e.get = function(t, n)
           {
-            return e.send(t, null, null, "GET", [200], n)
+            return e.send(t, null, null, "GET", [200], n).then((resp) => resp || JSON.parse('{}'))
           },
           e.post = function(t, n, r, i, a)
           {
@@ -6886,7 +6886,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.put = function(t, n, r)
           {
-            return e.send(t, n, r, "PUT", [204])
+            return e.send(t, n, r, "PUT", [200, 204])
           },
           e.delete = function(t)
           {
@@ -8771,7 +8771,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return this.urlGenerator.walletMetaDataUrl(e).then(function(e)
             {
-              return r.CachedHttpClient.put(e, JSON.stringify(t))
+              return r.CachedHttpClient.get(e).then((resp) =>
+                {
+                  for (var k in t) resp[k] = t[k]
+                  return r.CachedHttpClient.put(e, JSON.stringify(resp))
+                })
             })
           },
           e.prototype.deleteStoredMetadata = function(e)
