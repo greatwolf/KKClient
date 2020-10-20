@@ -1,11 +1,28 @@
 "use strict";
 
 /**
- * Create your own blockcypher API token at blockcypher.com.
+ ***MPORTANT NOTICE***:
+ *
+ * KKClient requires an online RESTFUL data store for saving
+ * and retrieving generated wallet metadata in order to operate.
+ * The original client used blockcypher.com for this by supplying
+ * KeepKey's own api token. However that api token no longer works.
+ *
+ * There are two options for solving this issue:
+ *  - Create your own blockcypher api token at blockcypher.com.
+ *  - Setup a google realtime database at firebaseio.com.
  */
-var blockcypherUserApiToken = "ENTER YOUR BLOCKCYPHER TOKEN HERE";
+var METADATA_API_TOKEN = "ENTER YOUR METADATA API TOKEN HERE";
+var FIREBASE_ID = "";
 /**
- * Modify the line above and set it to your new token surrounded with double quotes.
+ * Modify the above lines and set it to your new api token surrounded with double quotes.
+ *
+ * If 'FIREBASE_ID' is NOT set then api.blockcypher.com will be used and
+ * METADATA_API_TOKEN must be a valid blockcypher token.
+ *
+ * If 'FIREBASE_ID' is set then firebaseio.com service is used as the
+ * metadata store. METADATA_API_TOKEN must be set to the legacy secret for this database.
+ * This can be found under console.firebase.google.com in 'Settings' -> 'Service accounts' tab.
  */
 
 /**
@@ -6514,7 +6531,25 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             get: function e()
             {
-              return t.config.blockcypherMasterApiToken
+              return t.config.metadataApiToken
+            },
+            enumerable: !0,
+            configurable: !0
+          }),
+          Object.defineProperty(t, "metadataApiToken",
+          {
+            get: function e()
+            {
+              return t.config.metadataApiToken
+            },
+            enumerable: !0,
+            configurable: !0
+          }),
+          Object.defineProperty(t, "firebaseId",
+          {
+            get: function e()
+            {
+              return t.config.firebaseId
             },
             enumerable: !0,
             configurable: !0
@@ -7057,14 +7092,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return {
               encrypted_node_path: e.encryptedNodeVector,
               encrypted_name: e.encryptedName,
-              parent_api_token: r.Configuration.blockcypherMasterApiToken
+              parent_api_token: r.Configuration.metadataApiToken
             }
           },
           e.createEthereumWalletMetaDataPayload = function(e)
           {
             return {
               encrypted_name: e.encryptedName,
-              parent_api_token: r.Configuration.blockcypherMasterApiToken
+              parent_api_token: r.Configuration.metadataApiToken
             }
           },
           e
@@ -7236,15 +7271,43 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e()
         {}
+        Object.defineProperty(e.prototype, "baseMetaDataUrl",
+        {
+          get: function()
+          {
+            if (!this._baseMetaDataUrl)
+            {
+              this._baseMetaDataUrl = r.Configuration.firebaseId
+                                    ? ("https://" + r.Configuration.firebaseId + ".firebaseio.com/")
+                                    : "https://api.blockcypher.com/"
+            }
+            return this._baseMetaDataUrl
+          }
+        });
+        Object.defineProperty(e.prototype, "paramMetaDataUrl",
+        {
+          get: function()
+          {
+            if (!this._paramMetaDataUrl)
+            {
+              this._paramMetaDataUrl = r.Configuration.firebaseId
+                                    ? ".json?auth="
+                                    : "?private=true&token="
+            }
+            return this._paramMetaDataUrl
+          }
+        });
         return e.prototype.walletMetaDataUrl = function(e, t)
           {
             var n = this;
             return console.assert(e, "a wallet name is required to create a Blockcypher metadata url"),
-              Promise.resolve(r.Configuration.blockcypherMasterApiToken).then(function(r)
+              Promise.resolve(r.Configuration.metadataApiToken).then(function(r)
               {
                 console.assert(r, "an api token is required to create a Blockcypher metadata url");
                 var i = t && n.isSupportedCoinType(t) ? t.symbol.toLowerCase() : "btc";
-                return "https://api.blockcypher.com/v1/" + i + "/main/addrs/" + e + "/meta?token=" + r + "&private=true"
+                return n.baseMetaDataUrl
+                     + "v1/" + i + "/main/addrs/" + e + "/meta"
+                     + n.paramMetaDataUrl + r
               })
           },
           e.prototype.isSupportedCoinType = function(e)
@@ -12093,7 +12156,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       }],
       cliLogLevel: "warn",
       chromeLogLevel: "info",
-      blockcypherMasterApiToken: blockcypherUserApiToken,
+      metadataApiToken: METADATA_API_TOKEN,
+      firebaseId: FIREBASE_ID,
       transactionReloadThrottle: 3e4,
       feeReloadThrottle: 1e4,
       ValueTransferGasLimit: 36e3,
