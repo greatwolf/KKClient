@@ -13,7 +13,7 @@
  *  - Setup a google realtime database at firebaseio.com.
  */
 var METADATA_API_TOKEN = "ENTER YOUR METADATA API TOKEN HERE";
-var FIREBASE_ID = "";
+var FIREBASE_ID;
 /**
  * Modify the above lines and set it to your new api token surrounded with double quotes.
  *
@@ -7083,31 +7083,41 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       value: !0
     });
     var r = e("../../Configuration"),
+        api_token_service = e("../../modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service"),
       i = function()
       {
         function e()
         {}
         return e.createWalletMetaDataPayload = function(e)
           {
-            return {
-              encrypted_node_path: e.encryptedNodeVector,
-              encrypted_name: e.encryptedName,
-              parent_api_token: r.Configuration.metadataApiToken
-            }
+            return  api_token_service.BlockcypherApiTokenService.apiTokenPromise
+                    .then(function(walletApiToken)
+                    {
+                      return {
+                        encrypted_node_path: e.encryptedNodeVector,
+                        encrypted_name: e.encryptedName,
+                        parent_api_token: walletApiToken || r.Configuration.metadataApiToken
+                      }
+                    })
           },
           e.createEthereumWalletMetaDataPayload = function(e)
           {
-            return {
-              encrypted_name: e.encryptedName,
-              parent_api_token: r.Configuration.metadataApiToken
-            }
+            return  api_token_service.BlockcypherApiTokenService.apiTokenPromise
+                    .then(function(walletApiToken)
+                    {
+                      return {
+                        encrypted_name: e.encryptedName,
+                        parent_api_token: walletApiToken || r.Configuration.metadataApiToken
+                      }
+                    })
           },
           e
       }();
     n.PayloadFactory = i
   },
   {
-    "../../Configuration": 62
+    "../../Configuration": 62,
+    "../../modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service": 70,
   }],
   69: [function(e, t, n)
   {
@@ -7266,6 +7276,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       value: !0
     });
     var r = e("../../Configuration"),
+        api_token_service = e("../../modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service"),
       i = /btc|ltc|dash|doge/,
       a = function()
       {
@@ -7278,8 +7289,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             if (!this._baseMetaDataUrl)
             {
               this._baseMetaDataUrl = r.Configuration.firebaseId
-                                    ? ("https://" + r.Configuration.firebaseId + ".firebaseio.com/")
-                                    : "https://api.blockcypher.com/"
+                                    ? ("https://" + r.Configuration.firebaseId + ".firebaseio.com")
+                                    : "https://api.blockcypher.com"
             }
             return this._baseMetaDataUrl
           }
@@ -7300,14 +7311,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return e.prototype.walletMetaDataUrl = function(e, t)
           {
             var n = this;
+            var apiTokenPromise = api_token_service.BlockcypherApiTokenService.apiTokenPromise
             return console.assert(e, "a wallet name is required to create a Blockcypher metadata url"),
-              Promise.resolve(r.Configuration.metadataApiToken).then(function(r)
+              apiTokenPromise.then(function(token)
               {
-                console.assert(r, "an api token is required to create a Blockcypher metadata url");
+                console.assert(r.Configuration.metadataApiToken, "an api token is required to create a Blockcypher metadata url");
                 var i = t && n.isSupportedCoinType(t) ? t.symbol.toLowerCase() : "btc";
+                var walletId = n.baseMetaDataUrl.endsWith("firebaseio.com") ? ('/' + token) : ""
                 return n.baseMetaDataUrl
-                     + "v1/" + i + "/main/addrs/" + e + "/meta"
-                     + n.paramMetaDataUrl + r
+                     + [walletId, "v1", i, "main", "addrs", e, "meta"].join('/')
+                     + n.paramMetaDataUrl + r.Configuration.metadataApiToken
               })
           },
           e.prototype.isSupportedCoinType = function(e)
@@ -7319,7 +7332,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     n.BlockcypherWalletMetadataUrlGenerator = a
   },
   {
-    "../../Configuration": 62
+    "../../Configuration": 62,
+    "../../modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service": 70
   }],
   73: [function(e, t, n)
   {
@@ -7588,9 +7602,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = this,
               r = i.PayloadFactory.createWalletMetaDataPayload(t);
             return this.addressRegistry.registerAddress(e, t.address.toHex()),
-              this.walletApi.updateStoredMetadata(e, r).then(function()
+              r.then(function(r)
               {
-                return n.walletApi.getExistingWallet(e)
+                return n.walletApi.updateStoredMetadata(e, r).then(function()
+                {
+                  return n.walletApi.getExistingWallet(e)
+                })
               })
           },
           e.prototype.getTransactionSummaries = function(t)
@@ -8126,9 +8143,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = this,
               r = s.PayloadFactory.createWalletMetaDataPayload(t);
             return this.xpubRegistry.registerXpub(e, t.xpub),
-              this.walletApi.updateStoredMetadata(e, r).then(function()
+              r.then(function(r)
               {
-                return n.walletApi.getExistingWallet(e)
+                return n.walletApi.updateStoredMetadata(e, r).then(function()
+                {
+                  return n.walletApi.getExistingWallet(e)
+                })
               })
           },
           e.prototype.getTransactionSummaries = function(e)
