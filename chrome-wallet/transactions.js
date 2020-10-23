@@ -176,6 +176,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Vertcoin',
+      currencySymbol: 'VTC',
+      coinTypeCode: '28\'',
+      coinType: 28,
+      addressFormat: '^V\\w{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Zcash',
       currencySymbol: 'ZEC',
       coinTypeCode: '133\'',

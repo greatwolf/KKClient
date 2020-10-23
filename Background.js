@@ -4070,6 +4070,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   n.push(t.komodo.loadAccounts(e)),
                   n.push(t.qtum.loadAccounts(e)),
                   n.push(t.ravencoin.loadAccounts(e)),
+                  n.push(t.vertcoin.loadAccounts(e)),
                   n.push(t.zcash.loadAccounts(e)),
                   t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
                   t.bitcoinSV && n.push(t.bitcoinSV.loadAccounts(e)),
@@ -4112,6 +4113,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 t.komodo = new i.InsightAccountListLoader(o.CoinName.Komodo, "m/44'/" + s.CoinType.get(o.CoinName.Komodo).coinTypeCode),
                 t.qtum = new i.InsightAccountListLoader(o.CoinName.Qtum, "m/44'/" + s.CoinType.get(o.CoinName.Qtum).coinTypeCode),
                 t.ravencoin = new i.InsightAccountListLoader(o.CoinName.Ravencoin, "m/44'/" + s.CoinType.get(o.CoinName.Ravencoin).coinTypeCode),
+                t.vertcoin = new i.InsightAccountListLoader(o.CoinName.Vertcoin, "m/44'/" + s.CoinType.get(o.CoinName.Vertcoin).coinTypeCode),
                 t.zcash = new i.InsightAccountListLoader(o.CoinName.Zcash, "m/44'/" + s.CoinType.get(o.CoinName.Zcash).coinTypeCode),
                 e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
                 t.bitcoinCashLegacy = e[0],
@@ -4895,6 +4897,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               case 'Dash':
               case 'Qtum':
               case 'Ravencoin':
+              case 'Vertcoin':
                 t.setVersion(2)
                 break;
               case 'Zcash':
@@ -8518,6 +8521,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             "ltc" : 5,
             "dgb" : 2,
             "doge": 5,
+            "vtc": 5,
             "zec": 5,
           }
           this.coinId = e
@@ -8634,6 +8638,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               case "rvn":
                 t = "https://ravencoin.network/tx/" + e;
                 break;
+              case "vtc":
+                t = "http://insight.vertcoin.org/tx/" + e;
+                break;
               case "zec":
                 t = "https://blockchair.com/zcash/transaction/" + e;
                 break;
@@ -8727,6 +8734,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   break;
                 case c.CoinName.Ravencoin:
                   e.instances[c.CoinName.Ravencoin] = this.createInsightWalletApi("rvn", l.CoinType.get(c.CoinName.Ravencoin));
+                  break;
+                case c.CoinName.Vertcoin:
+                  e.instances[c.CoinName.Vertcoin] = this.createInsightWalletApi("vtc", l.CoinType.get(c.CoinName.Vertcoin));
                   break;
                 case c.CoinName.Zcash:
                   e.instances[c.CoinName.Zcash] = this.createInsightWalletApi("zec", l.CoinType.get(c.CoinName.Zcash));
@@ -10713,6 +10723,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       y = e("./komodo-fee-service"),
       w = e("./qtum-fee-service"),
       v = e("./ravencoin-fee-service"),
+      x = e("./vertcoin-fee-service"),
       z = e("./zcash-fee-service"),
       l = e("./ethereum-fee-service"),
       p = e("./litecoin-fee-service"),
@@ -10762,6 +10773,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   case o.CoinName.Ravencoin:
                     e.instances[t] = new v.RavencoinFeeService;
                     break;
+                  case o.CoinName.Vertcoin:
+                    e.instances[t] = new x.VertcoinFeeService;
+                    break;
                   case o.CoinName.Zcash:
                     e.instances[t] = new z.ZcashFeeService;
                     break;
@@ -10795,6 +10809,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./komodo-fee-service": 446,
     "./qtum-fee-service": 448,
     "./ravencoin-fee-service": 447,
+    "./vertcoin-fee-service": 453,
     "./zcash-fee-service": 445,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
@@ -15320,6 +15335,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e[e.Komodo = 141] = "Komodo",
         e[e.Qtum = 2301] = "Qtum",
         e[e.Ravencoin = 175] = "Ravencoin",
+        e[e.Vertcoin = 28] = "Vertcoin",
         e[e.Zcash = 133] = "Zcash",
         e[e.Aragon = 601] = "Aragon",
         e[e.Augur = 602] = "Augur",
@@ -15674,6 +15690,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             name: s.CoinName[s.CoinName.Ravencoin],
             addressFormat: "^R\\w{33}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8
+          },
+          {
+            name: s.CoinName[s.CoinName.Vertcoin],
+            addressFormat: "^V\\w{33}$",
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8
           },
@@ -79839,6 +79861,63 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "groestl-op.js": 451
+  }],
+  453: [function(e, t, n)
+  {
+    "use strict";
+    var r = this && this.__extends || function()
+    {
+      var e = Object.setPrototypeOf ||
+      {
+        __proto__: []
+      }
+      instanceof Array && function(e, t)
+        {
+          e.__proto__ = t
+        } ||
+        function(e, t)
+        {
+          for (var n in t)
+            t.hasOwnProperty(n) && (e[n] = t[n])
+        };
+      return function(t, n)
+      {
+        function r()
+        {
+          this.constructor = t
+        }
+        e(t, n),
+          t.prototype = null === n ? Object.create(n) : (r.prototype = n.prototype,
+            new r)
+      }
+    }();
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var i = e("bignumber.js"),
+      a = e("./abstract-per-kb-fee-service"),
+      o = e("@keepkey/device-client/dist/global/coin-name"),
+      s = function(e)
+      {
+        function t()
+        {
+          var t = e.call(this, o.CoinName.Vertcoin) || this;
+          return t.INPUT_SIZE = 148,
+            t.OUTPUT_SIZE = 34,
+            t.TRANSACTION_HEADER_SIZE = 10,
+            t.MIN_FEE = new i.default("1e5"),
+            t
+        }
+        return r(t, e),
+          t
+      }(a.AbstractPerKbFeeService);
+    n.VertcoinFeeService = s
+  },
+  {
+    "./abstract-per-kb-fee-service": 97,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "bignumber.js": 189
   }],
 },
 {}, [1]);
