@@ -419,8 +419,8 @@ angular.module('kkCommon').factory('NavigationService', ['$location', '$rootScop
                     ;
             else
                 e(a.path()) && !k && i.push(a.path());
-            console.log('navigating from %s to %s with "%s" transition', i.join(' > '), c, b.pageAnimationClass),
             b.pageAnimationClass = 'undefined' == typeof f ? 'undefined' == typeof g ? 'cross-fade' : g : f,
+            console.log('navigating from %s to %s with "%s" transition', i.join(' > '), c, b.pageAnimationClass),
             g = void 0,
             d(function() {
                 b.$digest(),
