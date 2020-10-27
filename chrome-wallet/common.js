@@ -123,13 +123,13 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
             return 'passphrase' === a || 'pin' === a || 'character' === a ? '<redacted>' : b
         }
         function h(a) {
-            return console.log('message sent to proxy:', JSON.stringify(a, g, 4)),
+            return console.log('UI --> proxy:', JSON.stringify(a, g, 4)),
             c(function(b) {
                 d.runtime.sendMessage(a, {}, b)
             })
         }
         function i(c, d, e) {
-            console.log('proxy-->UI:', c);
+            console.log('proxy --> UI:', JSON.stringify(c, undefined, 4));
             var g = {
                 request: c,
                 sender: d,
