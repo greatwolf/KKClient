@@ -890,9 +890,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           e.formatName = function(e)
           {
             return {
-              slow: 'Slow',
-              medium: 'Medium',
-              fast: 'Fast',
+              frugal: 'Frugal',
+              slow: 'Economy',
+              medium: 'Normal',
+              fast: 'Priority',
               dashInstantSend: 'InstantSend'
             } [e]
           }

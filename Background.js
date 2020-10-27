@@ -10042,7 +10042,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e[e.fast = 0] = "fast",
         e[e.medium = 1] = "medium",
         e[e.slow = 2] = "slow",
-        e[e.dashInstantSend = 3] = "dashInstantSend"
+        e[e.dashInstantSend = 3] = "dashInstantSend",
+        e[e.frugal = 4] = "frugal"
     })(r = n.FeeLevel || (n.FeeLevel = {}))
   },
   {}],
@@ -10353,7 +10354,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   fast: e.getFeePerByteRate(t, o.Configuration.fastFeePath),
                   medium: e.getFeePerByteRate(t, o.Configuration.mediumFeePath),
-                  slow: e.getFeePerByteRate(t, o.Configuration.slowFeePath)
+                  slow: e.getFeePerByteRate(t, o.Configuration.slowFeePath),
+                  frugal: new a.BigNumber(1)
                 }
               }).catch(function(e)
               {
@@ -10361,14 +10363,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   fast: new a.BigNumber(50),
                   medium: new a.BigNumber(40),
-                  slow: new a.BigNumber(30)
+                  slow: new a.BigNumber(30),
+                  frugal: new a.BigNumber(1)
                 }
               })),
               this._ratesPromise
           },
           t.prototype.getFeeLevels = function()
           {
-            return Promise.resolve([d.FeeLevel.fast, d.FeeLevel.medium, d.FeeLevel.slow])
+            return Promise.resolve([d.FeeLevel.fast, d.FeeLevel.medium, d.FeeLevel.slow, d.FeeLevel.frugal])
           },
           t.prototype.computeFee = function(e, t, n)
           {
