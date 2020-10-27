@@ -12215,9 +12215,20 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         applicationId: "hmldnhmidmcofnbojkgfnibmhmjopbpc"
       },
-      selectedFeeService: "earn",
+      selectedFeeService: "btcfee",
       feeServices:
       {
+        btcfee:
+        {
+          url: "https://btc-fee.net/api.json",
+          bytesPerFee: 1,
+          feePaths:
+          {
+            fast: "fast",
+            medium: "medium",
+            slow: "slow"
+          }
+        },
         earn:
         {
           url: "https://bitcoinfees.earn.com/api/v1/fees/recommended",
