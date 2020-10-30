@@ -299,15 +299,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                         messageType: "Initialize"
                       }),
                       [2]) : (console.log("looking for WebUsb devices..."),
-                      console.log(JSON.stringify(t)),
                       [4, e(chrome.usb,
                       {
                         vendorId: 11044,
                         productId: 2
                       })]);
                   case 2:
-                    return t = n.sent(),
-                      t && t.length ? (y = t[0],
+                    return (t = n.sent(),
+                      console.log(JSON.stringify(t)),
+                      t && t.length) ? (y = t[0],
                         console.log("Initializing WebUsb KeepKey"),
                         h.DeviceClientManager.instance.removeHidHelpers(),
                         h.DeviceClientManager.instance.addHidHelper(new f.ChromeWebUsbHelper),
@@ -347,9 +347,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           }
         }, function(e)
         {
-          s.UiMessenger.initializeUiMessager(e),
-            chrome.hid.onDeviceAdded.addListener(t),
-            chrome.hid.onDeviceRemoved.addListener(n),
+          var devConnectHandler = function()
+          {
             setTimeout(function()
             {
               console.log("timer done"),
@@ -357,7 +356,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   return console.log(e)
                 })
-            }, 1e3),
+            }, 1e3)
+          }
+          s.UiMessenger.initializeUiMessager(e),
+            chrome.hid.onDeviceAdded.addListener(devConnectHandler),
+            chrome.hid.onDeviceRemoved.addListener(n),
+            devConnectHandler(),
             h.DeviceClientManager.instance.on(h.DeviceClientManager.DEVICE_CONNECTED_EVENT, function(e)
             {
               e.addMessageHandler(l.MessageForwarder, s.UiMessenger.sendMessageToUI),
@@ -369,7 +373,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }),
             e.onClosed.addListener(function()
             {
-              chrome.hid.onDeviceAdded.removeListener(t),
+              chrome.hid.onDeviceAdded.removeListener(devConnectHandler),
                 chrome.hid.onDeviceRemoved.removeListener(n);
               var e = d.getAll();
               o.each(e, function(e)
