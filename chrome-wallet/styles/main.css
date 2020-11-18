@@ -13294,6 +13294,7 @@ a:hover {
   font-weight: 300;
   color: #666;
   transition: all .2s ease-out;
+  white-space: nowrap;
   padding: 0
 }
 
@@ -13305,11 +13306,16 @@ a:hover {
   padding-top: 7px
 }
 
+.account-balance-component .balance .wallet-approx {
+  padding-top: 5px;
+  margin: 0 5px -5px 0px
+}
+
 .account-balance-component .balance .wallet-currency {
   color: #bbb;
   letter-spacing: 1.3px;
   font-size: 11px;
-  margin-left: 0
+  margin: 0 5px 5px -5px
 }
 
 .account-balance-component .unconfirmed-balance {

@@ -669,7 +669,7 @@ angular.module('kkCommon').factory('CurrencyLookupService', function() {
 }),
 angular.module('kkCommon').run(['$templateCache', function(a) {
     a.put('app/common/common.tpl.html', ''),
-    a.put('app/common/directives/exchangeFormattedAmount.tpl.html', '<span class=cryptocurrency-amount><span ng-hide="!hasExchangeRate || amount == 0">&#8776; <span class=wallet-amount ng-bind=exchangeFormattedAmount></span> <span class=wallet-currency ng-bind=exchangeCurrencySymbol></span></span></span>'),
+    a.put('app/common/directives/exchangeFormattedAmount.tpl.html', '<span class=cryptocurrency-amount><span ng-hide="!hasExchangeRate || amount == 0"><span class=wallet-approx>&#8776; </span><span class=wallet-amount ng-bind=exchangeFormattedAmount></span> <span class=wallet-currency ng-bind=exchangeCurrencySymbol></span></span></span>'),
     a.put('app/common/directives/formattedAmount.tpl.html', '<span class=cryptocurrency-amount><span class=wallet-amount ng-bind=formattedAmount></span> <span ng-hide=suppressSymbol><span class=wallet-currency ng-bind=currencySymbol></span></span></span>')
 }
 ]),
