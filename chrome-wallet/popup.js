@@ -1960,6 +1960,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             a.set('Your device policies were updated!'),
               i();
             break;
+          case 'Session cleared':
+            a.set('Your session was successfullly cleared!');
+            break;
           case 'Device reset':
           case 'Device recovered':
             i();

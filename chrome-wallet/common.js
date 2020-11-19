@@ -18,7 +18,8 @@ angular.module('kkCommon', []).run(['DeviceBridgeService', 'environmentConfig', 
                 enabled: c
             })
         },
-        deleteAccount: a.deleteAccount
+        deleteAccount: a.deleteAccount,
+        DeviceBridge: a
     }
 }
 ]),
@@ -210,6 +211,11 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
             initiateSession: function a() {
                 return h({
                     messageType: 'InitiateSession'
+                })
+            },
+            endSession: function a() {
+                return h({
+                    messageType: 'EndSession'
                 })
             },
             cancel: function a() {

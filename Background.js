@@ -3640,6 +3640,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e("./dispatchers/get-wallet-nodes"),
       e("./dispatchers/initialize"),
       e("./dispatchers/initiate-session"),
+      e("./dispatchers/end-session"),
       e("./dispatchers/is-valid-exchange-region"),
       e("./dispatchers/passphrase"),
       e("./dispatchers/pin-matrix-ack"),
@@ -3682,6 +3683,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./dispatchers/get-wallet-nodes": 30,
     "./dispatchers/initialize": 31,
     "./dispatchers/initiate-session": 32,
+    "./dispatchers/end-session": 455,
     "./dispatchers/is-valid-exchange-region": 33,
     "./dispatchers/otherwise": 34,
     "./dispatchers/passphrase": 35,
@@ -79996,6 +79998,41 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../account-list-manager": 2,
     "../MessageDispatcher": 6,
     "@keepkey/device-client/dist/device-client-manager": 151
-  }]
+  }],
+  455: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../MessageDispatcher"),
+      i = e("../../account-list-manager"),
+      a = e("@keepkey/device-client/dist/device-client-manager"),
+      o = function()
+      {
+        function e()
+        {
+          this.messageType = "EndSession",
+            this.responds = !1
+        }
+        return e.prototype.action = function()
+          {
+            var e;
+            return a.DeviceClientManager.instance.getActiveClient().then(function(t)
+            {
+              return e = t,
+                e.endSession()
+            })
+          },
+          e
+      }();
+    r.MessageDispatcher.when(new o)
+  },
+  {
+    "../../account-list-manager": 2,
+    "../MessageDispatcher": 6,
+    "@keepkey/device-client/dist/device-client-manager": 151
+  }],
 },
 {}, [1]);
