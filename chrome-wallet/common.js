@@ -197,6 +197,11 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                 }, a);
                 return h(b)
             },
+            requestPinRetry: function a() {
+                return h({
+                    messageType: 'PinMatrixRetry'
+                })
+            },
             initialize: function a() {
                 return h({
                     messageType: 'Initialize'

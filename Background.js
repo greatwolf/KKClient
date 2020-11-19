@@ -3643,6 +3643,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e("./dispatchers/is-valid-exchange-region"),
       e("./dispatchers/passphrase"),
       e("./dispatchers/pin-matrix-ack"),
+      e("./dispatchers/pin-matrix-retry"),
       e("./dispatchers/recovery-device"),
       e("./dispatchers/reload-balances"),
       e("./dispatchers/request-currency-exchange"),
@@ -3685,6 +3686,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./dispatchers/otherwise": 34,
     "./dispatchers/passphrase": 35,
     "./dispatchers/pin-matrix-ack": 36,
+    "./dispatchers/pin-matrix-retry": 454,
     "./dispatchers/recovery-device": 37,
     "./dispatchers/reload-balances": 38,
     "./dispatchers/request-currency-exchange": 39,
@@ -16419,6 +16421,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "PublicKey",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["ButtonRequest", "PassphraseRequest", "PinMatrixRequest"],
         userInteractionRequired: !0
       }),
@@ -16438,6 +16441,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "Address",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["ButtonRequest", "PinMatrixRequest", "PassphraseRequest"],
         userInteractionRequired: !0
       }),
@@ -16449,6 +16453,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "EthereumAddress",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["ButtonRequest", "PinMatrixRequest", "PassphraseRequest"],
         userInteractionRequired: !0
       }),
@@ -16676,6 +16681,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "TxRequest_TXFINISHED",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["PassphraseRequest", "PinMatrixRequest", "ButtonRequest", "TxRequest_TXINPUT", "TxRequest_TXOUTPUT", "TxRequest_TXMETA"],
         userInteractionRequired: !0
       }),
@@ -20090,7 +20096,23 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             n.pendingMessageQueue = [],
             n.isDisabled = !1,
             n.cancelInitiated = !1,
+            n.canResendLastMessage = !1,
             n
+        }
+        function sendHelper(t, e)
+        {
+          var r = o.DeviceMessageStates.getHostMessageState(e.$type.name)
+          console.log("proxy --> device:\n    [%s] %s\n    WaitFor: %s", e.$type.name, a.DeviceMessageHelper.toPrintable(e), r && r.resolveMessage),
+            t.transport.write.call(t.transport, e).then(function()
+            {
+              0 === t.writeRequestInProgress.length && t.dequeueMessage()
+            }).catch(function()
+            {
+              console.log("Failed when writing to device"),
+                t.writeRequestInProgress.length = 0,
+                t.cancelPendingRequests(),
+                o.apply(e)
+            })
         }
         return r(t, e),
           t.prototype.send = function(e)
@@ -20123,6 +20145,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 var s = i.extend(
                 {
+                  retry: r.retryFailure && e,
                   resolve: n,
                   reject: o
                 }, r);
@@ -20130,17 +20153,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               }
               else
                 n();
-              console.log("proxy --> device:\n    [%s] %s\n    WaitFor: %s", e.$type.name, a.DeviceMessageHelper.toPrintable(e), r && r.resolveMessage),
-                t.transport.write.call(t.transport, e).then(function()
-                {
-                  0 === t.writeRequestInProgress.length && t.dequeueMessage()
-                }).catch(function()
-                {
-                  console.log("Failed when writing to device"),
-                    t.writeRequestInProgress.length = 0,
-                    t.cancelPendingRequests(),
-                    o.apply(e)
-                })
+              sendHelper(t, e);
             })
           },
           t.prototype.receive = function(e)
@@ -20161,6 +20174,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   if (o.DeviceMessageStates.isInterstitialMessage(s, n))
                     return this.writeRequestInProgress.push(o.DeviceMessageStates.getDeviceMessageState(e.$type.name)),
                       !0;
+                  if (s.retryFailure && r.code === s.retryFailure)
+                  {
+                    this.canResendLastMessage = true
+                    return !this.isDisabled
+                  }
                   s.rejectMessage === n ? (this.writeRequestInProgress.pop(),
                     s.reject(r)) : (this.cancelPendingRequests(),
                     this.isDisabled = !0,
@@ -20214,6 +20232,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 var e = this.pendingMessageQueue.shift();
                 this.send(e.message).then(e.resolve).catch(e.reject)
               }
+            },
+            t.prototype.resendLastMessage = function()
+            {
+              var msg = i.last(this.writeRequestInProgress)
+              if (!this.canResendLastMessage) return
+              if (!msg.retry) return
+
+              this.canResendLastMessage = false
+              sendHelper(this, msg.retry)
             },
             t.UNEXPECTED_MESSAGE_EVENT = "unexpected-message",
             t)
@@ -79937,5 +79964,38 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "@keepkey/device-client/dist/global/coin-name": 160,
     "bignumber.js": 189
   }],
+  454: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../MessageDispatcher"),
+      i = e("../../account-list-manager"),
+      a = e("@keepkey/device-client/dist/device-client-manager"),
+      o = function()
+      {
+        function e()
+        {
+          this.messageType = "PinMatrixRetry",
+            this.responds = !1
+        }
+        return e.prototype.action = function()
+          {
+            return a.DeviceClientManager.instance.getActiveClient().then(function(t)
+            {
+              t._deviceMessenger.resendLastMessage()
+            })
+          },
+          e
+      }();
+    r.MessageDispatcher.when(new o)
+  },
+  {
+    "../../account-list-manager": 2,
+    "../MessageDispatcher": 6,
+    "@keepkey/device-client/dist/device-client-manager": 151
+  }]
 },
 {}, [1]);
