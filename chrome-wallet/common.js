@@ -411,7 +411,7 @@ angular.module('kkCommon').factory('NavigationService', ['$location', '$rootScop
         return !!b.goable
     }
     function f(c, f, k) {
-        if (!j && (h && (c = h,
+        if (!j && (h && !c && (c = h,
         h = void 0),
         c.toLowerCase() !== a.path().toLowerCase())) {
             if (-1 !== _.indexOf(i, c))

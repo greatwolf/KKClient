@@ -13,6 +13,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       {
         n.goToPrevious('slideRight')
       },
+      e.setNextTransition = n.setNextTransition,
       e.cancelDeviceOperation = function()
       {
         t.cancel()
@@ -1436,7 +1437,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
                 pin: e.pin
               }),
               e.pin = '',
-              n.goToPrevious()
+              e.successRoute && n.go(e.successRoute)
           },
           e.$watch('pin', function()
           {
@@ -1641,9 +1642,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       t.wallet = i.getWalletById(t.walletId),
       t.currency = t.wallet.coinType,
       t.maxDepth = r.maxReceiveAddresses - 1,
-      t.isSingleAddressAccount = 'single' === t.wallet.addressStrategy,
-      l.clear(),
-      o.getReceiveAddress(t.walletId, t.addressDepth),
+      t.isSingleAddressAccount = 'single' === t.wallet.addressStrategy
       t.$on('$destroy', function()
       {
         l.clear(),
@@ -1662,7 +1661,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             {
               var n = ['/receive', t.walletId, e].join('/'),
                 a = e > t.addressDepth ? 'slideLeft' : 'slideRight';
-              t.go(n, a, !0)
+              o.getReceiveAddress(t.walletId, e)
+              c.setNextTransition(a),
+              c.setNextDestination(n)
             }, 500)
         })
       },
@@ -1900,7 +1901,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         var n = e;
         for (var a in this.request.message)
           this.request.message.hasOwnProperty(a) && (n = n.replace(':' + a, encodeURIComponent(_.snakeCase(this.request.message[a]))));
-        t.go(n)
+        t.go(n, undefined, t.getCurrentRoute().startsWith('/receive'))
       }]
     }
 
@@ -2101,9 +2102,13 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         t.set(this.request.message),
           e.go('/confirm-exchange')
       }]),
-      e.when('ReceiveAddress', ['ReceiveAddressService', function(e)
+      e.when('ReceiveAddress', ['NavigationService', 'ReceiveAddressService', '$timeout', function(nav, e, timeout)
       {
-        e.set(this.request.message)
+        var msg = this.request.message;
+        nav.go(['/receive', msg.account, msg.depth].join('/'),
+                undefined,
+                nav.getCurrentRoute().startsWith('/receive'))
+        timeout(function() { e.set(msg) }, 500)
       }]),
       e.when('BlockcypherApiToken', ['DeviceFeatureService', function(e)
       {
@@ -2906,7 +2911,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.status = n.status
   }]),
-  angular.module('kkWallet').controller('WalletController', ['$scope', '$routeParams', 'WalletNodeService', 'CurrencyLookupService', 'DeviceFeatureService', function(e, t, n, a, o)
+  angular.module('kkWallet').controller('WalletController', ['$scope', '$routeParams', 'WalletNodeService', 'CurrencyLookupService', 'DeviceFeatureService', 'DeviceBridgeService', function(e, t, n, a, o, br)
   {
     function i()
     {
@@ -2945,7 +2950,8 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.receive = function()
       {
-        e.go(['/receive', e.walletId].join('/'), 'slideLeft')
+        e.setNextTransition('slideLeft')
+        br.getReceiveAddress(e.walletId, 0);
       },
       e.sendAllowed = function(t)
       {
