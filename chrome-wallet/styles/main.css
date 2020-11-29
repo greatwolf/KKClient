@@ -12249,6 +12249,7 @@ button.fa:focus {
 #device-settings .content,
 #label .content,
 #pin .content,
+#select-word-count .content,
 #support .content {
   padding-top: 10px
 }
@@ -12258,6 +12259,7 @@ button.fa:focus {
 #device-settings .content h2,
 #label .content h2,
 #pin .content h2,
+#select-word-count .content h2,
 #support .content h2 {
   padding-bottom: 10px;
   border-bottom: 1px solid #ececed
@@ -12314,6 +12316,22 @@ button.fa:focus {
   width: 100%;
   max-height: 140px;
   overflow-y: scroll
+}
+
+#select-word-count .dropdown {
+  width: 100%
+}
+
+#select-word-count .dropdown button {
+  width: 100%;
+  line-height: 30px;
+  font-size: 15px;
+  font-weight: 700
+}
+
+#select-word-count .dropdown .dropdown-menu {
+  width: 100%;
+  max-height: 140px;
 }
 
 #initialize .notification .content-inner {
