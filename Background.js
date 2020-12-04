@@ -8539,7 +8539,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               get: function()
               {
-                var index = 1 + Math.trunc( Math.random() * 100 % trezorio[this.coinId] )
+                var index = 1 + Math.trunc( Math.random() * trezorio[this.coinId] )
                 return "https://" + this.coinId + index + '.trezor.io/api'
               }
             })
