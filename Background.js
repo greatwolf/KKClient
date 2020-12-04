@@ -8520,11 +8520,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e(e, t)
         {
+          this.coinId = e
+          this.metadataUrlGenerator = t
+
           var trezorio =
           {
             "btc" : 5,
-            "bch" : 5,
-            "btg" : 5,
             "dash": 5,
             "ltc" : 5,
             "dgb" : 2,
@@ -8532,8 +8533,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             "vtc": 5,
             "zec": 5,
           }
-          this.coinId = e
-          this.metadataUrlGenerator = t
           if (trezorio[this.coinId])
           {
             Object.defineProperty(this, 'rootUrl',
@@ -8547,17 +8546,28 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             
             return;
           }
+
           var guardaco =
           {
             "bsv" : "bsvbook",
             "grs" : "grsbook",
             "kmd" : "kmdbook",
             "qtum" : "qtumbook",
-            "rvn" : "rvnbook",
           }
           if (guardaco[this.coinId])
           {
             return this.rootUrl = "https://" + guardaco[this.coinId] + '.guarda.co/api'
+          }
+
+          var atomicwalletio =
+          {
+            "bch" : "bitcoin-cash",
+            "btg" : "bgold",
+            "rvn" : "ravencoin",
+          }
+          if (atomicwalletio[this.coinId])
+          {
+            return this.rootUrl = "https://" + atomicwalletio[this.coinId] + '.atomicwallet.io/api'
           }
           throw "block indexer not defined for cointype " + this.coinId;
         }
