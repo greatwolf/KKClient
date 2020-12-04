@@ -4,7 +4,7 @@
 
 A simple cryptocurrency wallet that integrates with the KeepKey device.
 
-This fork is an attempt to continue support and improve upon the original KeepKey Chrome Extension. The code is based off of Shapeshift's last original release of the KeepKey Client found in [Google's chrome web store](https://keepkey.zendesk.com/hc/en-us/articles/360001411570-Getting-Started-Initializing-Your-KeepKey-Device).
+This fork is an attempt to continue support and improve upon the original KeepKey Chrome Extension. The code is based off of Shapeshift's last original release of the KeepKey Client found in [Google's Chrome App store](https://keepkey.zendesk.com/hc/en-us/articles/360001411570-Getting-Started-Initializing-Your-KeepKey-Device).
 
 ## Motivation
 
@@ -18,12 +18,30 @@ This project is a best-effort attempt at trying to rectify that problem.
 
 ## How To Use
 
+There are two ways to install this extension onto a Chromium-based browser(eg. such as Brave), either by getting one of the tagged versions under the [release section](https://github.com/greatwolf/KKClient/releases) or directly from source repo. Using the release is a bit easier since it contains all the files necessary for the extension to function as well as skipping the optional step of setting up an api token for the metadata cloud store. The instructions below will assume Chome is being used. Adjust the directory and locations as needed for your setup.
+
+### From Release
+ - Download the latest KKClient-*x.x.x*.zip file in the [release section](https://github.com/greatwolf/KKClient/releases/latest).
+ - Extract the files into your location of choice or into Chrome's default extension path(eg. ../Google/Chrome/Userdata/Default/Extensions/idgiipeogajjpkgheijapngmlbohdhjg).
+ - Open Chrome and goto `chrome://extensions`. Make sure `developer mode` is toggled on.
+ - Click on the `Load Unpacked` button on the upper left corner.
+ - Navigate into the directory of where you extracted the extension, click `Select Folder` to load the extension.
+ - Start the extension by going to `chrome://apps`.
+ - Recreate any missing wallets by using `Add Account`.
+ 
+### From Source
  - Install the latest version of the original KeepKey Client. See [instructions here](https://keepkey.zendesk.com/hc/en-us/articles/360001411570-Getting-Started-Initializing-Your-KeepKey-Device).
  - Download the [zip file](https://github.com/greatwolf/KKClient/archive/master.zip) for this repo.
  - Extract the files into Chrome's extension path(eg. ../Extensions/idgiipeogajjpkgheijapngmlbohdhjg/6.4.0.1_0) replace and overwrite any existing files.
  - Open Chrome and goto `chrome://extensions`. Make sure 'developer mode' is toggled on.
  - Click on the `Load Unpacked` button on the upper left corner.
  - Find the extension path '../Extensions/idgiipeogajjpkgheijapngmlbohdhjg/6.4.0.1_0' and click `Select Folder` to reload the extension.
+ - Setup a blockcypher API access token at [blockcypher.com](https://blockcypher.com).
+ - Open 'background.js' file in a text editor. At the top of the file copy the API access token from the previous step into the `METADATA_API_TOKEN` variable and save. For example,
+ 
+        var METADATA_API_TOKEN = "d9a5e85023faa87914a191f6a741a2c4";
+        // The line above is only for illustration and is not a valid api token!
+        // Copy + paste the token you created there.
+     
  - Finally start the extension by going to `chrome://apps`.
-
-This should also work for Brave as well.
+ - Recreate any missing wallets by using `Add Account`.
