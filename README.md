@@ -16,6 +16,34 @@ Unfortunately, Shapeshift.com is not a dropin replacement for the chrome extensi
 
 This project is a best-effort attempt at trying to rectify that problem.
 
+## Features & Fixes
+
+This fork contains numerous improvements and bugfixes over the original client. Here's a non-exhaustive list:
+
+ - Lower transaction fee when sending altcoins
+ - Use btc-fee.net for cheaper btc fee estimation
+ - Display USD equivalent value in wallet
+ - Migrated to trezor's blockbook indexer away from insight's deprecated api
+ - Show cashaddr format for BCH transaction history
+ - Allow PIN input from keyboard's numpad
+ - Fixed PIN/Passphrase transitional issues in send & receive
+ - Fixed detection issue where sometimes KeepKey isn't detected when plugged in
+ - Fixed css styling for wallet balances so it no longer wraps on long digits
+ - Implemented a better PIN retry mechanism
+ - Allow BIP39 seed length selection when initializing KeepKey
+ - Removed Shapeshift advert overlay during startup load
+
+Altcoin Support:
+
+ - DigiByte
+ - BitcoinSV
+ - Zcash (supports unshielded addresses only)
+ - Komodo
+ - Ravencoin
+ - Qtum
+ - Groestlcoin
+ - Vertcoin
+
 ## How To Use
 
 There are two ways to install this extension onto a Chromium-based browser(eg. such as Brave), either by getting one of the tagged versions under the [release section](https://github.com/greatwolf/KKClient/releases) or directly from source repo. Using the release is a bit easier since it contains all the files necessary for the extension to function as well as skipping the optional step of setting up an api token for the metadata cloud store. The instructions below will assume Chome is being used. Adjust the directory and locations as needed for your setup.
