@@ -27,6 +27,9 @@ This fork contains numerous improvements and bugfixes over the original client. 
  - Show cashaddr format for BCH transaction history
  - Allow PIN input from keyboard's numpad
  - Fixed PIN/Passphrase transitional issues in send & receive
+ - Fixed a bug in how the client handles multibyte prefixes when generating base58 addresses from xpub
+ - Provide user configurable cloud store to google's firebase or api.blockcypher.com
+  (necessary to workaround KeepKey's defunced `blockcypherMasterApiToken`)
  - Fixed detection issue where sometimes KeepKey isn't detected when plugged in
  - Fixed css styling for wallet balances so it no longer wraps on long digits
  - Implemented a better PIN retry mechanism
