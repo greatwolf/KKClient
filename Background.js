@@ -3241,6 +3241,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   message: "Transaction sent"
                 })
+              }).catch(function(err)
+              {
+                o.UiMessenger.sendMessageToUI("Failure",
+                {
+                  message: JSON.stringify(err)
+                })
               })
           },
           e.prototype.sendToAddress = function(e, t)
