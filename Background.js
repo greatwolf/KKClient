@@ -10593,10 +10593,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           return t.INPUT_SIZE = 148,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
-            t.MIN_FEE = new i.default("1000000"),
+            t.MIN_FEE = new i.default(1e8),
             t
         }
         return r(t, e),
+          t.prototype.computeFee = function(t, n, r)
+          {
+            var kilobyte = (t * this.INPUT_SIZE
+                           + n * this.OUTPUT_SIZE
+                           + this.TRANSACTION_HEADER_SIZE)
+                           / 1e3
+            return Promise.resolve(this.MIN_FEE.times(Math.ceil(kilobyte)))
+          },
           t
       }(a.AbstractPerKbFeeService);
     n.DogecoinFeeService = s
