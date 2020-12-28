@@ -53,7 +53,8 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
                     if (4 == f.readyState && 200 == f.status) {
                         var e = b.formatAmount(a.currency, a.amount)
                           , g = JSON.parse(f.responseText)[asset][fiat];
-                        a.exchangeFormattedAmount = (e * g).toFixed(2),
+                        e *= g,
+                        a.exchangeFormattedAmount = e.toFixed(e < 0.01 ? 4 : 2),
                         a.hasExchangeRate = c.showFiatBalance,
                         a.$digest()
                     }
