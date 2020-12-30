@@ -13593,6 +13593,7 @@ a:hover {
   font-family: inherit
 }
 
+#build-transaction .progress-indicator,
 #preparing .progress-indicator {
   margin: 25px 0;
   text-align: center;
