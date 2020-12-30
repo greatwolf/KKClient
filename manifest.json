@@ -30,7 +30,7 @@
      "https://keepkey.shapeshift.com/*",
      "https://auth.shapeshift.io/oauth/",
      "https://bitcoinfees.earn.com/*",
-     "hid", "usb", "identity",
+     "hid", "usb", "identity", "storage",
      {
         "usbDevices":
         [

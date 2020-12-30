@@ -25,6 +25,7 @@ var FIREBASE_ID;
  * This can be found under console.firebase.google.com in 'Settings' -> 'Service accounts' tab.
  */
 
+window.localStorage = chrome.storage.local;
 /**
  * @license
  * https://github.com/ealmansi/bchaddrjs
