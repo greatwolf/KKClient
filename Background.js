@@ -10633,6 +10633,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       y = e("./komodo-fee-service"),
       w = e("./qtum-fee-service"),
       v = e("./ravencoin-fee-service"),
+      fjcfee = e("./fujicoin-fee-service"),
       x = e("./vertcoin-fee-service"),
       z = e("./zcash-fee-service"),
       l = e("./ethereum-fee-service"),
@@ -10683,6 +10684,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   case o.CoinName.Ravencoin:
                     e.instances[t] = new v.RavencoinFeeService;
                     break;
+                  case o.CoinName.Fujicoin:
+                    e.instances[t] = new fjcfee.FujicoinFeeService;
+                    break;
                   case o.CoinName.Vertcoin:
                     e.instances[t] = new x.VertcoinFeeService;
                     break;
@@ -10719,6 +10723,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./komodo-fee-service": 446,
     "./qtum-fee-service": 448,
     "./ravencoin-fee-service": 447,
+    "./fujicoin-fee-service": 456,
     "./vertcoin-fee-service": 453,
     "./zcash-fee-service": 445,
     "@keepkey/device-client/dist/global/coin-name": 160,
@@ -15652,6 +15657,17 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://vtc5.trezor.io",
             ],
             txUrlExplorer: "http://insight.vertcoin.org/tx/"
+          },
+          {
+            name: s.CoinName[s.CoinName.Fujicoin = 75] = "Fujicoin",
+            addressFormat: "^F\\w{26,34}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://explorer.fujicoin.org",
+            ],
+            txUrlExplorer: "http://explorer.fujicoin.org/tx/"
           },
           {
             name: s.CoinName[s.CoinName.Zcash = 133] = "Zcash",
@@ -80022,6 +80038,63 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../account-list-manager": 2,
     "../MessageDispatcher": 6,
     "@keepkey/device-client/dist/device-client-manager": 151
+  }],
+  456: [function(e, t, n)
+  {
+    "use strict";
+    var r = this && this.__extends || function()
+    {
+      var e = Object.setPrototypeOf ||
+      {
+        __proto__: []
+      }
+      instanceof Array && function(e, t)
+        {
+          e.__proto__ = t
+        } ||
+        function(e, t)
+        {
+          for (var n in t)
+            t.hasOwnProperty(n) && (e[n] = t[n])
+        };
+      return function(t, n)
+      {
+        function r()
+        {
+          this.constructor = t
+        }
+        e(t, n),
+          t.prototype = null === n ? Object.create(n) : (r.prototype = n.prototype,
+            new r)
+      }
+    }();
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var i = e("bignumber.js"),
+      a = e("./abstract-per-kb-fee-service"),
+      o = e("@keepkey/device-client/dist/global/coin-name"),
+      s = function(e)
+      {
+        function t()
+        {
+          var t = e.call(this, o.CoinName.Fujicoin) || this;
+          return t.INPUT_SIZE = 148,
+            t.OUTPUT_SIZE = 34,
+            t.TRANSACTION_HEADER_SIZE = 10,
+            t.MIN_FEE = new i.default(1e7),
+            t
+        }
+        return r(t, e),
+          t
+      }(a.AbstractPerKbFeeService);
+    n.FujicoinFeeService = s
+  },
+  {
+    "./abstract-per-kb-fee-service": 97,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "bignumber.js": 189
   }],
 },
 {}, [1]);
