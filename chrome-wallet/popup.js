@@ -1510,6 +1510,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       '/walletlist' !== o.getPreviousRoute() && o.setNextTransition('slideRight'),
       e.ok = function()
       {
+        o.goToPrevious();
         a.requestPinRetry(),
           t(function()
           {
