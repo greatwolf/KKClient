@@ -10469,7 +10469,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           return t.INPUT_SIZE = 149,
             t.OUTPUT_SIZE = 34,
             t.TRANSACTION_HEADER_SIZE = 10,
-            t.MIN_FEE = new i.default("10000"),
+            t.MIN_FEE = new i.default(1e3),
             t
         }
         return r(t, e),
