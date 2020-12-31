@@ -1969,13 +1969,11 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             a.set('Your PIN was successfully changed!'),
               c = '/device';
             break;
-          case 'Policies applied':
-            a.set('Your device policies were updated!'),
-              i();
-            break;
           case 'Session cleared':
-            a.set('Your session was successfullly cleared!');
+            a.set('Your session was successfully cleared!');
             break;
+          case 'Policies applied':
+            a.set('Your device policies were updated!');
           case 'Device reset':
           case 'Device recovered':
             i();
