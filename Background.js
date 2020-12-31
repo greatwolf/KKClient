@@ -4071,21 +4071,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.initializeAccountListLoaders(e).then(function()
             {
               var n = [];
-              return a.Configuration.apiTokenOverride ? console.log("Etherscan and Insight accounts can't be loaded when an API token override is being used") : (n.push(t.loadBtcAndForks(e)),
-                  n.push(t.loadEthereumAndTokens(e)),
-                  n.push(t.litecoin.loadAccounts(e)),
-                  n.push(t.dash.loadAccounts(e)),
-                  n.push(t.dogecoin.loadAccounts(e)),
-                  n.push(t.digibyte.loadAccounts(e)),
-                  n.push(t.grs.loadAccounts(e)),
-                  n.push(t.komodo.loadAccounts(e)),
-                  n.push(t.qtum.loadAccounts(e)),
-                  n.push(t.ravencoin.loadAccounts(e)),
-                  n.push(t.vertcoin.loadAccounts(e)),
-                  n.push(t.zcash.loadAccounts(e)),
-                  t.bitcoinCash && n.push(t.bitcoinCash.loadAccounts(e)),
-                  t.bitcoinSV && n.push(t.bitcoinSV.loadAccounts(e)),
-                  t.bitcoinGold && n.push(t.bitcoinGold.loadAccounts(e))),
+              return a.Configuration.apiTokenOverride
+                    ? console.log("Etherscan and Insight accounts can't be loaded when an API token override is being used")
+                    : (s.CoinType
+                        .getCoinList()
+                        .forEach(function(coin)
+                        {
+                          n.push( t[coin.name.toLowerCase()].loadAccounts(e) )
+                        }),
+                      t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e)),
+                      t.bitcoinGoldLegacy && n.push(t.bitcoinGoldLegacy.loadAccounts(e)),
+                      n.push(t.loadEthereumAndTokens(e))
+                    ),
                 Promise.all(n)
             }).then(function() {})
           },
@@ -4115,39 +4112,26 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               var e, n;
               t.ethereum = new r.EtherscanAccountListLoader(o.CoinName.Ethereum, "m/44'/" + s.CoinType.get(o.CoinName.Ethereum).coinTypeCode),
-                t.bitcoin = new i.InsightAccountListLoader(o.CoinName.Bitcoin, "m/44'/" + s.CoinType.get(o.CoinName.Bitcoin).coinTypeCode),
-                t.litecoin = new i.InsightAccountListLoader(o.CoinName.Litecoin, "m/44'/" + s.CoinType.get(o.CoinName.Litecoin).coinTypeCode),
-                t.dash = new i.InsightAccountListLoader(o.CoinName.Dash, "m/44'/" + s.CoinType.get(o.CoinName.Dash).coinTypeCode),
-                t.dogecoin = new i.InsightAccountListLoader(o.CoinName.Dogecoin, "m/44'/" + s.CoinType.get(o.CoinName.Dogecoin).coinTypeCode),
-                t.digibyte = new i.InsightAccountListLoader(o.CoinName.DigiByte, "m/44'/" + s.CoinType.get(o.CoinName.DigiByte).coinTypeCode),
-                t.grs = new i.InsightAccountListLoader(o.CoinName.Groestlcoin, "m/44'/" + s.CoinType.get(o.CoinName.Groestlcoin).coinTypeCode),
-                t.komodo = new i.InsightAccountListLoader(o.CoinName.Komodo, "m/44'/" + s.CoinType.get(o.CoinName.Komodo).coinTypeCode),
-                t.qtum = new i.InsightAccountListLoader(o.CoinName.Qtum, "m/44'/" + s.CoinType.get(o.CoinName.Qtum).coinTypeCode),
-                t.ravencoin = new i.InsightAccountListLoader(o.CoinName.Ravencoin, "m/44'/" + s.CoinType.get(o.CoinName.Ravencoin).coinTypeCode),
-                t.vertcoin = new i.InsightAccountListLoader(o.CoinName.Vertcoin, "m/44'/" + s.CoinType.get(o.CoinName.Vertcoin).coinTypeCode),
-                t.zcash = new i.InsightAccountListLoader(o.CoinName.Zcash, "m/44'/" + s.CoinType.get(o.CoinName.Zcash).coinTypeCode),
-                e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
-                t.bitcoinCashLegacy = e[0],
-                t.bitcoinCash = e[1],
-                e = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV)),
-                t.bitcoinSVLegacy = e[0],
-                t.bitcoinSV = e[1],
-                n = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinGold)),
-                t.bitcoinGoldLegacy = n[0],
-                t.bitcoinGold = n[1],
+              s.CoinType
+                .getCoinList()
+                .forEach(function(coin)
+                {
+                  var slip044 = o.CoinName[coin.name]
+                  var name    = coin.name.toLowerCase()
+                  t[name] = new i.InsightAccountListLoader(slip044,
+                                                           "m/44'/" + coin.coinTypeCode)
+                }),
+                t.bitcoinCashLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
+                t.bitcoinSVLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV)),
+                t.bitcoinGoldLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinGold)),
                 t.erc20Tokens = new c.EtherscanTokenAccountListLoader
             })
           },
           e.prototype.addBitcoinFork = function(e)
           {
-            var t = [];
-            if (e)
-            {
-              var n = new i.InsightAccountListLoader(o.CoinName[e.name], "m/44'/" + s.CoinType.get(o.CoinName.Bitcoin).coinTypeCode, d.WalletSelectors.hasTxHistory),
-                r = new i.InsightAccountListLoader(o.CoinName[e.name], "m/44'/" + e.coinTypeCode);
-              t.push(n, r)
-            }
-            return t
+            if (!e) return undefined
+
+            return new i.InsightAccountListLoader(o.CoinName[e.name], "m/44'/" + s.CoinType.get(o.CoinName.Bitcoin).coinTypeCode, d.WalletSelectors.hasTxHistory)
           },
           e
       }();
@@ -8526,53 +8510,26 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.coinId = e
           this.metadataUrlGenerator = t
 
-          var trezorio =
+          var coinType = r.CoinType.getBySymbol(this.coinId)
+          var blockbook = coinType && coinType.blockbook
+          if(!blockbook || !blockbook.length)
+            throw "block indexer not defined for cointype " + this.coinId;
+
+          if(blockbook.length == 1)
           {
-            "btc" : 5,
-            "dash": 5,
-            "ltc" : 5,
-            "dgb" : 2,
-            "doge": 5,
-            "vtc": 5,
-            "zec": 5,
+            this.rootUrl = blockbook[0] + '/api'
+            return
           }
-          if (trezorio[this.coinId])
+
+          Object.defineProperty(this, 'rootUrl',
           {
-            Object.defineProperty(this, 'rootUrl',
+            get: function()
             {
-              get: function()
-              {
-                var index = 1 + Math.trunc( Math.random() * trezorio[this.coinId] )
-                return "https://" + this.coinId + index + '.trezor.io/api'
-              }
-            })
-            
-            return;
-          }
-
-          var guardaco =
-          {
-            "bsv" : "bsvbook",
-            "grs" : "grsbook",
-            "kmd" : "kmdbook",
-            "qtum" : "qtumbook",
-          }
-          if (guardaco[this.coinId])
-          {
-            return this.rootUrl = "https://" + guardaco[this.coinId] + '.guarda.co/api'
-          }
-
-          var atomicwalletio =
-          {
-            "bch" : "bitcoin-cash",
-            "btg" : "bgold",
-            "rvn" : "ravencoin",
-          }
-          if (atomicwalletio[this.coinId])
-          {
-            return this.rootUrl = "https://" + atomicwalletio[this.coinId] + '.atomicwallet.io/api'
-          }
-          throw "block indexer not defined for cointype " + this.coinId;
+              var i = Math.trunc( Math.random() * blockbook.length )
+              return blockbook[i] + '/api'
+            }
+          })
+          return
         }
         return e.prototype.getWalletListUrl = function()
           {
@@ -8621,54 +8578,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getWebsiteTransactionUrl = function(e)
           {
             var t;
-            switch (this.coinId)
-            {
-              case "dash":
-                t = "https://insight.dash.org/insight/tx/" + e;
-                break;
-              case "ltc":
-                t = "https://insight.litecore.io/tx/" + e;
-                break;
-              case "btc":
-                t = "https://explorer.bitcoin.com/btc/tx/" + e;
-                break;
-              case "bch":
-                t = "https://explorer.bitcoin.com/bch/tx/" + e;
-                break;
-              case "bsv":
-                t = "https://blockchair.com/bitcoin-sv/transaction/" + e;
-                break;
-              case "btg":
-                t = "https://btgexplorer.com/tx/" + e;
-                break;
-              case "doge":
-                t = "https://blockchair.com/dogecoin/transaction/" + e;
-                break;
-              case "dgb":
-                t = "https://digiexplorer.info/tx/" + e;
-                break;
-              case "grs":
-                t = "https://blockchair.com/groestlcoin/transaction/" + e;
-                break;
-              case "kmd":
-                t = "https://kmdexplorer.io/tx/" + e;
-                break;
-              case "qtum":
-                t = "https://qtum.info/tx/" + e;
-                break;
-              case "rvn":
-                t = "https://ravencoin.network/tx/" + e;
-                break;
-              case "vtc":
-                t = "http://insight.vertcoin.org/tx/" + e;
-                break;
-              case "zec":
-                t = "https://blockchair.com/zcash/transaction/" + e;
-                break;
-              default:
-                throw "block explorer url is not defined for cointype " + this.coinId;
-            }
-            return t
+            var coinType = r.CoinType.getBySymbol(this.coinId)
+            if(!coinType || !coinType.txUrlExplorer)
+              throw "block explorer url is not defined for cointype " + this.coinId;
+
+            return coinType.txUrlExplorer + e
           },
           e.prototype.walletMetaDataUrl = function(e)
           {
@@ -8717,55 +8631,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             if (!e.instances[t])
               switch (t)
               {
-                case c.CoinName.Bitcoin:
-                  e.instances[c.CoinName.Bitcoin] = this.createInsightWalletApi("btc", l.CoinType.get(c.CoinName.Bitcoin));
-                  break;
-                case c.CoinName.Dogecoin:
-                  e.instances[c.CoinName.Dogecoin] = this.createInsightWalletApi("doge", l.CoinType.get(c.CoinName.Dogecoin));
-                  break;
-                case c.CoinName.Litecoin:
-                  e.instances[c.CoinName.Litecoin] = this.createInsightWalletApi("ltc", l.CoinType.get(c.CoinName.Litecoin));
-                  break;
                 case c.CoinName.Ethereum:
                   e.instances[c.CoinName.Ethereum] = this.createEtherscanWalletApi();
                   break;
-                case c.CoinName.Dash:
-                  e.instances[c.CoinName.Dash] = this.createInsightWalletApi("dash", l.CoinType.get(c.CoinName.Dash));
-                  break;
-                case c.CoinName.BitcoinCash:
-                  e.instances[c.CoinName.BitcoinCash] = this.createInsightWalletApi("bch", l.CoinType.get(c.CoinName.BitcoinCash));
-                  break;
-                case c.CoinName.BitcoinSV:
-                  e.instances[c.CoinName.BitcoinSV] = this.createInsightWalletApi("bsv", l.CoinType.get(c.CoinName.BitcoinSV));
-                  break;
-                case c.CoinName.BitcoinGold:
-                  e.instances[c.CoinName.BitcoinGold] = this.createInsightWalletApi("btg", l.CoinType.get(c.CoinName.BitcoinGold));
-                  break;
-                case c.CoinName.DigiByte:
-                  e.instances[c.CoinName.DigiByte] = this.createInsightWalletApi("dgb", l.CoinType.get(c.CoinName.DigiByte));
-                  break;
-                case c.CoinName.Groestlcoin:
-                  e.instances[c.CoinName.Groestlcoin] = this.createInsightWalletApi("grs", l.CoinType.get(c.CoinName.Groestlcoin));
-                  break;
-                case c.CoinName.Komodo:
-                  e.instances[c.CoinName.Komodo] = this.createInsightWalletApi("kmd", l.CoinType.get(c.CoinName.Komodo));
-                  break;
-                case c.CoinName.Qtum:
-                  e.instances[c.CoinName.Qtum] = this.createInsightWalletApi("qtum", l.CoinType.get(c.CoinName.Qtum));
-                  break;
-                case c.CoinName.Ravencoin:
-                  e.instances[c.CoinName.Ravencoin] = this.createInsightWalletApi("rvn", l.CoinType.get(c.CoinName.Ravencoin));
-                  break;
-                case c.CoinName.Vertcoin:
-                  e.instances[c.CoinName.Vertcoin] = this.createInsightWalletApi("vtc", l.CoinType.get(c.CoinName.Vertcoin));
-                  break;
-                case c.CoinName.Zcash:
-                  e.instances[c.CoinName.Zcash] = this.createInsightWalletApi("zec", l.CoinType.get(c.CoinName.Zcash));
-                  break;
                 default:
-                  throw "No wallet api available for " + c.CoinName[t];
+                  var slip044  = t;
+                  var coinType = l.CoinType.get(slip044);
+                  if(coinType)
+                    e.instances[slip044] = this.createInsightWalletApi(coinType.symbol.toLowerCase(),
+                                                                      coinType);
               }
-            return e.instances[t]
+            if(e.instances[t]) return e.instances[t]
+
+            throw "No wallet api available for " + c.CoinName[slip044];
           },
           e.createEtherscanWalletApi = function()
           {
@@ -15386,23 +15264,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var r;
     (function(e)
     {
-      e[e.Bitcoin = 0] = "Bitcoin",
-        e[e.Testnet = 1] = "Testnet",
-        e[e.Namecoin = 7] = "Namecoin",
-        e[e.Litecoin = 2] = "Litecoin",
-        e[e.Dogecoin = 3] = "Dogecoin",
-        e[e.Dash = 5] = "Dash",
-        e[e.Ethereum = 6] = "Ethereum",
-        e[e.DigiByte = 20] = "DigiByte",
-        e[e.BitcoinCash = 145] = "BitcoinCash",
-        e[e.BitcoinSV = 236] = "BitcoinSV",
-        e[e.BitcoinGold = 156] = "BitcoinGold",
-        e[e.Groestlcoin = 17] = "Groestlcoin",
-        e[e.Komodo = 141] = "Komodo",
-        e[e.Qtum = 2301] = "Qtum",
-        e[e.Ravencoin = 175] = "Ravencoin",
-        e[e.Vertcoin = 28] = "Vertcoin",
-        e[e.Zcash = 133] = "Zcash",
         e[e.Aragon = 601] = "Aragon",
         e[e.Augur = 602] = "Augur",
         e[e.BAT = 603] = "BAT",
@@ -15472,7 +15333,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function e(e)
         {
           this.configuration = e,
-            this.exchangeForbidden = !!this.configuration.exchangeForbidden
+          this.blockbook = e.blockbook,
+          this.txUrlExplorer = e.txUrlExplorer,
+          this.exchangeForbidden = !!this.configuration.exchangeForbidden
         }
         return e.newDustCalculation = function(e)
           {
@@ -15507,6 +15370,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.getList = function()
           {
             return e.instances
+          },
+          e.getCoinList = function()
+          {
+            return e.instances
+                    .filter(n => !n.isToken)
+                    .filter(coin => coin.name !== "Ethereum")
           },
           e.clearList = function()
           {
@@ -15668,6 +15537,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               dust: this.dust.toString(),
               name: this.name,
               isToken: this.isToken,
+              blockbook: this.configuration.blockbook,
+              txUrlExplorer: this.configuration.txUrlExplorer,
               exchangeForbidden: this.exchangeForbidden
             }
           },
@@ -15682,94 +15553,168 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.instances = [],
           e.config = [
           {
-            name: s.CoinName[s.CoinName.Bitcoin],
+            name: s.CoinName[s.CoinName.Bitcoin = 0] = "Bitcoin",
             addressFormat: "(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^(bc1)[a-zA-HJ-NP-Z0-9]{25,39}$)",
             dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://btc1.trezor.io",
+              "https://btc2.trezor.io",
+              "https://btc3.trezor.io",
+              "https://btc4.trezor.io",
+              "https://btc5.trezor.io",
+            ],
+            txUrlExplorer: "https://explorer.bitcoin.com/btc/tx/"
           },
           {
-            name: s.CoinName[s.CoinName.Litecoin],
+            name: s.CoinName[s.CoinName.Litecoin = 2] = "Litecoin",
             addressFormat: "(^[LM][a-km-zA-HJ-NP-Z1-9]{26,33}$)|(^(ltc1)[a-zA-HJ-NP-Z0-9]{25,39}$)",
             dust: e.newDustCalculation(100000),
-            defaultDecimals: 8
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://ltc1.trezor.io",
+              "https://ltc2.trezor.io",
+              "https://ltc3.trezor.io",
+              "https://ltc4.trezor.io",
+              "https://ltc5.trezor.io",
+            ],
+            txUrlExplorer: "https://insight.litecore.io/tx/"
           },
           {
-            name: s.CoinName[s.CoinName.Dogecoin],
+            name: s.CoinName[s.CoinName.Dogecoin = 3] = "Dogecoin",
             addressFormat: "^[DA9][1-9A-HJ-NP-Za-km-z]{33}$",
             dust: "100000000",
-            defaultDecimals: 8
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://doge1.trezor.io",
+              "https://doge2.trezor.io",
+              "https://doge3.trezor.io",
+              "https://doge4.trezor.io",
+              "https://doge5.trezor.io",
+            ],
+            txUrlExplorer: "https://blockchair.com/dogecoin/transaction/"
           },
           {
-            name: s.CoinName[s.CoinName.Ethereum],
+            name: s.CoinName[s.CoinName.Dash = 5] = "Dash",
+            addressFormat: "^[X7][a-km-zA-HJ-NP-Z1-9]{25,34}$",
+            dust: e.oldDustCalculation(10000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://dash1.trezor.io",
+              "https://dash2.trezor.io",
+              "https://dash3.trezor.io",
+              "https://dash4.trezor.io",
+              "https://dash5.trezor.io",
+            ],
+            txUrlExplorer: "https://insight.dash.org/insight/tx/"
+          },
+          {
+            name: s.CoinName[s.CoinName.Ethereum = 6] = "Ethereum",
             addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
             dust: 1,
             defaultDecimals: 18
           },
           {
-            name: s.CoinName[s.CoinName.Dash],
-            addressFormat: "^[X7][a-km-zA-HJ-NP-Z1-9]{25,34}$",
-            dust: e.oldDustCalculation(10000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.DigiByte],
-            addressFormat: "^D\\w{33}$",
-            dust: e.oldDustCalculation(10000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.BitcoinCash],
-            addressFormat: "(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^bitcoincash:[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{25,55}$)|(^bitcoincash:[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{25,55}$)",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.BitcoinSV],
-            addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.BitcoinGold],
-            addressFormat: "(^[AG][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^(btg1)[a-zA-HJ-NP-Z0-9]{25,39}$)",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.Groestlcoin],
+            name: s.CoinName[s.CoinName.Groestlcoin = 17] = "Groestlcoin",
             addressFormat: "^F\\w{33}$",
             dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
+            defaultDecimals: 8,
+            blockbook: ["https://grsbook.guarda.co"],
+            txUrlExplorer: "https://blockchair.com/groestlcoin/transaction/"
           },
           {
-            name: s.CoinName[s.CoinName.Komodo],
-            addressFormat: "^R\\w{33}$",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
+            name: s.CoinName[s.CoinName.DigiByte = 20] = "DigiByte",
+            addressFormat: "^D\\w{33}$",
+            dust: e.oldDustCalculation(10000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://dgb1.trezor.io",
+              "https://dgb2.trezor.io",
+            ],
+            txUrlExplorer: "https://digiexplorer.info/tx/"
           },
           {
-            name: s.CoinName[s.CoinName.Qtum],
-            addressFormat: "^Q\\w{33}$",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.Ravencoin],
-            addressFormat: "^R\\w{33}$",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
-          },
-          {
-            name: s.CoinName[s.CoinName.Vertcoin],
+            name: s.CoinName[s.CoinName.Vertcoin = 28] = "Vertcoin",
             addressFormat: "^V\\w{33}$",
             dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://vtc1.trezor.io",
+              "https://vtc2.trezor.io",
+              "https://vtc3.trezor.io",
+              "https://vtc4.trezor.io",
+              "https://vtc5.trezor.io",
+            ],
+            txUrlExplorer: "http://insight.vertcoin.org/tx/"
           },
           {
-            name: s.CoinName[s.CoinName.Zcash],
+            name: s.CoinName[s.CoinName.Zcash = 133] = "Zcash",
             addressFormat: "^t1[a-km-zA-HJ-NP-Z1-9]{33}$",
             dust: e.newDustCalculation(3000),
-            defaultDecimals: 8
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://zec1.trezor.io",
+              "https://zec2.trezor.io",
+              "https://zec3.trezor.io",
+              "https://zec4.trezor.io",
+              "https://zec5.trezor.io",
+            ],
+            txUrlExplorer: "https://blockchair.com/zcash/transaction/"
+          },
+          {
+            name: s.CoinName[s.CoinName.Komodo = 141] = "Komodo",
+            addressFormat: "^R\\w{33}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://kmdbook.guarda.co"],
+            txUrlExplorer: "https://kmdexplorer.io/tx/"
+          },
+          {
+            name: s.CoinName[s.CoinName.BitcoinCash = 145] = "BitcoinCash",
+            addressFormat: "(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^bitcoincash:[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{25,55}$)|(^bitcoincash:[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{25,55}$)",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://bchblockexplorer.com"],
+            txUrlExplorer: "https://explorer.bitcoin.com/bch/tx/"
+          },
+          {
+            name: s.CoinName[s.CoinName.BitcoinGold = 156] = "BitcoinGold",
+            addressFormat: "(^[AG][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^(btg1)[a-zA-HJ-NP-Z0-9]{25,39}$)",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://bgold.atomicwallet.io"],
+            txUrlExplorer: "https://btgexplorer.com/tx/"
+          },
+          {
+            name: s.CoinName[s.CoinName.BitcoinSV = 236] = "BitcoinSV",
+            addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://bsvbook.guarda.co"],
+            txUrlExplorer: "https://blockchair.com/bitcoin-sv/transaction/"
+          },
+          {
+            name: s.CoinName[s.CoinName.Ravencoin = 175] = "Ravencoin",
+            addressFormat: "^R\\w{33}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://ravencoin.atomicwallet.io"],
+            txUrlExplorer: "https://ravencoin.network/tx/"
+          },
+          {
+            name: s.CoinName[s.CoinName.Qtum = 2301] = "Qtum",
+            addressFormat: "^Q\\w{33}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://qtumbook.guarda.co"],
+            txUrlExplorer: "https://qtum.info/tx/"
           },
           {
             name: s.CoinName[s.CoinName.Aragon],
