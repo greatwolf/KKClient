@@ -45,6 +45,7 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
                 {
                   "BitcoinCash" : "bitcoin-cash",
                   "BitcoinSV" : "bitcoin-cash-sv",
+                  "BitcoinGold" : "bitcoin-gold",
                 }
                 var asset = assetIds[crypto] || crypto.toLowerCase()
                 fiat = fiat.toLowerCase()
