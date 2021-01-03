@@ -118,7 +118,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
     }
     e.walletList = n.wallets,
       e.walletName = '',
-      e.assetTypes = angular.copy(c.getAccountCurrencyTypes()),
+      e.assetTypes = angular.copy(c.getAccountCurrencyTypes()).sort(),
       e.selectedAsset = 'Bitcoin',
       e.setAssetType = function(t)
       {
