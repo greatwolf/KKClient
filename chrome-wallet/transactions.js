@@ -85,6 +85,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Syscoin',
+      currencySymbol: 'SYS',
+      coinTypeCode: '57\'',
+      coinType: 57,
+      addressFormat: '^S\\w{26,34}$',
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Fujicoin',
       currencySymbol: 'FJC',
       coinTypeCode: '75\'',
