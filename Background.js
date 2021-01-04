@@ -15547,8 +15547,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               dust: this.dust.toString(),
               name: this.name,
               isToken: this.isToken,
-              blockbook: this.configuration.blockbook,
-              txUrlExplorer: this.configuration.txUrlExplorer,
               exchangeForbidden: this.exchangeForbidden
             }
           },
