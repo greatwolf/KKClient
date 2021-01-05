@@ -11140,6 +11140,7 @@ form input::-webkit-input-placeholder {
 form .invalid {
   float: right;
   color: #d26464;
+  white-space: nowrap;
   font-style: italic
 }
 
@@ -11454,6 +11455,7 @@ h6 {
 #build-transaction .amount-entry,
 #build-transaction .value-container {
   width: 225px;
+  max-height: 53px;
   display: inline-block
 }
 
@@ -11461,10 +11463,14 @@ h6 {
   margin-top: 0
 }
 
+#build-transaction .fee-selector {
+  padding-top: 15px
+}
+
 #build-transaction .fee-container {
   display: flex;
   justify-content: center;
-  padding-top: 10px;
+  padding-top: 15px;
   position: relative
 }
 
@@ -11749,7 +11755,7 @@ h6 {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0 50px
+  padding: 10px 50px 0
 }
 
 .content-form-inner.sending .exchange-images.image-centered {
@@ -11786,6 +11792,7 @@ h6 {
 
 .content-header {
   display: flex;
+  max-height: 64px;
   justify-content: center
 }
 
