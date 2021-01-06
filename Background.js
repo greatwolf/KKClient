@@ -10110,11 +10110,17 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     });
     var i = e("./abstract-chained-transaction-fee-service"),
       a = e("./FeeLevel"),
+      bignum = e("bignumber.js"),
       o = function(e)
       {
-        function t()
+        function t(_, profile)
         {
-          return null !== e && e.apply(this, arguments) || this
+          var t = null !== e && e.apply(this, arguments) || this
+          return t.INPUT_SIZE = profile.INPUT_SIZE || 148,
+            t.OUTPUT_SIZE = profile.OUTPUT_SIZE || 34,
+            t.TRANSACTION_HEADER_SIZE = profile.TRANSACTION_HEADER_SIZE || 10,
+            t.MIN_FEE = new bignum.default(profile.MIN_FEE || 1e3),
+            t
         }
         return r(t, e),
           t.prototype.computeFee = function(e, t)
@@ -10133,7 +10139,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "./FeeLevel": 94,
-    "./abstract-chained-transaction-fee-service": 95
+    "./abstract-chained-transaction-fee-service": 95,
+    "bignumber.js": 189
   }],
   98: [function(e, t, n)
   {
@@ -10234,13 +10241,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       l = e("@keepkey/device-client/dist/global/coin-name"),
       p = function(e)
       {
-        function t()
+        function t(coinDetail)
         {
-          var t = e.call(this, l.CoinName.Bitcoin) || this;
+          var t = e.call(this, l.CoinName[coinDetail.name]) || this;
+          var feeProfile = coinDetail.feeProfile;
           return t.feeUrl = o.Configuration.feeServiceUrl,
-            t.maxInputSize = 148,
-            t.outputSize = 34,
-            t.transactionOverheadSize = 10,
+            t.INPUT_SIZE = feeProfile.INPUT_SIZE || 148,
+            t.OUTPUT_SIZE = feeProfile.OUTPUT_SIZE || 34,
+            t.TRANSACTION_HEADER_SIZE = feeProfile.TRANSACTION_HEADER_SIZE || 10,
+            t.MIN_FEE = new a.default(feeProfile.MIN_FEE || 1e3),
             t
         }
         return r(t, e),
@@ -10254,7 +10263,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   fast: e.getFeePerByteRate(t, o.Configuration.fastFeePath),
                   medium: e.getFeePerByteRate(t, o.Configuration.mediumFeePath),
                   slow: e.getFeePerByteRate(t, o.Configuration.slowFeePath),
-                  frugal: new a.BigNumber(1)
+                  frugal: e.MIN_FEE.div(1e3)
                 }
               }).catch(function(e)
               {
@@ -10278,7 +10287,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return i.isUndefined(n) && (n = d.FeeLevel.fast),
               this.getRates().then(function(o)
               {
-                var s = e * r.maxInputSize + t * r.outputSize + r.transactionOverheadSize,
+                var s = e * r.INPUT_SIZE + t * r.OUTPUT_SIZE + r.TRANSACTION_HEADER_SIZE,
                   c = i.isString(n) ? n : d.FeeLevel[n],
                   l = i.get(o, c);
                 return l.times(s).integerValue(a.BigNumber.ROUND_CEIL)
@@ -10341,19 +10350,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       o = e("./abstract-per-kb-fee-service"),
       s = function(e)
       {
-        function t()
+        function t(coinDetail)
         {
-          var t = e.call(this, a.CoinName.BitcoinGold) || this;
-          return t.INPUT_SIZE = 149,
-            t.OUTPUT_SIZE = 34,
-            t.TRANSACTION_HEADER_SIZE = 10,
-            t.MIN_FEE = new i.default(1e3),
-            t
+          return e.call(this, a.CoinName[coinDetail.name], coinDetail.feeProfile) || this;
         }
         return r(t, e),
           t
       }(o.AbstractPerKbFeeService);
-    n.BitcoinGoldFeeService = s
+    n.GranularFeeService = s
   },
   {
     "./abstract-per-kb-fee-service": 97,
@@ -10466,14 +10470,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       o = e("@keepkey/device-client/dist/global/coin-name"),
       s = function(e)
       {
-        function t()
+        function t(coinDetail)
         {
-          var t = e.call(this, o.CoinName.Dogecoin) || this;
-          return t.INPUT_SIZE = 148,
-            t.OUTPUT_SIZE = 34,
-            t.TRANSACTION_HEADER_SIZE = 10,
-            t.MIN_FEE = new i.default(1e8),
-            t
+          return e.call(this, o.CoinName[coinDetail.name], coinDetail.feeProfile) || this;
         }
         return r(t, e),
           t.prototype.computeFee = function(t, n, r)
@@ -10486,7 +10485,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           t
       }(a.AbstractPerKbFeeService);
-    n.DogecoinFeeService = s
+    n.RoundUpFeeService = s
   },
   {
     "./abstract-per-kb-fee-service": 97,
@@ -10620,92 +10619,40 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       value: !0
     });
-    var r = e("./bitcoin-fee-service"),
-      i = e("./bitcoin-cash-fee-service"),
-      g = e("./bitcoin-sv-fee-service"),
-      a = e("./bitcoin-gold-fee-service"),
-      o = e("@keepkey/device-client/dist/global/coin-name"),
-      s = e("@keepkey/device-client/dist/global/coin-type"),
-      d = e("./dash-fee-service"),
-      c = e("./dogecoin-fee-service"),
-      f = e("./digibyte-fee-service"),
-      grsfee = e("./grs-fee-service"),
-      y = e("./komodo-fee-service"),
-      w = e("./qtum-fee-service"),
-      v = e("./ravencoin-fee-service"),
-      fjcfee = e("./fujicoin-fee-service"),
-      sysfee = e("./syscoin-fee-service"),
-      x = e("./vertcoin-fee-service"),
-      z = e("./zcash-fee-service"),
-      l = e("./ethereum-fee-service"),
-      p = e("./litecoin-fee-service"),
+    var o = e("@keepkey/device-client/dist/global/coin-name"),
+        s = e("@keepkey/device-client/dist/global/coin-type"),
+        feeServices =
+        {
+          'bitcoin-fee-service' : e("./bitcoin-fee-service").BitcoinFeeService,
+          'ethereum-fee-service' : e("./ethereum-fee-service").EthereumFeeService,
+          'roundup-per-kb-fee-service' : e("./roundup-per-kb-fee-service").RoundUpFeeService,
+          'granular-per-kb-fee-service' : e("./granular-per-kb-fee-service").GranularFeeService,
+        },
       u = function()
       {
         function e()
         {}
         return e.getInstance = function(t, n)
           {
-            if (!e.instances[t])
-              if (s.CoinType.get(t).isToken)
-                console.assert(n, "Gas limit is required for tokens"),
-                e.instances[t] = new l.EthereumFeeService(n);
-              else
-                switch (t)
-                {
-                  case o.CoinName.Bitcoin:
-                    e.instances[t] = new r.BitcoinFeeService;
-                    break;
-                  case o.CoinName.BitcoinCash:
-                    e.instances[t] = new i.BitcoinCashFeeService;
-                    break;
-                  case o.CoinName.BitcoinSV:
-                    e.instances[t] = new g.BitcoinSVFeeService;
-                    break;
-                  case o.CoinName.BitcoinGold:
-                    e.instances[t] = new a.BitcoinGoldFeeService;
-                    break;
-                  case o.CoinName.Litecoin:
-                    e.instances[t] = new p.LitcoinFeeService;
-                    break;
-                  case o.CoinName.Dogecoin:
-                    e.instances[t] = new c.DogecoinFeeService;
-                    break;
-                  case o.CoinName.DigiByte:
-                    e.instances[t] = new f.DigiByteFeeService;
-                    break;
-                  case o.CoinName.Groestlcoin:
-                    e.instances[t] = new grsfee.GroestlcoinFeeService;
-                    break;
-                  case o.CoinName.Komodo:
-                    e.instances[t] = new y.KomodoFeeService;
-                    break;
-                  case o.CoinName.Qtum:
-                    e.instances[t] = new w.QtumFeeService;
-                    break;
-                  case o.CoinName.Ravencoin:
-                    e.instances[t] = new v.RavencoinFeeService;
-                    break;
-                  case o.CoinName.Syscoin:
-                    e.instances[t] = new sysfee.SyscoinFeeService;
-                    break;
-                  case o.CoinName.Fujicoin:
-                    e.instances[t] = new fjcfee.FujicoinFeeService;
-                    break;
-                  case o.CoinName.Vertcoin:
-                    e.instances[t] = new x.VertcoinFeeService;
-                    break;
-                  case o.CoinName.Zcash:
-                    e.instances[t] = new z.ZcashFeeService;
-                    break;
-                  case o.CoinName.Ethereum:
-                    e.instances[t] = new l.EthereumFeeService;
-                    break;
-                  case o.CoinName.Dash:
-                    e.instances[t] = new d.DashFeeService;
-                    break;
-                  default:
-                    throw "No fee service is defined for " + o.CoinName[t];
-                }
+            if (e.instances[t]) return e.instances[t]
+
+            var coinDetail = s.CoinType.get(t)
+            if (coinDetail.isToken)
+            {
+              console.assert(n, "Gas limit is required for tokens"),
+              e.instances[t] = new l.EthereumFeeService(n);
+              return e.instances[t]
+            }
+
+            var feeService = feeServices[coinDetail.feeProfile.servicer]
+            if (!feeService)
+            {
+              console.warn("No valid fee service defined for "
+                          + o.CoinName[t]
+                          + ". Defaulting to GranularFeeService.");
+              feeService = feeServices['granular-per-kb-fee-service']
+            }
+            e.instances[t] = new feeService(coinDetail);
             return e.instances[t]
           },
           e.instances = [],
@@ -10714,23 +10661,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     n.FeeServiceFactory = u
   },
   {
-    "./bitcoin-cash-fee-service": 98,
     "./bitcoin-fee-service": 99,
-    "./bitcoin-sv-fee-service": 444,
-    "./bitcoin-gold-fee-service": 100,
-    "./dash-fee-service": 101,
-    "./dogecoin-fee-service": 102,
+    "./granular-per-kb-fee-service": 100,
+    "./roundup-per-kb-fee-service": 102,
     "./ethereum-fee-service": 103,
-    "./litecoin-fee-service": 105,
-    "./digibyte-fee-service": 443,
-    "./grs-fee-service": 449,
-    "./komodo-fee-service": 446,
-    "./qtum-fee-service": 448,
-    "./ravencoin-fee-service": 447,
-    "./fujicoin-fee-service": 456,
-    "./syscoin-fee-service": 457,
-    "./vertcoin-fee-service": 453,
-    "./zcash-fee-service": 445,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
   }],
@@ -15345,6 +15279,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.configuration = e,
           this.blockbook = e.blockbook,
           this.txUrlExplorer = e.txUrlExplorer,
+          this.feeProfile = e.feeProfile || {},
           this.exchangeForbidden = !!this.configuration.exchangeForbidden
         }
         return e.newDustCalculation = function(e)
@@ -15573,7 +15508,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://btc4.trezor.io",
               "https://btc5.trezor.io",
             ],
-            txUrlExplorer: "https://explorer.bitcoin.com/btc/tx/"
+            txUrlExplorer: "https://explorer.bitcoin.com/btc/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e3,
+              servicer: 'bitcoin-fee-service'
+            }
           },
           {
             name: s.CoinName[s.CoinName.Litecoin = 2] = "Litecoin",
@@ -15588,7 +15528,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://ltc4.trezor.io",
               "https://ltc5.trezor.io",
             ],
-            txUrlExplorer: "https://insight.litecore.io/tx/"
+            txUrlExplorer: "https://insight.litecore.io/tx/",
+            feeProfile:
+            {
+              INPUT_SIZE: 149,
+              MIN_FEE: 1e4,
+            }
           },
           {
             name: s.CoinName[s.CoinName.Dogecoin = 3] = "Dogecoin",
@@ -15603,7 +15548,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://doge4.trezor.io",
               "https://doge5.trezor.io",
             ],
-            txUrlExplorer: "https://blockchair.com/dogecoin/transaction/"
+            txUrlExplorer: "https://blockchair.com/dogecoin/transaction/",
+            feeProfile:
+            {
+              MIN_FEE: 1e8,
+              servicer: 'roundup-per-kb-fee-service'
+            }
           },
           {
             name: s.CoinName[s.CoinName.Dash = 5] = "Dash",
@@ -15618,13 +15568,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://dash4.trezor.io",
               "https://dash5.trezor.io",
             ],
-            txUrlExplorer: "https://insight.dash.org/insight/tx/"
+            txUrlExplorer: "https://insight.dash.org/insight/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e3,
+              servicer: 'granular-per-kb-fee-service'
+            }
           },
           {
             name: s.CoinName[s.CoinName.Ethereum = 6] = "Ethereum",
             addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
             dust: 1,
-            defaultDecimals: 18
+            defaultDecimals: 18,
+            feeProfile: { servicer: 'ethereum-fee-service' }
           },
           {
             name: s.CoinName[s.CoinName.Groestlcoin = 17] = "Groestlcoin",
@@ -15644,7 +15600,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://dgb1.trezor.io",
               "https://dgb2.trezor.io",
             ],
-            txUrlExplorer: "https://digiexplorer.info/tx/"
+            txUrlExplorer: "https://digiexplorer.info/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 2e3
+            }
           },
           {
             name: s.CoinName[s.CoinName.Vertcoin = 28] = "Vertcoin",
@@ -15659,7 +15619,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://vtc4.trezor.io",
               "https://vtc5.trezor.io",
             ],
-            txUrlExplorer: "http://insight.vertcoin.org/tx/"
+            txUrlExplorer: "http://insight.vertcoin.org/tx/",
+            feeProfile: { MIN_FEE: 1e5 }
           },
           {
             name: s.CoinName[s.CoinName.Syscoin = 57] = "Syscoin",
@@ -15670,7 +15631,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             [
               "https://sys1.bcfn.ca",
             ],
-            txUrlExplorer: "https://chainz.cryptoid.info/sys/tx.dws?"
+            txUrlExplorer: "https://chainz.cryptoid.info/sys/tx.dws?",
+            feeProfile: { MIN_FEE: 1e4 }
           },
           {
             name: s.CoinName[s.CoinName.Fujicoin = 75] = "Fujicoin",
@@ -15696,7 +15658,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               "https://zec4.trezor.io",
               "https://zec5.trezor.io",
             ],
-            txUrlExplorer: "https://blockchair.com/zcash/transaction/"
+            txUrlExplorer: "https://blockchair.com/zcash/transaction/",
+            feeProfile:
+            {
+              TRANSACTION_HEADER_SIZE: 29,
+              MIN_FEE: 1e3
+            }
           },
           {
             name: s.CoinName[s.CoinName.Komodo = 141] = "Komodo",
@@ -15704,7 +15671,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://kmdbook.guarda.co"],
-            txUrlExplorer: "https://kmdexplorer.io/tx/"
+            txUrlExplorer: "https://kmdexplorer.io/tx/",
+            feeProfile:
+            {
+              TRANSACTION_HEADER_SIZE: 29,
+              MIN_FEE: 1e3
+            }
           },
           {
             name: s.CoinName[s.CoinName.BitcoinCash = 145] = "BitcoinCash",
@@ -15712,7 +15684,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://bchblockexplorer.com"],
-            txUrlExplorer: "https://explorer.bitcoin.com/bch/tx/"
+            txUrlExplorer: "https://explorer.bitcoin.com/bch/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e3,
+              servicer: 'granular-per-kb-fee-service'
+            }
           },
           {
             name: s.CoinName[s.CoinName.BitcoinGold = 156] = "BitcoinGold",
@@ -15720,7 +15697,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://bgold.atomicwallet.io"],
-            txUrlExplorer: "https://btgexplorer.com/tx/"
+            txUrlExplorer: "https://btgexplorer.com/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e3
+            }
           },
           {
             name: s.CoinName[s.CoinName.BitcoinSV = 236] = "BitcoinSV",
@@ -15728,7 +15709,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://bsvbook.guarda.co"],
-            txUrlExplorer: "https://blockchair.com/bitcoin-sv/transaction/"
+            txUrlExplorer: "https://blockchair.com/bitcoin-sv/transaction/",
+            feeProfile:
+            {
+              MIN_FEE: 1e3
+            }
           },
           {
             name: s.CoinName[s.CoinName.Ravencoin = 175] = "Ravencoin",
@@ -15736,7 +15721,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://ravencoin.atomicwallet.io"],
-            txUrlExplorer: "https://ravencoin.network/tx/"
+            txUrlExplorer: "https://ravencoin.network/tx/",
+            feeProfile: { MIN_FEE: 1e6 }
           },
           {
             name: s.CoinName[s.CoinName.Qtum = 2301] = "Qtum",
@@ -15744,7 +15730,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://qtumbook.guarda.co"],
-            txUrlExplorer: "https://qtum.info/tx/"
+            txUrlExplorer: "https://qtum.info/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 4e5
+            }
           },
           {
             name: s.CoinName[s.CoinName.Aragon],
