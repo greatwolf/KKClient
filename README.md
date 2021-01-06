@@ -38,14 +38,16 @@ This fork contains numerous improvements and bugfixes over the original client. 
 
 Altcoin Support:
 
- - DigiByte
  - BitcoinSV
+ - BitcoinGold
+ - DigiByte
  - Zcash (supports unshielded addresses only)
  - Komodo
  - Ravencoin
  - Qtum
  - Groestlcoin
  - Vertcoin
+ - Fujicoin
 
 ## How To Use
 
