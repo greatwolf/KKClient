@@ -9838,6 +9838,7 @@ a:hover
   position: fixed;
   background-color: rgba(255, 255, 255, .92);
   z-index: 2;
+  padding-right: 15px;
   top: 0;
   right: 15px;
   left: 160px
@@ -9867,7 +9868,7 @@ a:hover
 
 .transaction-list .table
 {
-  width: 910px
+  width: 100%
 }
 
 .transaction-list .table .transaction
@@ -9875,10 +9876,17 @@ a:hover
   border-top: 1px solid #ddd
 }
 
+.transaction-list .table .transaction.even
+{
+  background: honeydew
+}
+
 .transaction-list .table .thead,
 .transaction-list .table .transaction
 {
-  padding: 3px 0
+  padding: 3px 0;
+  display: flex;
+  align-items: center;
 }
 
 .transaction-list .table .thead .amount,
@@ -9904,23 +9912,24 @@ a:hover
 
 .transaction-list .table .date
 {
-  width: 55px
+  width: 100px
 }
 
 .transaction-list .table .time
 {
-  width: 77px
+  width: 80px
 }
 
 .transaction-list .table .address
 {
-  width: 309px
+  flex-grow: 1;
+  width: 310px
 }
 
 .transaction-list .table .amount
 {
-  width: 180px;
-  text-align: right
+  width: 160px;
+  text-align: center
 }
 
 .transaction-list .table .amount .received
@@ -9931,6 +9940,7 @@ a:hover
 .transaction-list .table .link
 {
   width: 85px;
+  padding-right: 15px;
   text-align: right
 }
 
