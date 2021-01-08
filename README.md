@@ -1,6 +1,7 @@
 # ![KKClient Logo](/images/icon.png) KKClient
 
 ![Release downloads](https://img.shields.io/github/downloads/greatwolf/KKClient/total?cacheSeconds=600)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 A simple cryptocurrency wallet that integrates with the KeepKey device.
 
@@ -78,3 +79,7 @@ There are two ways to install this extension onto a Chromium-based browser(eg. s
      
  - Finally start the extension by going to `chrome://apps`.
  - Recreate any missing wallets by using `Add Account`.
+
+## License
+
+Since this fork is based off of KeepKey's original ChromeApp codebase, it inherits the same LGPLv3 license as well. See [keepkey/chrome-proxy](https://github.com/keepkey/chrome-proxy/blob/a33af2ccd300b0580a0fab793aae82049402695d/src/background.js#L4).
