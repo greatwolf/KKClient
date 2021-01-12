@@ -15516,6 +15516,23 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.Testnet = 1] = "Testnet",
+            addressFormat: "(^[2mn][a-km-zA-HJ-NP-Z1-9]{25,34}$)",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://tbtc1.trezor.io",
+              "https://tbtc2.trezor.io",
+            ],
+            txUrlExplorer: "https://bitpay.com/insight/#/BTC/testnet/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e3,
+              servicer: 'granular-fee-service'
+            }
+          },
+          {
             name: s.CoinName[s.CoinName.Litecoin = 2] = "Litecoin",
             addressFormat: "(^[LM][a-km-zA-HJ-NP-Z1-9]{26,33}$)|(^(ltc1)[a-zA-HJ-NP-Z0-9]{25,39}$)",
             dust: e.newDustCalculation(100000),

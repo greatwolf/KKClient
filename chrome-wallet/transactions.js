@@ -19,6 +19,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Testnet',
+      currencySymbol: 'TEST',
+      coinTypeCode: '1\'',
+      coinType: 1,
+      addressFormat: '^[2mn][a-km-zA-HJ-NP-Z1-9]{25,34}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Litecoin',
       currencySymbol: 'LTC',
       coinTypeCode: '2\'',
