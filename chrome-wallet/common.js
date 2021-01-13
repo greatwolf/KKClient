@@ -278,9 +278,10 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                 }, a);
                 return h(b)
             },
-            getWalletNodes: function a() {
+            getWalletNodes: function a(walletId) {
                 return h({
-                    messageType: 'GetWalletNodes'
+                    messageType: 'GetWalletNodes',
+                    accountId: walletId
                 })
             },
             getTransactionHistory: function d(a, b) {
@@ -291,9 +292,10 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                 return b && (c.subAccount = b),
                 h(c)
             },
-            reloadBalances: function a() {
+            reloadBalances: function a(walletId) {
                 return h({
-                    messageType: 'ReloadBalances'
+                    messageType: 'ReloadBalances',
+                    accountId: walletId
                 })
             },
             isValidExchangeRegion: function a() {
@@ -530,14 +532,14 @@ angular.module('kkCommon').factory('WalletNodeService', ['$rootScope', '$timeout
     return {
         wallets: i,
         walletStats: j,
-        reload: function(b) {
+        reload: function(b, walletId) {
             _.each(i, function(a) {
                 delete a.chainCode,
                 delete a.publicKey,
                 delete a.xpub,
                 b && a.addresses && a.addresses.length && (a.addresses.length = 0)
             }),
-            c.getWalletNodes(),
+            c.getWalletNodes(walletId),
             setTimeout(function() {
                 a.$digest()
             })

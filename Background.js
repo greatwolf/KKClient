@@ -463,9 +463,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               coinType: t
             })
           },
-          e.reloadBalances = function()
+          e.reloadBalances = function(accountId)
           {
-            return e.reloadAccountList(e.accountList).then(function() {})
+            return e.reloadAccountList
+                    (
+                      e.accountList.filter((n) => !accountId || n.id == accountId)
+                    )
+                    .then(function() {})
           },
           e.reloadAccountList = function(t)
           {
@@ -2591,13 +2595,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.messageType = "GetWalletNodes",
             this.responds = !1
         }
-        return e.prototype.action = function()
+        return e.prototype.action = function(msg)
           {
             var e = s.DeviceClientManager.instance.getActiveClient();
-            return e = o.AccountListManager.loaded ? e.then(i.UiMessenger.sendAccountsToUi.bind(i.UiMessenger, !1)).then(o.AccountListManager.reloadBalances) : e.then(function(e)
-              {
-                return a.AccountListLoader.getInstance().loadAccounts(e)
-              }).then(o.AccountListManager.setAccountsLoaded),
+            return e = o.AccountListManager.loaded
+                     ? e.then (i.UiMessenger.sendAccountsToUi.bind(i.UiMessenger, !1))
+                        .then (o.AccountListManager
+                                .reloadBalances
+                                .bind(o.AccountListManager, msg && msg.accountId))
+                     : e.then(function(e)
+                              {
+                                return a.AccountListLoader.getInstance().loadAccounts(e)
+                              })
+                        .then(o.AccountListManager.setAccountsLoaded),
               e.then(i.UiMessenger.sendAccountsToUi.bind(i.UiMessenger))
           },
           e
@@ -3061,9 +3071,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.messageType = "ReloadBalances",
             this.responds = !1
         }
-        return e.prototype.action = function()
+        return e.prototype.action = function(msg)
           {
-            return a.AccountListManager.reloadBalances().then(i.UiMessenger.sendAccountsToUi.bind(i.UiMessenger))
+            return a.AccountListManager
+                    .reloadBalances(msg && msg.accountId)
+                    .then(i.UiMessenger.sendAccountsToUi.bind(i.UiMessenger))
           },
           e
       }();
@@ -3957,9 +3969,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               }
               e.transactionWatcher = new l.TransactionWatcher(n, e.address, e.value),
                 e.transactionWatcher.watch(n.removePendingAmounts.bind(n, e))
-            }).then(function()
-            {
-              return p.BalanceReloader.reloadBalances()
             })
           },
           e.prototype.removePendingAmounts = function(e)
@@ -3979,7 +3988,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               e.transactionWatcher = new l.TransactionWatcher(t.destinationAccount, t.withdrawalAddress.address, t.value),
                 e.transactionWatcher.watch(this.removePendingIncomingExchange.bind(t.destinationAccount, e))
             }
-            p.BalanceReloader.reloadBalances()
+            p.BalanceReloader.reloadBalances({accountId: this.wallet.data.id})
           },
           e.prototype.removeIncomingTransfer = function(e)
           {
@@ -4019,11 +4028,25 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.updateWallet = function(e)
           {
-            console.assert(e, "wallet has no data property"),
-              this._wallet.data.unspentTxs = [],
-              this._wallet.data.unconfirmedTxs = [],
-              this._wallet.data.txHist = [],
-              r.merge(this._wallet.data, e)
+            console.assert(e, "wallet has no data property")
+            function setTransactionFlag(tx)
+            {
+              var addr = r.find(external, {address: tx.address})
+              if (addr) addr.hasTransactions = true
+            }
+            var wallet = this._wallet.data;
+            var external = wallet.chains && wallet.chains[0].chainAddresses;
+            if (external)
+            {
+              e.txHist.forEach(setTransactionFlag)
+              e.unspentTxs.forEach(setTransactionFlag)
+              e.unconfirmedTxs.forEach(setTransactionFlag)
+            }
+
+            this._wallet.data.unspentTxs = [],
+            this._wallet.data.unconfirmedTxs = [],
+            this._wallet.data.txHist = [],
+            r.merge(this._wallet.data, e)
           },
           e
       }();
@@ -4158,13 +4181,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e()
         {}
-        return e.reloadBalances = function()
+        return e.reloadBalances = function(accountId)
           {
             return console.assert(!e.reloading, "overlapping reloads"),
               e.reloading = !0,
               new Promise(function(t)
               {
-                r.MessageDispatcher.execute("ReloadBalances").then(function()
+                r.MessageDispatcher.execute("ReloadBalances", accountId).then(function()
                 {
                   e.reloading = !1,
                     t()

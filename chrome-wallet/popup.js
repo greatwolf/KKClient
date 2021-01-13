@@ -1147,7 +1147,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.refresh = function()
         {
           n.setUnfresh(),
-            t.reloadBalances()
+            t.reloadBalances(e.walletId)
         }
       }],
       template: '<a class="refresh-button" uib-tooltip="Refresh" tooltip-popup-delay="500" tooltip-placement="auto bottom" tooltip-append-to-body="true"><div class="icon icon-refresh" ng-click="refresh()" ></div></a>'
@@ -1753,7 +1753,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.wallet.id && (c.getMaximumTransactionAmount(e.wallet.id, t.subaccount, e.userInput.feeLevel),
         c.compute(e.wallet.id, t.subaccount, l.unformatAmount(e.currency, e.userInput.amount)))
     }
-    o.reload(),
+    o.reload(undefined, t.wallet),
       e.feeLevels = [],
       e.estimatedFee = c.estimatedFee,
       e.isExchange = !1,
