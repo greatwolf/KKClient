@@ -15683,7 +15683,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             [
               "https://explorer.fujicoin.org",
             ],
-            txUrlExplorer: "http://explorer.fujicoin.org/tx/"
+            txUrlExplorer: "http://explorer.fujicoin.org/tx/",
+            feeProfile: { MIN_FEE: 1e7 }
           },
           {
             name: s.CoinName[s.CoinName.Zcash = 133] = "Zcash",
