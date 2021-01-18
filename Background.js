@@ -7568,7 +7568,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     c = i.walletApi.urlGenerator.getWalletUrl(s);
                   return c.then(function(t)
                   {
-                    return e.CQapiThrottler.get(t)
+                    return e.ESapiThrottler.get(t)
                   }).then(function(e)
                   {
                     return console.assert(e, "failed to get wallet balance from etherscan"),
@@ -7585,7 +7585,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                       n ? Promise.resolve(
                       {
                         result: 0
-                      }) : e.CQapiThrottler.get(t)
+                      }) : e.ESapiThrottler.get(t)
                   }).then(function(e)
                   {
                     return console.assert(e, "failed to get transaction count from etherscan"),
@@ -7666,7 +7666,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return a.EtherscanDataTranslator.transactionList(a.EtherscanDataTranslator.externalTransactionList(e, n)).txHist
             })
           },
-          e.ESapiThrottler = new c.ApiThrottler(3, 3),
+          e.ESapiThrottler = new c.ApiThrottler(1, 2),
           e.CQapiThrottler = l.HttpClient,
           e
       }();
@@ -7898,14 +7898,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return "https://eth.coinquery.com/api?module=account&action=balance&address=0x" + e + "&tag=latest&apikey=" + t
+              return "https://api.etherscan.io/api?module=account&action=balance&address=0x" + e + "&tag=latest&apikey=" + t
             })
           },
           e.prototype.getWalletTokenUrl = function(e, t)
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(n)
             {
-              return "https://eth.coinquery.com/api?module=account&action=tokenbalance&contractaddress=" + t + "&address=0x" + e + "&tag=latest&apikey=" + n
+              return "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=" + t + "&address=0x" + e + "&tag=latest&apikey=" + n
             })
           },
           e.prototype.getWebsiteTransactionUrl = function(e)
@@ -7936,7 +7936,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(e)
             {
-              return "https://eth.coinquery.com/api?module=proxy&action=eth_blockNumber&apikey=" + e
+              return "https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=" + e
             })
           },
           e.prototype.getOutgoingTransactionCount = function(e)
@@ -7944,7 +7944,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
               return e = e.startsWith("0x") ? e : "0x" + e,
-                "https://eth.coinquery.com/api?module=proxy&action=eth_getTransactionCount&address=" + e + "&sort=asc&apikey=" + t
+                "https://api.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=" + e + "&sort=asc&apikey=" + t
             })
           },
           e
