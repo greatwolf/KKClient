@@ -4077,6 +4077,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       s = e("@keepkey/device-client/dist/global/coin-type"),
       d = e("../../global/wallet-selectors"),
       c = e("../../blockchainApis/etherscan/etherscan-token-account-list-loader"),
+      p = e("../../blockchainApis/blockbook-api/blockbook-account-list-loader"),
       l = function()
       {
         function e()
@@ -4141,8 +4142,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   var slip044 = o.CoinName[coin.name]
                   var name    = coin.name.toLowerCase()
-                  t[name] = new i.InsightAccountListLoader(slip044,
-                                                           "m/44'/" + coin.coinTypeCode)
+                  t[name] = new p.BlockbookAccountListLoader(slip044,
+                                                             "m/44'/" + coin.coinTypeCode)
                 }),
                 t.bitcoinCashLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
                 t.bitcoinSVLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV)),
@@ -4154,7 +4155,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             if (!e) return undefined
 
-            return new i.InsightAccountListLoader(o.CoinName[e.name], "m/44'/" + s.CoinType.get(o.CoinName.Bitcoin).coinTypeCode, d.WalletSelectors.hasTxHistory)
+            return new p.BlockbookAccountListLoader(o.CoinName[e.name], "m/44'/" + s.CoinType.get(o.CoinName.Bitcoin).coinTypeCode, d.WalletSelectors.hasTxHistory)
           },
           e
       }();
@@ -4165,6 +4166,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../blockchainApis/etherscan/etherscan-account-list-loader": 74,
     "../../blockchainApis/etherscan/etherscan-token-account-list-loader": 77,
     "../../blockchainApis/insight-api/insight-account-list-loader": 79,
+    "../../blockchainApis/blockbook-api/blockbook-account-list-loader": 443,
     "../../global/wallet-selectors": 92,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
@@ -8674,28 +8676,29 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       o = e("./etherscan/etherscan-url-generator"),
       s = e("./insight-api/insight-url-generator"),
       d = e("./insight-api/insight-api-helper"),
+      u = e("./blockbook-api/blockbook-url-generator"),
+      f = e("./blockbook-api/blockbook-api-helper"),
       c = e("@keepkey/device-client/dist/global/coin-name"),
       l = e("@keepkey/device-client/dist/global/coin-type"),
       p = function()
       {
         function e()
         {}
-        return e.getInstance = function(t)
+        return e.getInstance = function(slip044)
           {
-            if (!e.instances[t])
-              switch (t)
+            var coinType = l.CoinType.get(slip044);
+            if (!e.instances[slip044])
+              switch (slip044)
               {
                 case c.CoinName.Ethereum:
                   e.instances[c.CoinName.Ethereum] = this.createEtherscanWalletApi();
                   break;
                 default:
-                  var slip044  = t;
-                  var coinType = l.CoinType.get(slip044);
                   if(coinType)
-                    e.instances[slip044] = this.createInsightWalletApi(coinType.symbol.toLowerCase(),
+                    e.instances[slip044] = this.createBlockbookWalletApi(coinType.symbol.toLowerCase(),
                                                                       coinType);
               }
-            if(e.instances[t]) return e.instances[t]
+            if(e.instances[slip044]) return e.instances[slip044]
 
             throw "No wallet api available for " + c.CoinName[slip044];
           },
@@ -8715,6 +8718,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               n.apiHelper = new d.InsightApiHelper(n, t),
               n
           },
+          e.createBlockbookWalletApi = function(e, t)
+          {
+            var n = new r.WalletApi,
+              i = new a.BlockcypherWalletMetadataUrlGenerator;
+            return n.urlGenerator = new u.BlockbookUrlGenerator(e, i),
+              n.apiHelper = new f.BlockbookApiHelper(n, t),
+              n
+          },
           e.instances = [],
           e
       }();
@@ -8726,6 +8737,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./etherscan/etherscan-url-generator": 78,
     "./insight-api/insight-api-helper": 80,
     "./insight-api/insight-url-generator": 82,
+    "./blockbook-api/blockbook-api-helper": 444,
+    "./blockbook-api/blockbook-url-generator": 446,
     "./wallet-api": 84,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
@@ -78455,6 +78468,586 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       }
   },
   {}],
+  443: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../../blockchainApis/insight-api/insight-account-list-loader");
+    n.BlockbookAccountListLoader = r.InsightAccountListLoader
+  },
+  {
+    "../../blockchainApis/insight-api/insight-account-list-loader": 79
+  }],
+  444: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("lodash"),
+      i = e("../../global/Wallet"),
+      a = e("../../global/SubchainEnum"),
+      o = e("../../HttpClient"),
+      s = e("../blockcypher-metadata/PayloadFactory"),
+      d = e("../../services/insight-xpub-registry"),
+      c = e("../../big-number-filter"),
+      l = e("../../Configuration"),
+      p = e("./blockbook-data-translator"),
+      u = e("bitcore-lib"),
+      f = e("../../services/transaction-cache-registry"),
+      g = e("@keepkey/device-client/dist/node-vector"),
+      h = e("../blockcypher-metadata/blockcypher-metadata-api"),
+      m = function()
+      {
+        function e(e, t)
+        {
+          this.walletApi = e,
+          this.coinType = t,
+          this.xpubRegistry = d.InsightXpubRegistry.instance,
+          this.txPageSize = 8,
+          this.transactionSummaryCache = {}
+        }
+        return Object.defineProperty(e.prototype, "network",
+          {
+            get: function e()
+            {
+              return this._network || (this._network = u.Networks.add(
+                {
+                  name: this.coinType.name.toLowerCase(),
+                  pubkeyhash: this.coinType.pubkeyhash,
+                  scripthash: this.coinType.scripthash
+                })),
+                this._network
+            },
+            enumerable: !0,
+            configurable: !0
+          }),
+          e.prototype.loadWallet = function(e)
+          {
+            var t = this,
+              n = this.xpubRegistry.getXpub(e),
+              r;
+            return n ? h.BlockcypherMetadataApi.get(e, this.coinType).then(function(a)
+            {
+              var o = {};
+              return a.encrypted_name ? (o.xpub = n,
+                o.id = e,
+                o.hasTransactionHistory = !1,
+                o.highConfidenceBalance = t.coinType.parseAmount(0),
+                o.lowConfidenceBalance = t.coinType.parseAmount(0),
+                o.addresses = {},
+                o.txHist = [],
+                o.unconfirmedTxs = [],
+                o.unspentTxs = [],
+                t.walletApi.setWalletMetadata(o, a),
+                r = new i.Wallet(o, t.walletApi),
+                r) : void console.warn("encrypted name not set for insight wallet id " + e)
+            }).then(function(e)
+            {
+              if (e)
+                return t.extendChains(e.data, [a.Subchain.EXTERNAL, a.Subchain.CHANGE])
+            }).then(function()
+            {
+              return r
+            }) : Promise.reject("the xpub for " + e + " is not registered.")
+          },
+          e.prototype.getBlockHeightFromBlockchainData = function(e)
+          {
+            return r.get(e, "info.blocks")
+          },
+          e.prototype.deleteWallet = function(accountId)
+          {
+            return this.walletApi.deleteStoredMetadata(accountId).then(function()
+            {
+              return null
+            })
+          },
+          e.prototype.sendRawTransaction = function(e, t)
+          {
+            var n = t ? this.walletApi.urlGenerator.dashInstantSendTransactionUrl() : this.walletApi.urlGenerator.sendTransactionUrl();
+            return n.then(function(t)
+            {
+              return o.HttpClient.post(t, e.toHex(), "application/x-www-form-urlencoded")
+            }).then(function(e)
+            {
+              return e
+            })
+          },
+          e.prototype.createWallet = function(e, t)
+          {
+            var n = this,
+              r = s.PayloadFactory.createWalletMetaDataPayload(t);
+            return this.xpubRegistry.registerXpub(e, t.xpub),
+              r.then(function(r)
+              {
+                return n.walletApi.updateStoredMetadata(e, r).then(function()
+                {
+                  return n.walletApi.getExistingWallet(e)
+                })
+              })
+          },
+          e.prototype.getTransactionSummaries = function(e)
+          {
+            var t = this;
+            return this.loadWallet(e).then(function()
+            {
+              return t.transactionSummaryCache[e]
+            })
+          },
+          e.prototype.getRecentTransactions = function(e, t)
+          {
+            var n = this;
+            return this.walletApi.urlGenerator.getRecentTransactionsUrl(t, e).then(o.HttpClient.get).then(function(e)
+            {
+              var r = {};
+              e.items = e.items || e.txs || [];
+              return r[t] = {
+                  address: t,
+                  path: g.NodeVector.fromString("0")
+                },
+                p.BlockbookDataTranslator.transactionsToTransactionSummaries(e, r, n.coinType)
+            })
+          },
+          e.prototype.getTransaction = function(e)
+          {
+            var t = this;
+            return this.walletApi.urlGenerator.getTransactionUrl(e.toHex()).then(o.HttpClient.get).then(function(e)
+            {
+              return p.BlockbookDataTranslator.transaction(e, t.coinType)
+            })
+          },
+          e.prototype.createUnusedAddress = function(e, t, n)
+          {
+            var i = e.chains[t],
+              a = Promise.resolve();
+            return i.unusedAddresses = r.filter(i.chainAddresses,
+              {
+                hasTransactions: !1
+              }),
+              i.unusedAddresses.length <= n && (a = this.extendChains(e, [t])),
+              a.then(function()
+              {
+                return e.chains[t]
+              })
+          },
+          e.prototype.extendChains = function(e, t)
+          {
+            var n = this,
+              i = new u.HDPublicKey(e.xpub),
+              a = [],
+              o = f.TransactionCacheRegistry.getInstance(e.id);
+            return e.chains || (e.chains = [],
+                e.addresses = {}),
+              r.each(t, function(t)
+              {
+                e.chains[t] || (e.chains[t] = {
+                  index: t,
+                  chainAddresses: []
+                });
+                for (var o = e.chains[t].chainAddresses, s = r.findLastIndex(o,
+                  {
+                    hasTransactions: !0
+                  }), d = s + l.Configuration.BIP44_MAX_ADDRESS_GAP, c = d - o.length + 1; 0 < c--;)
+                {
+                  var p = o.length,
+                    u = n.getAddressDetail(i, new g.NodeVector([t, p]));
+                  o.push(u),
+                    e.addresses[u.address] = u,
+                    a.push(u.address)
+                }
+              }),
+              a.length ? this.getInsightTransactions(e.xpub).then(function(t)
+              {
+                return t.items.forEach(function(t)
+                  {
+                    t.vout.forEach(function(t)
+                      {
+                        p.BlockbookDataTranslator.isNotOpReturn(t) && t.scriptPubKey.addresses && t.scriptPubKey.addresses.forEach(function(t)
+                        {
+                          e.addresses[t] && (e.addresses[t].hasTransactions = !0)
+                        })
+                      }),
+                      o.addOrUpdate(p.BlockbookDataTranslator.transaction(t, n.coinType))
+                  }),
+                  p.BlockbookDataTranslator.transactionsToTransactionSummaries(t, e.addresses, n.coinType)
+              }).then(function(i)
+              {
+                var a = [],
+                  o = [];
+                return e.hasTransactionHistory = e.hasTransactionHistory || 0 < i.length,
+                  r.each(i, function(e)
+                  {
+                    e.value.isGreaterThan(0) && !e.spent && (e.isConfirmed ? a.push(e) : o.push(e))
+                  }),
+                  o.forEach(function(e)
+                  {
+                    e.vin.forEach(function()
+                    {
+                      r.remove(o, function(t)
+                      {
+                        return t.hash.toHex() === e.hash.toHex() && t.outputIndex === e.outputIndex
+                      })
+                    })
+                  }),
+                  e.unspentTxs = r.unionBy(e.unspentTxs, a, n.getTxSummaryKey),
+                  e.unconfirmedTxs = r.unionBy(e.unconfirmedTxs, o, n.getTxSummaryKey),
+                  e.txHist = r.unionBy(e.txHist, i, n.getTxSummaryKey),
+                  n.extendChains(e, t)
+              }) : (this.transactionSummaryCache[e.id] = {
+                  unspentTxs: e.unspentTxs,
+                  unconfirmedTxs: e.unconfirmedTxs,
+                  txHist: e.txHist
+                },
+                Promise.resolve(e))
+          },
+          e.prototype.getTxSummaryKey = function(e)
+          {
+            var t = [e.hash.toHex(), e.outputIndex.toString()].join(":");
+            return t
+          },
+          e.prototype.getAddressDetail = function(e, t)
+          {
+            var n = e.derive(t.toString()),
+              r = new u.PublicKey(n.toObject().publicKey),
+              i = r.toAddress(this.network).toString();
+              if (this.network.name === "bitcoincash")
+                i = bchaddr.toCashAddress(i)
+            return {
+              address: i,
+              path: t,
+              hasTransactions: !1
+            }
+          },
+          e.prototype.getInsightTransactions = function(e)
+          {
+            var t = this;
+            return this.walletApi.urlGenerator.getTransactionsUrl(e, this.txPageSize).then(function(e)
+            {
+              return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
+            }).then(function(n)
+            {
+              return t.getMoreInsightTransactions(e, n)
+            })
+          },
+          e.prototype.getMoreInsightTransactions = function(e, t)
+          {
+            for (var n = this, i = [], s = {
+                from: 2,
+                to: t.totalPages,
+                items: t.txs || []
+              }, d = function(t)
+              {
+                return n.walletApi.urlGenerator.getAllTransactionsUrl(e, t, n.txPageSize).then(function(e)
+                {
+                  return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
+                }).then(function(e)
+                {
+                  s.items = r.uniqBy(r.union(s.items, e.txs || []), "txid")
+                })
+              }; s.from <= s.to; ++s.from)
+                i.push(d(s.from));
+
+            return Promise.all(i).then(function()
+            {
+              return s
+            })
+          },
+          e
+      }();
+    n.BlockbookApiHelper = m
+  },
+  {
+    "../../Configuration": 62,
+    "../../HttpClient": 65,
+    "../../big-number-filter": 67,
+    "../../global/SubchainEnum": 88,
+    "../../global/Wallet": 89,
+    "../../services/insight-xpub-registry": 120,
+    "../../services/transaction-cache-registry": 121,
+    "../blockcypher-metadata/PayloadFactory": 68,
+    "../blockcypher-metadata/blockcypher-metadata-api": 71,
+    "./blockbook-data-translator": 445,
+    "@keepkey/device-client/dist/node-vector": 167,
+    "bitcore-lib": 191,
+    lodash: 368
+  }],
+  445: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("lodash"),
+      i = e("bytebuffer"),
+      a = e("../../global/summable-list"),
+      o = function()
+      {
+        function e()
+        {}
+        return e.transactionsToTransactionSummaries = function(t, n, i)
+          {
+            var a = r.map(t.items, function(t)
+              {
+                return e.transactionSummary(t, n, i)
+              }),
+              o = r.flatten(a);
+            return o
+          },
+          e.transactionSummary = function(t, n, a)
+          {
+            var o = [];
+            return r.each(t.vin, function(e)
+              {
+                n[e.addresses[0]] && o.push(
+                {
+                  address: e.addresses[0],
+                  hash: i.fromHex(t.txid),
+                  blockHeight: t.blockheight,
+                  value: a.floatToAmount(e.value).negated(),
+                  outputIndex: e.n,
+                  confidence: 1,
+                  isConfirmed: !!(0 < t.confirmations),
+                  confirmations: t.confirmations,
+                  dashInstantSend: !!t.txlock
+                })
+              }),
+              r.each(t.vout, function(s)
+              {
+                var d = [];
+                e.isNotOpReturn(s) && s.scriptPubKey.addresses && (s.scriptPubKey.addresses.forEach(function(e)
+                  {
+                    n[e] && d.push(e)
+                  }),
+                  console.assert((1 >= d.length,
+                    "Multiple addresses matched on an output. What does it mean?")),
+                  d.length && o.push(
+                  {
+                    address: d[0],
+                    hash: i.fromHex(t.txid),
+                    blockHeight: t.blockheight,
+                    value: a.floatToAmount(s.value),
+                    outputIndex: s.n,
+                    confidence: 0 < t.confirmations ? 1 : 0,
+                    isConfirmed: !!(0 < t.confirmations),
+                    confirmations: t.confirmations,
+                    dashInstantSend: !!t.txlock,
+                    spent: s.spent,
+                    vin: r.map(t.vin, function(e)
+                    {
+                      if (!e.coinbase)
+                        return {
+                          address: e.addresses[0],
+                          hash: i.fromHex(e.txid),
+                          blockHeight: t.blockheight,
+                          value: a.floatToAmount(e.value).negated(),
+                          outputIndex: e.n
+                        }
+                    })
+                  }))
+              }),
+              o
+          },
+          e.txHistory = function(t, n)
+          {
+            return r.map(t.items, function(t)
+            {
+              return e.transaction(t, n)
+            })
+          },
+          e.transaction = function(t, n)
+          {
+            var r = {
+              blockHeight: 1,
+              hash: i.fromHex(t.txid),
+              addresses: e.gatherAddresses(t),
+              inputs: e.transactionInputs(t.vin, n),
+              outputs: e.transactionOutputs(t.vout, n),
+              confidence: t.confirmations ? 1 : 0,
+              version: t.version,
+              lockTime: t.locktime,
+              timestamp: new Date
+            };
+            return t.confirmations && (r.blockHash = i.fromHex(t.blockhash),
+                r.confirmations = t.confirmations,
+                r.timestamp = new Date(1e3 * t.time)),
+              r
+          },
+          e.isNotOpReturn = function(e)
+          {
+            return !e.scriptPubKey.hex.startsWith("6a") // bytecode for OP_RETURN
+          },
+          e.gatherAddresses = function(e)
+          {
+            var t = r.map(e.vout, function(e)
+            {
+              return e.scriptPubKey.addresses
+            });
+            return t.push(r.map(e.vin, "addr")),
+              r.flatten(t)
+          },
+          e.transactionInputs = function(t, n)
+          {
+            var i = new a.SummableList;
+            return r.each(t, function(t)
+              {
+                i.add(e.transactionInput(t, n))
+              }),
+              i
+          },
+          e.transactionInput = function(e, t)
+          {
+            return {
+              address: r.get(e, "addresses.0", void 0),
+              outputIndex: e.coinbase ? -1 : r.get(e, "vout"),
+              value: Math.round(t.parseAmount(r.get(e, "value", 0)) * 1e8),
+              prevHash: i.fromHex(r.get(e, "txid", "0000000000000000000000000000000000000000000000000000000000000000")),
+              script: i.fromHex(r.get(e, "scriptSig.hex", r.get(e, "coinbase", ""))),
+              sequence: e.sequence
+            }
+          },
+          e.transactionOutputs = function(t, n)
+          {
+            var i = new a.SummableList;
+            return r.each(t, function(t)
+              {
+                i.add(e.transactionOutput(t, n))
+              }),
+              i
+          },
+          e.transactionOutput = function(e, t)
+          {
+            return {
+              address: r.get(e, "scriptPubKey.addresses.0"),
+              value: t.floatToAmount(e.value),
+              script: i.fromHex(e.scriptPubKey.hex)
+            }
+          },
+          e
+      }();
+    n.BlockbookDataTranslator = o
+  },
+  {
+    "../../global/summable-list": 91,
+    bytebuffer: 300,
+    lodash: 368
+  }],
+  446: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("@keepkey/device-client/dist/global/coin-type"),
+      i = function()
+      {
+        function e(e, t)
+        {
+          this.coinId = e
+          this.metadataUrlGenerator = t
+
+          var coinType = r.CoinType.getBySymbol(this.coinId)
+          var blockbook = coinType && coinType.blockbook
+          if(!blockbook || !blockbook.length)
+            throw "block indexer not defined for cointype " + this.coinId;
+
+          if(blockbook.length == 1)
+          {
+            this.rootUrl = blockbook[0] + '/api'
+            return
+          }
+
+          Object.defineProperty(this, 'rootUrl',
+          {
+            get: function()
+            {
+              var i = Math.trunc( Math.random() * blockbook.length )
+              return blockbook[i] + '/api'
+            }
+          })
+          return
+        }
+        return e.prototype.getWalletListUrl = function()
+          {
+            return Promise.reject("Wallet list not available for this api")
+          },
+          e.prototype.sendTransactionUrl = function()
+          {
+            return Promise.resolve(this.rootUrl + "/sendtx/")
+          },
+          e.prototype.dashInstantSendTransactionUrl = function()
+          {
+            return Promise.resolve(this.rootUrl + "/sendtx/")
+          },
+          e.prototype.getTransactionsUrl = function(e, t)
+          {
+            return this.getAllTransactionsUrl(e, 1, t || 1000)
+          },
+          e.prototype.getAllTransactionsUrl = function(e, t, n)
+          {
+            return Promise.resolve(this.rootUrl + (e.startsWith("xpub") ? "/xpub/" : "/address/") + e + "?page=" + t + "&pageSize=" + n + "&details=txs")
+          },
+          e.prototype.getPartialTransactionUrl = function()
+          {
+            return Promise.reject("unimplemented")
+          },
+          e.prototype.getWalletUrl = function()
+          {
+            return Promise.reject("unimplemented")
+          },
+          e.prototype.createWalletUrl = function()
+          {
+            return Promise.reject("unimplemented")
+          },
+          e.prototype.unusedAddressesUrl = function()
+          {
+            return Promise.reject("unimplemented")
+          },
+          e.prototype.deriveAddressesUrl = function()
+          {
+            return Promise.reject("unimplemented")
+          },
+          e.prototype.getTransactionUrl = function(e)
+          {
+            return Promise.resolve(this.rootUrl + "/tx/" + e)
+          },
+          e.prototype.getWebsiteTransactionUrl = function(e)
+          {
+            var t;
+            var coinType = r.CoinType.getBySymbol(this.coinId)
+            if(!coinType || !coinType.txUrlExplorer)
+              throw "block explorer url is not defined for cointype " + this.coinId;
+
+            return coinType.txUrlExplorer + e
+          },
+          e.prototype.walletMetaDataUrl = function(e)
+          {
+            return this.metadataUrlGenerator.walletMetaDataUrl(e, r.CoinType.getBySymbol(this.coinId))
+          },
+          e.prototype.getConfidenceUrl = function()
+          {
+            return Promise.reject("unimplemented")
+          },
+          e.prototype.getBlockchainDataUrl = function()
+          {
+            return Promise.resolve(this.rootUrl + "/status")
+          },
+          e.prototype.getRecentTransactionsUrl = function(e)
+          {
+            return this.getTransactionsUrl(e)
+          },
+          e
+      }();
+    n.BlockbookUrlGenerator = i
+  },
+  {
+    "@keepkey/device-client/dist/global/coin-type": 161
+  }],
   450: [function(require, module, exports)
   {
     /////////////////////////////////////
