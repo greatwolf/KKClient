@@ -6931,43 +6931,44 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e()
         {}
-        return e.get = function(t, n)
+        return e.get = function(aUrl, responseDecode)
           {
-            return e.send(t, null, null, "GET", [200], n).then((resp) => resp || JSON.parse('{}'))
+            return e.send(aUrl, null, null, "GET", [200], responseDecode)
+                    .then((resp) => resp || JSON.parse('{}'))
           },
-          e.post = function(t, n, r, i, a)
+          e.post = function(aUrl, payload, contentType, responseDecode, requestEncode)
           {
-            return a && (n = a(n)),
-              e.send(t, n, r, "POST", [200, 201], i)
+            return requestEncode && (payload = requestEncode(payload)),
+              e.send(aUrl, payload, contentType, "POST", [200, 201], responseDecode)
           },
-          e.put = function(t, n, r)
+          e.put = function(aUrl, payload, contentType)
           {
-            return e.send(t, n, r, "PUT", [200, 204])
+            return e.send(aUrl, payload, contentType, "PUT", [200, 204])
           },
-          e.delete = function(t)
+          e.delete = function(aUrl)
           {
-            return e.send(t, null, null, "DELETE", [200, 204])
+            return e.send(aUrl, null, null, "DELETE", [200, 204])
           },
-          e.send = function(t, n, i, a, o, s)
+          e.send = function(aUrl, payload, contentType, method, resolveStatuses, decode)
           {
-            return s || (s = JSON.parse),
+            return decode || (decode = JSON.parse),
               new Promise(function(d, c)
               {
                 var l = new XMLHttpRequest;
                 l.onreadystatechange = function()
                   {
                     if (4 === l.readyState)
-                      if (console.log("HTTP " + a + " " + t + " (" + l.status + ")"),
+                      if (console.log("HTTP " + method + " " + aUrl + " (" + l.status + ")"),
                         0 === l.status || 404 === l.status)
-                        e.send(t, n, i, a, o).then(function(e)
+                        e.send(aUrl, payload, contentType, method, resolveStatuses).then(function(e)
                         {
                           d(e)
                         }).catch(function(e)
                         {
                           c(e)
                         });
-                      else if (-1 !== r.indexOf(o, l.status))
-                      l.response ? d(s(l.response)) : d("");
+                      else if (-1 !== r.indexOf(resolveStatuses, l.status))
+                      l.response ? d(decode(l.response)) : d("");
                     else
                     {
                       var p;
@@ -6992,43 +6993,73 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                       }
                     }
                   },
-                  l.open(a, t, !0),
-                  i && l.setRequestHeader("Content-Type", i),
-                  l.send(n)
+                  l.open(method, aUrl, !0),
+                  contentType && l.setRequestHeader("Content-Type", contentType),
+                  l.send(payload)
               })
           },
           e
       }();
     n.HttpClient = i
-    var cached_response = {}
+    var cached_promises = {},
+        cached_responses = {},
+        ttl_queue = []
+    var expire_cache = (url) => delete cached_responses[url]
+    var cache_response = function(url, resp, ttl)
+    {
+      delete cached_promises[url];
+      cached_responses[url] = { result: resp, expires: ttl && (Date.now() + ttl) }
+      return resp
+    }
+    var fetch_response = function(url)
+    {
+      var resp = cached_responses[url]
+      if (!resp) return
+      if (resp.expires && (resp.expires < Date.now()))
+      {
+        expire_cache(url)
+        return
+      }
+      return resp.result
+    }
     n.CachedHttpClient =
     {
-      'get': function(t, n)
+      get: function(url, responseDecode)
       {
-        if (t in cached_response)
-        {
-          return Promise.resolve(cached_response[t])
-        }
-        return i.get(t, n).then((resp) => { cached_response[t] = resp ; return resp })
-      },
-      'put': function(t, n, r)
-      {
-        if (t in cached_response) delete cached_response[t]
+        var ttl = ttl_queue.pop()
+        var response = fetch_response(url)
+        if (response)
+          return Promise.resolve(response)
 
-        return i.put(t, n, r)
-      },
-      'post': function(t, n, r, i, a)
-      {
-        if (t in cached_response) delete cached_response[t]
+        if (!cached_promises[url]) 
+          cached_promises[url] = i.get(url, responseDecode)
+                                  .then((resp) => cache_response(url, resp, ttl))
 
-        return i.post(t, n, r, i, a)
+        return cached_promises[url]
       },
-      'delete': function(t)
+      put: function(url, payload, contentType)
       {
-        if (t in cached_response) delete cached_response[t]
+        expire_cache(url)
 
-        return i.delete(t)
+        return i.put(url, payload, contentType)
       },
+      post: function(url, payload, contentType, responseDecode, requestEncode)
+      {
+        expire_cache(url)
+
+        return i.post(url, payload, contentType, responseDecode, requestEncode)
+      },
+      delete: function(url)
+      {
+        expire_cache(url)
+
+        return i.delete(url)
+      },
+      push_ttl: function(msec)
+      {
+        msec && ttl_queue.push(msec)
+        return n.CachedHttpClient
+      }
     }
   },
   {
