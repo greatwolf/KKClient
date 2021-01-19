@@ -5868,7 +5868,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             get: function e()
             {
-              return l.Configuration.valueTransferGasLimit
+              return this.feeService.gasLimit || l.Configuration.valueTransferGasLimit
             },
             enumerable: !0,
             configurable: !0
@@ -10464,11 +10464,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       p = e("@keepkey/device-client/dist/global/coin-type"),
       u = function(e)
       {
-        function t(t)
+        function t(coinDetail, t)
         {
-          void 0 === t && (t = d.Configuration.valueTransferGasLimit);
           var n = e.call(this, l.CoinName.Ethereum) || this;
-          return n.gasLimit = t,
+          return n.gasLimit = t ||
+            s.BigNumber(coinDetail.feeProfile.gasLimit || d.Configuration.valueTransferGasLimit),
             n
         }
         return r(t, e),
@@ -10569,7 +10569,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             if (coinDetail.isToken)
             {
               console.assert(n, "Gas limit is required for tokens"),
-              e.instances[t] = new l.EthereumFeeService(n);
+              e.instances[t] = new feeServices['ethereum-fee-service'](coinDetail, n);
               return e.instances[t]
             }
 
