@@ -8789,13 +8789,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             enumerable: !0,
             configurable: !0
           }),
-          e.prototype.getExistingWallet = function(e, t, n)
+          e.prototype.getExistingWallet = function(walletId, contractAddress, walletMetaData)
           {
-            return e ? this.apiHelper.loadWallet(e, t, n) : Promise.reject("wallet name required")
+            return walletId
+                 ? this.apiHelper.loadWallet(walletId, contractAddress, walletMetaData)
+                 : Promise.reject("wallet name required")
           },
-          e.prototype.createWallet = function(e, t)
+          e.prototype.createWallet = function(walletId, walletMetaData)
           {
-            return this.apiHelper.createWallet(e, t)
+            return this.apiHelper.createWallet(walletId, walletMetaData)
           },
           e.prototype.getTransaction = function(e)
           {
@@ -8803,16 +8805,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               throw "getTransaction() not available in walletApi";
             return this.apiHelper.getTransaction(e)
           },
-          e.prototype.createUnusedAddress = function(e, t, n)
+          e.prototype.createUnusedAddress = function(wallet, chainIndex, addressIndexOffset)
           {
             if (!this.apiHelper.createUnusedAddress)
               throw "createUnusedAddress() not available in walletApi";
-            return this.apiHelper.createUnusedAddress(e.data, t, n)
+            return this.apiHelper.createUnusedAddress(wallet.data, chainIndex, addressIndexOffset)
           },
-          e.prototype.getTransactionSummaries = function(e, t)
+          e.prototype.getTransactionSummaries = function(walletId, t)
           {
             return void 0 === t && (t = !1),
-              this.apiHelper.getTransactionSummaries(e, t)
+              this.apiHelper.getTransactionSummaries(walletId, t)
           },
           e.prototype.sendRawTransaction = function(e, t)
           {
@@ -78545,7 +78547,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 o.unspentTxs = [],
                 t.walletApi.setWalletMetadata(o, a),
                 r = new i.Wallet(o, t.walletApi),
-                r) : void console.warn("encrypted name not set for insight wallet id " + e)
+                r) : void console.warn("encrypted name not set for blockbook wallet id " + e)
             }).then(function(e)
             {
               if (e)
@@ -78660,7 +78662,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     a.push(u.address)
                 }
               }),
-              a.length ? this.getInsightTransactions(e.xpub).then(function(t)
+              a.length ? this.getBlockbookTransactions(e.xpub).then(function(t)
               {
                 return t.items.forEach(function(t)
                   {
@@ -78722,7 +78724,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               hasTransactions: !1
             }
           },
-          e.prototype.getInsightTransactions = function(e)
+          e.prototype.getBlockbookTransactions = function(e)
           {
             var t = this;
             return this.walletApi.urlGenerator.getTransactionsUrl(e, this.txPageSize).then(function(e)
@@ -78730,10 +78732,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return o.HttpClient.get(e, c.BigNumberFilter.responseFilter)
             }).then(function(n)
             {
-              return t.getMoreInsightTransactions(e, n)
+              return t.getMoreBlockbookTransactions(e, n)
             })
           },
-          e.prototype.getMoreInsightTransactions = function(e, t)
+          e.prototype.getMoreBlockbookTransactions = function(e, t)
           {
             for (var n = this, i = [], s = {
                 from: 2,
