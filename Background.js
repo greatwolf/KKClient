@@ -6840,14 +6840,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var a = new i.BigNumber(0),
               o = new i.BigNumber(0),
               s, d, c;
-            return t.to === n && t.from === n ? (d = t.gasPrice.times(t.gasUsed),
+            return t.to === n && t.from === n ? (d = t.gasPrice.times(t.gasUsed.isNaN() ? t.gas : t.gasUsed),
                 c = ["<internal transfer>"]) : t.to === n ? (a = t.value,
                 d = new i.BigNumber(0),
                 c = [t.from]) : t.from === n && (o = t.value,
-                d = t.gasPrice.times(t.gasUsed),
+                d = t.gasPrice.times(t.gasUsed.isNaN() ? t.gas : t.gasUsed),
                 c = [t.to]),
               s = a.minus(o).minus(d),
-              new e(t.timestamp, 1, a, o, d, c, !1, r, s)
+              new e(t.timestamp, 1, a, o, d, c, !t.confirmations, r, s)
           },
           e.fromDetailedTransaction = function(t, n, r)
           {
