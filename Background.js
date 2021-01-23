@@ -985,7 +985,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       a = e("../../modules/keepkeyjs/Configuration"),
       o = e("bytebuffer"),
       s = e("../../modules/keepkeyjs/blockchainApis/wallet-api-factory"),
-      d = e("../../modules/keepkeyjs/blockchainApis/etherscan/etherscan-account-list-loader"),
+      d = e("../../modules/keepkeyjs/blockchainApis/etherbook/etherbook-account-list-loader"),
       c = e("../../account-list-manager"),
       l = e("@keepkey/device-client/dist/node-vector"),
       p = e("@keepkey/device-client/dist/global/coin-name"),
@@ -1011,7 +1011,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               if (g = e,
                 f === p.CoinName.Ethereum)
               {
-                var i = l.NodeVector.join([n, d.EtherscanAccountListLoader.tailNodeVector]);
+                var i = l.NodeVector.join([n, d.EtherbookAccountListLoader.tailNodeVector]);
                 r = r.then(function()
                 {
                   return g.getEthereumAddress(i, !1)
@@ -1061,7 +1061,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../account-list-manager": 2,
     "../../modules/keepkeyjs/Configuration": 62,
     "../../modules/keepkeyjs/DeterministicKeyGenerator": 63,
-    "../../modules/keepkeyjs/blockchainApis/etherscan/etherscan-account-list-loader": 74,
+    "../../modules/keepkeyjs/blockchainApis/etherbook/etherbook-account-list-loader": 456,
     "../../modules/keepkeyjs/blockchainApis/wallet-api-factory": 83,
     "../MessageDispatcher": 6,
     "@keepkey/device-client/dist/device-client-manager": 151,
@@ -4070,13 +4070,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       value: !0
     });
-    var r = e("../../blockchainApis/etherscan/etherscan-account-list-loader"),
+    var r = e("../../blockchainApis/etherbook/etherbook-account-list-loader"),
       i = e("../../blockchainApis/insight-api/insight-account-list-loader"),
       a = e("../../Configuration"),
       o = e("@keepkey/device-client/dist/global/coin-name"),
       s = e("@keepkey/device-client/dist/global/coin-type"),
       d = e("../../global/wallet-selectors"),
-      c = e("../../blockchainApis/etherscan/etherscan-token-account-list-loader"),
+      c = e("../../blockchainApis/etherbook/etherbook-token-account-list-loader"),
       p = e("../../blockchainApis/blockbook-api/blockbook-account-list-loader"),
       l = function()
       {
@@ -4135,7 +4135,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.initialized ? Promise.resolve() : e.featuresService.promise.then(function()
             {
               var e, n;
-              t.ethereum = new r.EtherscanAccountListLoader(o.CoinName.Ethereum, "m/44'/" + s.CoinType.get(o.CoinName.Ethereum).coinTypeCode),
+              t.ethereum = new r.EtherbookAccountListLoader(o.CoinName.Ethereum, "m/44'/" + s.CoinType.get(o.CoinName.Ethereum).coinTypeCode),
               s.CoinType
                 .getCoinList()
                 .forEach(function(coin)
@@ -4148,7 +4148,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 t.bitcoinCashLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
                 t.bitcoinSVLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV)),
                 t.bitcoinGoldLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinGold)),
-                t.erc20Tokens = new c.EtherscanTokenAccountListLoader
+                t.erc20Tokens = new c.EtherbookTokenAccountListLoader
             })
           },
           e.prototype.addBitcoinFork = function(e)
@@ -4163,8 +4163,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "../../Configuration": 62,
-    "../../blockchainApis/etherscan/etherscan-account-list-loader": 74,
-    "../../blockchainApis/etherscan/etherscan-token-account-list-loader": 77,
+    "../../blockchainApis/etherbook/etherbook-account-list-loader": 456,
+    "../../blockchainApis/etherbook/etherbook-token-account-list-loader": 459,
     "../../blockchainApis/insight-api/insight-account-list-loader": 79,
     "../../blockchainApis/blockbook-api/blockbook-account-list-loader": 443,
     "../../global/wallet-selectors": 92,
@@ -8678,6 +8678,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       d = e("./insight-api/insight-api-helper"),
       u = e("./blockbook-api/blockbook-url-generator"),
       f = e("./blockbook-api/blockbook-api-helper"),
+      g = e("./etherbook/etherbook-api-helper"),
+      h = e("./etherbook/etherbook-url-generator"),
       c = e("@keepkey/device-client/dist/global/coin-name"),
       l = e("@keepkey/device-client/dist/global/coin-type"),
       p = function()
@@ -8687,20 +8689,25 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return e.getInstance = function(slip044)
           {
             var coinType = l.CoinType.get(slip044);
-            if (!e.instances[slip044])
-              switch (slip044)
+            if (!e.instances[slip044] && coinType)
+            {
+              if (coinType.blockbook && coinType.blockbook.length)
               {
-                case c.CoinName.Ethereum:
-                  e.instances[c.CoinName.Ethereum] = this.createEtherscanWalletApi();
-                  break;
-                default:
-                  if(coinType)
-                    e.instances[slip044] = this.createBlockbookWalletApi(coinType.symbol.toLowerCase(),
-                                                                      coinType);
+                e.instances[slip044] = this.createBlockbookWalletApi(coinType.symbol.toLowerCase(),
+                                                                     coinType);
               }
-            if(e.instances[slip044]) return e.instances[slip044]
+              else if (coinType.insight && coinType.insight.length)
+              {
+                e.instances[slip044] = this.createInsightWalletApi(coinType.symbol.toLowerCase(),
+                                                                   coinType);
+              }
+              else if (slip044 === c.CoinName.Ethereum)
+                e.instances[c.CoinName.Ethereum] = this.createEtherscanWalletApi();
+            }
+            if (!e.instances[slip044])
+              throw "No wallet api available for " + c.CoinName[slip044];
 
-            throw "No wallet api available for " + c.CoinName[slip044];
+            return e.instances[slip044]
           },
           e.createEtherscanWalletApi = function()
           {
@@ -8721,10 +8728,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.createBlockbookWalletApi = function(e, t)
           {
             var n = new r.WalletApi,
-              i = new a.BlockcypherWalletMetadataUrlGenerator;
-            return n.urlGenerator = new u.BlockbookUrlGenerator(e, i),
-              n.apiHelper = new f.BlockbookApiHelper(n, t),
-              n
+                i = new a.BlockcypherWalletMetadataUrlGenerator;
+            if (t.name === 'Ethereum')
+            {
+              n.urlGenerator = new h.EtherbookUrlGenerator(e, i);
+              n.apiHelper = new g.EtherbookApiHelper(n, t);
+            }
+            else
+            {
+              n.urlGenerator = new u.BlockbookUrlGenerator(e, i);
+              n.apiHelper = new f.BlockbookApiHelper(n, t);
+            }
+            return n
           },
           e.instances = [],
           e
@@ -8739,6 +8754,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./insight-api/insight-url-generator": 82,
     "./blockbook-api/blockbook-api-helper": 444,
     "./blockbook-api/blockbook-url-generator": 446,
+    "./etherbook/etherbook-api-helper": 457,
+    "./etherbook/etherbook-url-generator": 460,
     "./wallet-api": 84,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
@@ -15484,7 +15501,17 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
             dust: 1,
             defaultDecimals: 18,
-            feeProfile: { servicer: 'ethereum-fee-service' }
+            blockbook:
+            [
+              "https://eth1.trezor.io",
+              "https://eth2.trezor.io",
+            ],
+            txUrlExplorer: "https://etherscan.io/tx/",
+            feeProfile:
+            {
+              gasLimit: 21e3,
+              servicer: 'ethereum-fee-service'
+            }
           },
           {
             name: s.CoinName[s.CoinName.Groestlcoin = 17] = "Groestlcoin",
@@ -79020,7 +79047,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.getWebsiteTransactionUrl = function(e)
           {
-            var t;
             var coinType = r.CoinType.getBySymbol(this.coinId)
             if(!coinType || !coinType.txUrlExplorer)
               throw "block explorer url is not defined for cointype " + this.coinId;
@@ -80071,6 +80097,384 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../account-list-manager": 2,
     "../MessageDispatcher": 6,
     "@keepkey/device-client/dist/device-client-manager": 151
+  }],
+  456: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../../blockchainApis/etherscan/etherscan-account-list-loader")
+
+    n.EtherbookAccountListLoader = r.EtherscanAccountListLoader
+  },
+  {
+    "../../blockchainApis/etherscan/etherscan-account-list-loader": 74
+  }],
+  457: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var lodash = e("lodash"),
+      i = e("../blockcypher-metadata/PayloadFactory"),
+      a = e("./etherbook-data-translator"),
+      o = e("../../global/Wallet"),
+      s = e("../../services/ethereum-address-registry"),
+      d = e("../blockcypher-metadata/blockcypher-metadata-api"),
+      c = e("./api-throttler"),
+      l = e("../../HttpClient"),
+      p = e("@keepkey/device-client/dist/global/coin-type"),
+      u = e("@keepkey/device-client/dist/global/coin-name"),
+      f = function()
+      {
+        function e(e)
+        {
+          this.walletApi = e,
+            this.addressRegistry = s.EthereumAddressRegistry.instance
+        }
+        return e.prototype.loadWallet = function(t, n, r)
+          {
+            var i = this,
+              s = this.addressRegistry.getAddress(t);
+            if (!s)
+              return Promise.reject("the address for " + t + " is not registered.");
+            var c;
+            return c = n ? Promise.resolve(r) : d.BlockcypherMetadataApi.get(t, p.CoinType.get(u.CoinName.Ethereum)),
+              c.then(function(r)
+              {
+                var d;
+                if (!r.encrypted_name)
+                  console.warn("encrypted name not set for etherscan wallet id " + t);
+                else
+                {
+                  var c = void 0;
+                    c = i.walletApi.urlGenerator.getWalletUrl(s);
+                  return c.then(function(t)
+                  {
+                    return e.EBapiThrottler.push_ttl(30000).get(t)
+                  }).then(function(e)
+                  {
+                    console.assert(e, "failed to get wallet balance from etherscan")
+                    !e.tokens && (e.tokens = [])
+                    e.tokens.forEach((each) => { each.contract = each.contract.toLowerCase() })
+                    if (n)
+                    {
+                      var needle = {contract: "0x" + n.toHex()}
+                      e = lodash.find(e.tokens, needle) || needle
+                      e.balance = e.balance || "0"
+                      e.transfers = e.transfers || 0
+                    }
+
+                    return d = a.EtherbookDataTranslator.balance(e),
+                      d.id = t,
+                      d.hasTransactionHistory = a.EtherbookDataTranslator.hasTransactions(d, e),
+                      d
+                  }).then(function(e)
+                  {
+                    return console.assert(e, "failed to get transaction count from etherscan"),
+                      i.walletApi.setWalletMetadata(d, r)
+                  }).then(function(e)
+                  {
+                    return console.assert(e, "failed to get a completed wallet from etherscan"),
+                      new o.Wallet(e, i.walletApi)
+                  })
+                }
+              })
+          },
+          e.prototype.getBlockHeightFromBlockchainData = function(e)
+          {
+            return parseInt(e.blockbook.bestHeight)
+          },
+          e.prototype.deleteWallet = function(e)
+          {
+            return this.walletApi.deleteStoredMetadata(e).then(function()
+            {
+              return null
+            })
+          },
+          e.prototype.sendRawTransaction = function(txraw, n)
+          {
+            return console.assert(!n, "Dash on Etherscan, huhhh?"),
+              this.walletApi.urlGenerator.sendTransactionUrl().then(function(url)
+              {
+                return e.EBapiThrottler.post(url, '0x' + txraw.toHex())
+              })
+          },
+          e.prototype.createWallet = function(e, t)
+          {
+            var n = this,
+              r = i.PayloadFactory.createWalletMetaDataPayload(t);
+            return this.addressRegistry.registerAddress(e, t.address.toHex()),
+              r.then(function(r)
+              {
+                return n.walletApi.updateStoredMetadata(e, r).then(function()
+                {
+                  return n.walletApi.getExistingWallet(e)
+                })
+              })
+          },
+          e.prototype.getTransactionSummaries = function(t)
+          {
+            var n = this,
+              i = this.addressRegistry.getAddress(t),
+              o, s;
+            return this.walletApi.urlGenerator.getTransactionsUrl(i).then(function(t)
+            {
+              return e.EBapiThrottler.push_ttl(30000).get(t)
+            }).then(function(e)
+            {
+              o = a.EtherbookDataTranslator.externalTransactionList(e, i)
+            })
+            .then(function()
+            {
+              return a.EtherbookDataTranslator.transactionList(o)
+            })
+          },
+          e.prototype.getRecentTransactions = function(t, n)
+          {
+            return this.walletApi.urlGenerator.getRecentTransactionsUrl(n, t).then(function(t)
+            {
+              return e.EBapiThrottler.get(t)
+            }).then(function(e)
+            {
+              return a.EtherbookDataTranslator.transactionList(a.EtherbookDataTranslator.externalTransactionList(e, n)).txHist
+            })
+          },
+          e.EBapiThrottler = l.CachedHttpClient,
+          e.CQapiThrottler = l.HttpClient,
+          e
+      }();
+    n.EtherbookApiHelper = f
+  },
+  {
+    "../../HttpClient": 65,
+    "../../global/Wallet": 89,
+    "../../services/ethereum-address-registry": 119,
+    "../blockcypher-metadata/PayloadFactory": 68,
+    "../blockcypher-metadata/blockcypher-metadata-api": 71,
+    "./api-throttler": 73,
+    "./etherbook-data-translator": 458,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "@keepkey/device-client/dist/global/coin-type": 161,
+    lodash: 368
+  }],
+  458: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("lodash"),
+      i = e("bytebuffer"),
+      a = e("bignumber.js"),
+      o = function()
+      {
+        function e()
+        {}
+        return e.balance = function(e)
+          {
+            return {
+              highConfidenceBalance: new a.BigNumber(e.balance || 0),
+              lowConfidenceBalance: new a.BigNumber(e.unconfirmedBalance || 0)
+            }
+          },
+          e.tokenBalance = function(resp)
+          {
+            var token_balance = resp.tokens && (resp.tokens[0].balance || 0)
+            return {
+              highConfidenceBalance:  new a.BigNumber(token_balance),
+              lowConfidenceBalance: new a.BigNumber(0)
+            }
+          },
+          e.hasTransactions = function(e, t)
+          {
+            return e.highConfidenceBalance.gt(0) || 0 < (t.txs || t.transfers)
+          },
+          e.transactionList = function(e)
+          {
+            return e.sort(function(e, t)
+            {
+              return e.timestamp.getMilliseconds() - t.timestamp.getMilliseconds()
+            }),
+            {
+              txHist: e,
+              hasTransactionHistory: !!e.length
+            }
+          },
+          e.internalTransactionList = function(t, n)
+          {
+            return r.map(t.result, function(t)
+            {
+              return e.transaction(t, n)
+            })
+          },
+          e.externalTransactionList = function(t, n)
+          {
+            return r.map(t.transactions || [], function(t)
+            {
+              return e.externalTransaction(t, e.transaction(t, n))
+            })
+          },
+          e.transaction = function(t, n)
+          {
+            var r = {
+              blockHeight: parseInt(t.blockHeight),
+              hash: i.fromHex(e.removeHexPrefix(t.txid)),
+              from: e.removeHexPrefix(t.vin[0].addresses[0].toLowerCase()),
+              to: e.removeHexPrefix(t.vout[0].addresses[0].toLowerCase()),
+              value: new a.BigNumber(t.value),
+              gas: new a.BigNumber(t.ethereumSpecific.gasLimit),
+              timestamp: new Date(1e3 * parseInt(t.blockTime)),
+              data: i.fromHex(e.removeHexPrefix(t.ethereumSpecific.data)),
+              contractAddress: t.contractAddress,
+              isError: parseInt(t.isError)
+            };
+            r.isIncoming = r.to === n;
+            r.isOutgoing = r.from === n;
+            return r
+          },
+          e.externalTransaction = function(t, n)
+          {
+            return n.blockHash = t.blockHash && i.fromHex(e.removeHexPrefix(t.blockHash)),
+              n.confirmations = parseInt(t.confirmations),
+              n.gasPrice = new a.BigNumber(t.ethereumSpecific.gasPrice),
+              n.gasUsed = new a.BigNumber(t.ethereumSpecific.gasUsed),
+              n.nonce = new a.BigNumber(t.ethereumSpecific.nonce),
+              n
+          },
+          e.removeHexPrefix = function(e)
+          {
+            return e.startsWith("0x") ? e.substr(2) : e
+          },
+          e
+      }();
+    n.EtherbookDataTranslator = o
+  },
+  {
+    "bignumber.js": 189,
+    bytebuffer: 300,
+    lodash: 368
+  }],
+  459: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var s = e("../../blockchainApis/etherscan/etherscan-token-account-list-loader")
+    n.EtherbookTokenAccountListLoader = s.EtherscanTokenAccountListLoader
+  },
+  {
+    "../../blockchainApis/etherscan/etherscan-token-account-list-loader": 77,
+  }],
+  460: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../../Configuration"),
+      i = e("@keepkey/device-client/dist/global/coin-type"),
+      a = e("@keepkey/device-client/dist/global/coin-name"),
+      o = function()
+      {
+        function e(coinId, e)
+        {
+          this.coinId = coinId
+          this.blockcypherUrlGenerator = e
+
+          var coinType = i.CoinType.getBySymbol(this.coinId)
+          var blockbook = coinType && coinType.blockbook
+          if(!blockbook || !blockbook.length)
+            throw "block indexer not defined for cointype " + this.coinId;
+
+          if(blockbook.length == 1)
+          {
+            this.rootUrl = blockbook[0] + '/api'
+            return
+          }
+
+          Object.defineProperty(this, 'rootUrl',
+          {
+            get: function()
+            {
+              var i = Math.trunc( Math.random() * blockbook.length )
+              return blockbook[i] + '/api'
+            }
+          })
+        }
+        return e.prototype.getWalletListUrl = function()
+          {
+            return Promise.reject("getWalletListUrl(): wallets not supported")
+          },
+          e.prototype.sendTransactionUrl = function(e)
+          {
+            return Promise.resolve([this.rootUrl, 'v2', 'sendtx/'].join('/'))
+          },
+          e.prototype.getTransactionUrl = function()
+          {
+            return Promise.reject("not available here")
+          },
+          e.prototype.getTransactionsUrl = function(e)
+          {
+            return this.getWalletUrl(e)
+                       .then((urlpath) => urlpath + "?details=txslight")
+          },
+          e.prototype.getPartialTransactionUrl = function()
+          {
+            return Promise.reject("getPartialTransactionUrl not valid for ethereum")
+          },
+          e.prototype.getWalletUrl = function(e)
+          {
+            return Promise.resolve([this.rootUrl, 'v2', 'address', '0x' + e].join('/'))
+          },
+          e.prototype.getWebsiteTransactionUrl = function(e)
+          {
+            var coinType = i.CoinType.getBySymbol(this.coinId)
+            if(!coinType || !coinType.txUrlExplorer)
+              throw "block explorer url is not defined for cointype " + this.coinId;
+
+            if(!e.startsWith("0x")) e = "0x" + e;
+            return coinType.txUrlExplorer + e
+          },
+          e.prototype.walletMetaDataUrl = function(e)
+          {
+            return this.blockcypherUrlGenerator.walletMetaDataUrl(e, i.CoinType.get(a.CoinName.Ethereum))
+          },
+          e.prototype.getRecentTransactionsUrl = function(e, t)
+          {
+            return Promise.resolve(r.Configuration.etherscanApiToken).then(function(n)
+            {
+              return e = e.startsWith("0x") ? e : "0x" + e,
+                "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
+            })
+          },
+          e.prototype.getCurrentGasPriceUrl = function()
+          {
+            return Promise.resolve(r.Configuration.etherscanApiToken).then(function(e)
+            {
+              return "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice&apikey=" + e
+            })
+          },
+          e.prototype.getBlockchainDataUrl = function()
+          {
+            return Promise.resolve([this.rootUrl, 'v2', 'status'].join('/'))
+          },
+          e
+      }();
+    n.EtherbookUrlGenerator = o
+  },
+  {
+    "../../Configuration": 62,
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    "@keepkey/device-client/dist/global/coin-type": 161
   }],
 },
 {}, [1]);
