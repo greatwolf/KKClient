@@ -78559,7 +78559,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.getBlockHeightFromBlockchainData = function(e)
           {
-            return r.get(e, "info.blocks")
+            return r.get(e, "backend.blocks")
           },
           e.prototype.deleteWallet = function(accountId)
           {
