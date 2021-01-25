@@ -5879,9 +5879,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             get: function e()
             {
+              var self = this
               return this._gasPricePromise || (this._gasPricePromise = this.feeService.getRates().then(function(e)
                 {
-                  return e.fast
+                  return e[self.options.feeLevel]
                 })),
                 this._gasPricePromise
             },
@@ -6663,6 +6664,24 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             get: function e()
             {
               return t.selectedFeeService.feePaths.slow
+            },
+            enumerable: !0,
+            configurable: !0
+          }),
+          Object.defineProperty(t, "selectedGasService",
+          {
+            get: function e()
+            {
+              return t.config.gasServices[t.config.selectedGasService]
+            },
+            enumerable: !0,
+            configurable: !0
+          }),
+          Object.defineProperty(t, "gasServiceUrl",
+          {
+            get: function e()
+            {
+              return t.selectedGasService.url
             },
             enumerable: !0,
             configurable: !0
@@ -7956,13 +7975,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               return e = e.startsWith("0x") ? e : "0x" + e,
                 "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
-            })
-          },
-          e.prototype.getCurrentGasPriceUrl = function()
-          {
-            return Promise.resolve(r.Configuration.etherscanApiToken).then(function(e)
-            {
-              return "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice&apikey=" + e
             })
           },
           e.prototype.getBlockchainDataUrl = function()
@@ -10486,7 +10498,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       value: !0
     });
-    var i = e("./abstract-fee-service"),
+    var lodash = e("lodash"),
+      i = e("./abstract-fee-service"),
       a = e("./FeeLevel"),
       o = e("../../HttpClient"),
       s = e("bignumber.js"),
@@ -10499,8 +10512,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function t(coinDetail, t)
         {
           var n = e.call(this, l.CoinName.Ethereum) || this;
+          var gasService = d.Configuration.selectedGasService;
           return n.gasLimit = t ||
             s.BigNumber(coinDetail.feeProfile.gasLimit || d.Configuration.valueTransferGasLimit),
+            n.gasUrl = d.Configuration.gasServiceUrl,
+            n.gasLevels = Object.keys(gasService.gasPaths),
             n
         }
         return r(t, e),
@@ -10510,28 +10526,33 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             if (!this._ratesPromise)
             {
               var t = c.WalletApiFactory.getInstance(l.CoinName.Ethereum).urlGenerator;
-              this._ratesPromise = t.getCurrentGasPriceUrl().then(function(e)
-              {
-                return o.HttpClient.get(e)
-              }).then(function(t)
-              {
-                return e.clearPromiseAfterTimeout(),
-                {
-                  fast: new s.BigNumber(t.result, 16).precision(2)
-                }
-              }).catch(function(e)
-              {
-                return console.error(e),
-                {
-                  fast: new s.BigNumber(35e9).precision(2)
-                }
-              })
+              this._ratesPromise =
+                 o.HttpClient.get(this.gasUrl)
+                  .then(function(result)
+                  {
+                    var toGasRates = function(gasRates, gasLevel)
+                    {
+                      var gasService = d.Configuration.selectedGasService.gasPaths
+                      var rate = lodash.get(result, gasService[gasLevel])
+                      gasRates[gasLevel] = new s.BigNumber(rate).precision(2)
+                      return gasRates
+                    }
+                    var gasRates = e.gasLevels.reduce(toGasRates, {})
+                    e.clearPromiseAfterTimeout()
+                    return gasRates
+                  }).catch(function(e)
+                  {
+                    return console.error(e),
+                    {
+                      fast: new s.BigNumber(35e9).precision(2)
+                    }
+                  })
             }
             return this._ratesPromise
           },
           t.prototype.getFeeLevels = function()
           {
-            return Promise.resolve([a.FeeLevel.fast])
+            return Promise.resolve(this.gasLevels.map(n => a.FeeLevel[n]))
           },
           t.prototype.isFeeSufficient = function(e)
           {
@@ -10540,24 +10561,39 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return t.lte(e)
             })
           },
-          t.prototype.computeFee = function()
+          t.prototype.computeFee = function(_, __, feeLevel)
           {
             var e = this;
+            feeLevel = a.FeeLevel[feeLevel || 0]
             return this.getRates().then(function(t)
             {
-              return t.fast.times(e.gasLimit)
+              return t[feeLevel].times(e.gasLimit)
             })
           },
           t.prototype.estimateFeeForAmount = function()
           {
             var e = this;
-            return this.computeFee().then(function(t)
+            var feePromises = []
+            var mapGasRate = function(gasName, rate)
             {
-              return {
-                currency: p.CoinType.get(e.coinType).name,
-                fast: t.toString()
+              return { [gasName]: rate.toString() }
+            }
+            this.gasLevels.forEach
+            (
+              gasLevel =>
+              {
+                feePromises.push(e.computeFee(null, null, a.FeeLevel[gasLevel])
+                                  .then(mapGasRate.bind(null, gasLevel)))
               }
-            })
+            )
+
+            return Promise.all(feePromises)
+                          .then(feeResults =>
+                                {
+                                  return feeResults.reduce(lodash.merge, {
+                                    currency: p.CoinType.get(e.coinType).name,
+                                  })
+                                })
           },
           t
       }(i.AbstractFeeService);
@@ -10571,7 +10607,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./abstract-fee-service": 96,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161,
-    "bignumber.js": 189
+    "bignumber.js": 189,
+    lodash: 368
   }],
   104: [function(e, t, n)
   {
@@ -12020,6 +12057,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             slow: "low_fee_per_kb"
           }
         }
+      },
+      selectedGasService: "etherscan",
+      gasServices:
+      {
+        etherscan:
+        {
+          url: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
+          gasPaths:
+          {
+            fast: "result",
+          }
+        },
       },
       environmentConfig:
       {
@@ -80454,13 +80503,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               return e = e.startsWith("0x") ? e : "0x" + e,
                 "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
-            })
-          },
-          e.prototype.getCurrentGasPriceUrl = function()
-          {
-            return Promise.resolve(r.Configuration.etherscanApiToken).then(function(e)
-            {
-              return "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice&apikey=" + e
             })
           },
           e.prototype.getBlockchainDataUrl = function()
