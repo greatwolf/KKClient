@@ -21,8 +21,6 @@
      "https://*.trezor.io/api/*",
      "https://*.atomicwallet.io/api/*",
      "https://*.guarda.co/api/*",
-     "https://*.coinquery.com/api/*",
-     "https://coinquery.com/*",
      "https://api.blockcypher.com/v1/*",
      "https://api.etherscan.io/api/*",
      "https://keepkey-wallet.keepkey.com/*",
@@ -30,6 +28,7 @@
      "https://keepkey.shapeshift.com/*",
      "https://auth.shapeshift.io/oauth/",
      "https://bitcoinfees.earn.com/*",
+     "https://gasnow.org/*",
      "hid", "usb", "identity", "storage",
      {
         "usbDevices":

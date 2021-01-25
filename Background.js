@@ -12058,7 +12058,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           }
         }
       },
-      selectedGasService: "etherscan",
+      selectedGasService: "gasnow",
       gasServices:
       {
         etherscan:
@@ -12067,6 +12067,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           gasPaths:
           {
             fast: "result",
+          }
+        },
+        gasnow:
+        {
+          url: "https://gasnow.org/api/v3/gas/price",
+          gasPaths:
+          {
+            fast: "data.fast",
+            medium: "data.standard",
+            slow: "data.slow",
           }
         },
       },
