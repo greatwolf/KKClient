@@ -3,7 +3,7 @@
    {
       "background":
       {
-         "scripts": [ "Background.js" ]
+         "page": "./Background.html"
       }
    },
    "description": "A simple cryptocurrency wallet that integrates with the KeepKey device",
