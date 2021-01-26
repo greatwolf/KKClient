@@ -4423,13 +4423,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               addressStrategy: "single"
             })
           },
-          t.prototype.getMaximumTransactionAmount = function()
+          t.prototype.getMaximumTransactionAmount = function(gasLevel)
           {
             var e = this;
             return console.assert(this._balancePromise, "balance not defined"),
               this._balancePromise.then(function()
               {
-                return e.feeService.computeFee()
+                return e.feeService.computeFee(null, null, gasLevel)
               }).then(function(t)
               {
                 return console.assert(e.highConfidenceBalance.isGreaterThan(0), "highConfidence balance is too low:", e.highConfidenceBalance.toString()),
