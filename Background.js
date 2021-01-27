@@ -3231,6 +3231,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   message: "Transaction sent"
                 })
+              }).then(this.delay(3e3)).then(function()
+              {
+                a.MessageDispatcher.execute("ReloadBalances", {accountId: n.id})
               }).catch(function(err)
               {
                 o.UiMessenger.sendMessageToUI("Failure",
@@ -3965,7 +3968,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               e.transactionWatcher = new l.TransactionWatcher(t.destinationAccount, t.withdrawalAddress.address, t.value),
                 e.transactionWatcher.watch(this.removePendingIncomingExchange.bind(t.destinationAccount, e))
             }
-            p.BalanceReloader.reloadBalances({accountId: this.wallet.data.id})
           },
           e.prototype.removeIncomingTransfer = function(e)
           {
