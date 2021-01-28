@@ -15409,23 +15409,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
-            name: s.CoinName[s.CoinName.Ethereum = 6] = "Ethereum",
-            addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
-            dust: 1,
-            defaultDecimals: 18,
-            blockbook:
-            [
-              "https://eth1.trezor.io",
-              "https://eth2.trezor.io",
-            ],
-            txUrlExplorer: "https://etherscan.io/tx/",
-            feeProfile:
-            {
-              gasLimit: 21e3,
-              servicer: 'ethereum-fee-service'
-            }
-          },
-          {
             name: s.CoinName[s.CoinName.Groestlcoin = 17] = "Groestlcoin",
             addressFormat: "^F\\w{33}$",
             dust: e.newDustCalculation(3000),
@@ -15476,6 +15459,23 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             ],
             txUrlExplorer: "https://chainz.cryptoid.info/sys/tx.dws?",
             feeProfile: { MIN_FEE: 1e4 }
+          },
+          {
+            name: s.CoinName[s.CoinName.Ethereum = 60] = "Ethereum",
+            addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
+            dust: 1,
+            defaultDecimals: 18,
+            blockbook:
+            [
+              "https://eth1.trezor.io",
+              "https://eth2.trezor.io",
+            ],
+            txUrlExplorer: "https://etherscan.io/tx/",
+            feeProfile:
+            {
+              gasLimit: 21e3,
+              servicer: 'ethereum-fee-service'
+            }
           },
           {
             name: s.CoinName[s.CoinName.Fujicoin = 75] = "Fujicoin",
