@@ -12251,6 +12251,11 @@ button.fa:focus {
   border-bottom: 1px solid #ececed
 }
 
+#about .content .applogo-icon {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
 #character-request .content,
 #confirm-exchange .content,
 #device-settings .content,
