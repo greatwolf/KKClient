@@ -4008,23 +4008,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.updateWallet = function(e)
           {
             console.assert(e, "wallet has no data property")
-            function setTransactionFlag(tx)
-            {
-              var addr = r.find(external, {address: tx.address})
-              if (addr) addr.hasTransactions = true
-            }
-            var wallet = this._wallet.data;
-            var external = wallet.chains && wallet.chains[0].chainAddresses;
-            if (external)
-            {
-              e.txHist.forEach(setTransactionFlag)
-              e.unspentTxs.forEach(setTransactionFlag)
-              e.unconfirmedTxs.forEach(setTransactionFlag)
-            }
-
-            this._wallet.data.unspentTxs = [],
-            this._wallet.data.unconfirmedTxs = [],
-            this._wallet.data.txHist = [],
             r.merge(this._wallet.data, e)
           },
           e
@@ -4764,10 +4747,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var e = this;
             return this.wallet.api.getTransactionSummaries(this.id, !0).then(function(t)
             {
-              return t ? e.updateWallet(t) : t = e.wallet.data,
-                e.highConfidenceBalance = e.getHighConfidenceBalance().minus(e.pendingOutgoingAmounts.value),
-                e.lowConfidenceBalance = e.getLowConfidenceBalance().plus(e.pendingIncomingAmounts.value),
-                t
+              if (t) e.updateWallet(t)
+              else t = e.wallet.data
+              if (!t.hasBalance)
+              {
+                e.highConfidenceBalance = e.getHighConfidenceBalance().minus(e.pendingOutgoingAmounts.value)
+                e.lowConfidenceBalance = e.getLowConfidenceBalance().plus(e.pendingIncomingAmounts.value)
+              }
+              return t
             }).then(function()
             {
               var t = i.flatten([e.wallet.data.unspentTxs, e.wallet.data.unconfirmedTxs]);
@@ -78452,7 +78439,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.coinType = t,
           this.xpubRegistry = d.InsightXpubRegistry.instance,
           this.txPageSize = 8,
-          this.transactionSummaryCache = {}
+          this.walletDataCache = {}
         }
         return Object.defineProperty(e.prototype, "network",
           {
@@ -78538,7 +78525,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var t = this;
             return this.loadWallet(e).then(function()
             {
-              return t.transactionSummaryCache[e]
+              return t.walletDataCache[e]
             })
           },
           e.prototype.getRecentTransactions = function(e, t)
@@ -78577,75 +78564,98 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 return e.chains[t]
               })
           },
-          e.prototype.extendChains = function(e, t)
+          e.prototype.extendChains = function(wallet, subchain)
           {
-            var n = this,
-              i = new u.HDPublicKey(e.xpub),
-              a = [],
-              o = f.TransactionCacheRegistry.getInstance(e.id);
-            return e.chains || (e.chains = [],
-                e.addresses = {}),
-              r.each(t, function(t)
+            if (!wallet.chains) wallet.chains = []
+
+            var self = this;
+            var processSubchains = function(addresses, subindex)
+            {
+              var nodematcher = RegExp("/" + subindex + "/(\\d+)$");
+              addresses = addresses.filter(node => nodematcher.test(node.path));
+
+              var hdPubKey = new u.HDPublicKey(wallet.xpub),
+                  lastUsed = addresses.length && r.last(addresses).path.match(nodematcher)[1],
+                  maxIndex = l.Configuration.BIP44_MAX_ADDRESS_GAP
+                           + Number(lastUsed);
+              var generate_BIP44_addr = function(_, v)
               {
-                e.chains[t] || (e.chains[t] = {
-                  index: t,
-                  chainAddresses: []
-                });
-                for (var o = e.chains[t].chainAddresses, s = r.findLastIndex(o,
-                  {
-                    hasTransactions: !0
-                  }), d = s + l.Configuration.BIP44_MAX_ADDRESS_GAP, c = d - o.length + 1; 0 < c--;)
-                {
-                  var p = o.length,
-                    u = n.getAddressDetail(i, new g.NodeVector([t, p]));
-                  o.push(u),
-                    e.addresses[u.address] = u,
-                    a.push(u.address)
-                }
-              }),
-              a.length ? this.getBlockbookTransactions(e.xpub).then(function(t)
+                var node = self.getAddressDetail(hdPubKey, new g.NodeVector([subindex, v]))
+                wallet.addresses[node.address] = node
+                return node
+              }
+              wallet.chains[subindex] =
               {
-                return t.items.forEach(function(t)
+                index: subindex,
+                chainAddresses: Array.from({length: maxIndex + 1},
+                                            generate_BIP44_addr)
+              }
+              addresses
+                  .filter(n => n.transfers > 0)
+                  .map(n => n.name)
+                  .forEach(function(name)
                   {
-                    t.vout.forEach(function(t)
-                      {
-                        p.BlockbookDataTranslator.isNotOpReturn(t) && t.scriptPubKey.addresses && t.scriptPubKey.addresses.forEach(function(t)
-                        {
-                          e.addresses[t] && (e.addresses[t].hasTransactions = !0)
-                        })
-                      }),
-                      o.addOrUpdate(p.BlockbookDataTranslator.transaction(t, n.coinType))
-                  }),
-                  p.BlockbookDataTranslator.transactionsToTransactionSummaries(t, e.addresses, n.coinType)
-              }).then(function(i)
+                    wallet.addresses[name].hasTransactions = true
+                  })
+            }
+            var processDerived = function(resp)
+            {
+              wallet.hasBalance = true
+              wallet.highConfidenceBalance = self.coinType.parseAmount(resp.balance)
+              wallet.lowConfidenceBalance = self.coinType.parseAmount(resp.unconfirmedBalance)
+
+              subchain.forEach(processSubchains.bind(null, resp.tokens || []))
+              return resp
+            }
+            var processUnconfirmedTxs = function(resp)
+            {
+              var unconfirmedTxs = r.take(resp.txids, resp.unconfirmedTxs)
+              wallet.unconfirmedTxs = p.BlockbookDataTranslator.hashFromTxids(unconfirmedTxs)
+              return resp
+            }
+            var processTxHist = function(resp)
+            {
+              wallet.hasTransactionHistory = resp.txs > 0
+              wallet.txHist = p.BlockbookDataTranslator.hashFromTxids(resp.txids || [])
+              return resp
+            }
+            var processUtxoSummary = function(resp)
+            {
+              wallet.unspentTxs = resp.map(function(unspentTx)
               {
-                var a = [],
-                  o = [];
-                return e.hasTransactionHistory = e.hasTransactionHistory || 0 < i.length,
-                  r.each(i, function(e)
-                  {
-                    e.value.isGreaterThan(0) && !e.spent && (e.isConfirmed ? a.push(e) : o.push(e))
-                  }),
-                  o.forEach(function(e)
-                  {
-                    e.vin.forEach(function()
-                    {
-                      r.remove(o, function(t)
-                      {
-                        return t.hash.toHex() === e.hash.toHex() && t.outputIndex === e.outputIndex
-                      })
-                    })
-                  }),
-                  e.unspentTxs = r.unionBy(e.unspentTxs, a, n.getTxSummaryKey),
-                  e.unconfirmedTxs = r.unionBy(e.unconfirmedTxs, o, n.getTxSummaryKey),
-                  e.txHist = r.unionBy(e.txHist, i, n.getTxSummaryKey),
-                  n.extendChains(e, t)
-              }) : (this.transactionSummaryCache[e.id] = {
-                  unspentTxs: e.unspentTxs,
-                  unconfirmedTxs: e.unconfirmedTxs,
-                  txHist: e.txHist
-                },
-                Promise.resolve(e))
+                return p.BlockbookDataTranslator.utxoSummary(unspentTx, self.coinType)
+              })
+            }
+            var chainTasks = []
+            chainTasks.push(
+              this.walletApi.urlGenerator
+                  .deriveAddressesUrl(wallet.xpub)
+                  .then(o.HttpClient.get)
+                  .then(processDerived)
+                  .then(processUnconfirmedTxs)
+                  .then(processTxHist))
+            chainTasks.push(
+              this.walletApi.urlGenerator
+                  .getUtxoUrl(wallet.xpub)
+                  .then(o.HttpClient.get)
+                  .then(processUtxoSummary))
+
+            return Promise.all(chainTasks)
+                          .then(function()
+                          {
+                            self.walletDataCache[wallet.id] =
+                            {
+                              addresses: wallet.addresses,
+                              chains: wallet.chains,
+                              highConfidenceBalance: wallet.highConfidenceBalance,
+                              lowConfidenceBalance: wallet.lowConfidenceBalance,
+                              hasBalance: wallet.hasBalance,
+                              unspentTxs: wallet.unspentTxs,
+                              unconfirmedTxs: wallet.unconfirmedTxs,
+                              txHist: wallet.txHist
+                            }
+                            return wallet
+                          })
           },
           e.prototype.getTxSummaryKey = function(e)
           {
@@ -78740,6 +78750,26 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               }),
               o = r.flatten(a);
             return o
+          },
+          e.hashFromTxids = function(txids)
+          {
+            return txids.map(txid =>
+            {
+              return { hash: i.fromHex(txid) }
+            })
+          },
+          e.utxoSummary = function(utxo, n)
+          {
+            return {
+              address: utxo.address,
+              hash: i.fromHex(utxo.txid),
+              blockHeight: utxo.height,
+              value: n.parseAmount(utxo.value),
+              outputIndex: utxo.vout,
+              isConfirmed: utxo.confirmations > 0,
+              confirmations: utxo.confirmations,
+              spent: false
+            }
           },
           e.transactionSummary = function(t, n, a)
           {
@@ -78951,9 +78981,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.reject("unimplemented")
           },
-          e.prototype.deriveAddressesUrl = function()
+          e.prototype.deriveAddressesUrl = function(e)
           {
-            return Promise.reject("unimplemented")
+            return Promise.resolve([this.rootUrl, "v2", "xpub", e].join('/') + "?tokens=used")
+          },
+          e.prototype.getUtxoUrl = function(e)
+          {
+            return Promise.resolve([this.rootUrl, "v2", "utxo", e].join('/'))
           },
           e.prototype.getTransactionUrl = function(e)
           {
