@@ -87,13 +87,15 @@ angular.module('kkCommon').directive('formattedAmount', function() {
         scope: {
             amount: '=',
             currency: '=',
+            signed: '=',
             suppressSymbol: '='
         },
         controller: ['$scope', 'CurrencyLookupService', function(a, b) {
+            var formatValue = a.signed ? b.formatSignedAmount : b.formatAmount
             a.currencySymbol = b.getCurrencySymbol(a.currency),
-            a.formattedAmount = b.formatAmount(a.currency, a.amount),
+            a.formattedAmount = formatValue(a.currency, a.amount),
             a.$watch('amount', function() {
-                a.formattedAmount = b.formatAmount(a.currency, a.amount)
+                a.formattedAmount = formatValue(a.currency, a.amount)
             }),
             a.$watch('currency', function() {
                 a.currencySymbol = b.getCurrencySymbol(a.currency)
@@ -609,6 +611,14 @@ angular.module('kkCommon').factory('WalletNodeService', ['$rootScope', '$timeout
 ]),
 angular.module('kkCommon').factory('CurrencyLookupService', function() {
     var b;
+    var formatSignedAmount = function(c, d)
+    {
+      if (_.isUndefined(c) || _.isUndefined(d))
+          return 0;
+      var e = d || 0
+        , a = _.find(b, { name: c })
+      return new a.displayAmountConstructor(e).shiftedBy(-a.decimals);
+    }
     return {
         set: function c(a) {
             b = a,
@@ -668,15 +678,10 @@ angular.module('kkCommon').factory('CurrencyLookupService', function() {
             return _.get(c, 'isToken')
         },
         formatAmount: function g(c, d) {
-            if (_.isUndefined(c) || _.isUndefined(d))
-                return 0;
-            var e = d ? d : 0
-              , a = _.find(b, {
-                name: c
-            })
-              , f = new a.displayAmountConstructor(e).shiftedBy(-a.decimals);
-            return f.gte(0) ? f : 0
+            var amount = formatSignedAmount(c, d)
+            return amount && amount.gte(0) ? amount : 0
         },
+        formatSignedAmount: formatSignedAmount,
         unformatAmount: function e(a, c) {
             ['', '.', void 0].includes(c) && (c = 0);
             var d = _.find(b, {
