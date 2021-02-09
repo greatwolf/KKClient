@@ -2262,6 +2262,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 n ? t.deviceClient.getEthereumAddress(i.nodePath, !1) : t.deviceClient.getAddress(i.nodePath, i.coinType, !1)
             }).then(function(o)
             {
+              if (!o) return;
               n ? t.deviceClient.getEthereumAddress(i.nodePath, !0) : t.deviceClient.getAddress(i.nodePath, i.coinType, !0);
               var s;
               return s = o.address_str ? o.address_str : n && o.address ? "0x" + o.address.toHex() : o.address,
