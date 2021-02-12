@@ -14896,10 +14896,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     return g += f.chunk_size,
                       [3, 2];
                   case 5:
-                    t.coins.forEach(function(e)
-                      {
-                        d.CoinType.fromFeatureCoin(e)
-                      }),
+                      d.CoinType.createInstances(t.coins),
                       b = d.CoinType.getList(),
                       t.coin_metadata = b.map(function(e)
                       {
@@ -15143,15 +15140,32 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             e.instances.length = 0
           },
-          e.fromFeatureCoin = function(t)
+          e.createInstances = function(featureCoins)
           {
-            var n = r.find(e.config,
+            var client_coins   = e.config.map(n => n.name),
+                firmware_coins = featureCoins.map(n => n.coin_name),
+                loadable_coins = r.intersection(firmware_coins, client_coins);
+            var configByName  = r.keyBy(e.config, 'name'),
+                featureByName = r.keyBy(featureCoins, 'coin_name');
+            loadable_coins.forEach(function(i)
             {
-              name: t.coin_name
-            });
-            if (!n)
-              console.warn("Coin " + t.coin_name + " was skipped. It doesn't have a configuration defined.");
-            else if (!e.get(s.CoinName[t.coin_name]))
+              e.makeInstance(featureByName[i], configByName[i])
+            })
+            r .difference(firmware_coins, client_coins)
+              .forEach(function(coin)
+              {
+                console.warn("Coin %s was skipped. It doesn't have a configuration defined.", coin)
+              })
+            r .difference(client_coins, firmware_coins)
+              .forEach(function(coin)
+              {
+                console.warn("Coin %s was skipped. Missing firmware support.", coin)
+              })
+          },
+          e.makeInstance = function(t, n)
+          {
+            console.assert(n, 'config missing for ' + t.coin_name)
+            if (!e.get(s.CoinName[t.coin_name]))
             {
               var a = new e(n);
               return a.isToken = !1,
