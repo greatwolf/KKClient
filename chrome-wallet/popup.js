@@ -7,7 +7,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
   {
     chrome.runtime.connect()
   }]),
-  angular.module('kkWallet').run(['$rootScope', 'DeviceBridgeService', 'NavigationService', function(e, t, n)
+  angular.module('kkWallet').run(['$rootScope', 'DeviceBridgeService', 'NavigationService', 'PinLockService', function(e, t, n, pinLock)
   {
     e.goBack = function()
       {
@@ -16,7 +16,14 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.setNextTransition = n.setNextTransition,
       e.cancelDeviceOperation = function()
       {
+        if (pinLock.state === pinLock.verifying)
+          pinLock.state = pinLock.cancelling
         t.cancel()
+      },
+      e.cancelPinRequest = function()
+      {
+        e.cancelDeviceOperation()
+        e.goBack()
       },
       e.openBuyKeepkeyWindow = function()
       {
@@ -354,8 +361,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.showMessage = !0
       }, 3e4)
   }]),
-  angular.module('kkWallet').controller('DeviceController', ['$scope', '$routeParams', 'NavigationService', 'EntryPointNavigationService', 'DeviceBridgeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', function(e, t, n, a, o, i, c)
+  angular.module('kkWallet').controller('DeviceController', ['$scope', '$routeParams', 'NavigationService', 'EntryPointNavigationService', 'DeviceBridgeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', 'PinLockService', function(e, t, n, a, o, i, c, pinLock)
   {
+    pinLock.reset();
     e.wipeDevice = function()
       {
         n.setNextTransition('slideLeft'),
@@ -402,8 +410,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.showLoginButton = !c.value()
       }, !1)
   }]),
-  angular.module('kkWallet').controller('LifeboatController', ['$scope', '$routeParams', 'NavigationService', 'EntryPointNavigationService', 'DeviceBridgeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', function(e, t, n, a, o, i)
+  angular.module('kkWallet').controller('LifeboatController', ['$scope', '$routeParams', 'NavigationService', 'EntryPointNavigationService', 'DeviceBridgeService', 'DeviceFeatureService', 'PinLockService', function(e, t, n, a, o, i, pinLock)
   {
+    pinLock.reset();
     e.wipeDevice = function()
       {
         n.setNextTransition('slideLeft'),
@@ -1439,7 +1448,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
                 pin: e.pin
               }),
               e.pin = '',
-              e.successRoute ? n.go(e.successRoute) : n.goToPrevious('slideRight')
+              e.successRoute && n.go(e.successRoute)
           },
           e.$watch('pin', function()
           {
@@ -1503,19 +1512,22 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
   }]),
   angular.module('kkWallet').controller('FailureController', ['$scope', '$timeout', 'FailureMessageService', 'DeviceBridgeService', 'NavigationService', function(e, t, n, a, o)
   {
+    var prevRoute = o.getPreviousRoute();
+    e.showDeviceConfigurationButton = '/walletlist' === prevRoute;
     e.failures = _.map(n.get(), function(e)
       {
         return _.isArray(e.message) ? e.message.pop() : e.message ? e.message : 'Unspecified error occured'
       }),
-      '/walletlist' !== o.getPreviousRoute() && o.setNextTransition('slideRight'),
+      '/walletlist' !== prevRoute && o.setNextTransition('slideRight'),
+      e.$on('$destroy', function()
+      {
+        if (!o.getCurrentRoute().startsWith('/failure')) n.clear()
+      }),
       e.ok = function()
       {
         o.goToPrevious();
-        a.requestPinRetry(),
-          t(function()
-          {
-            n.clear()
-          }, 2e3)
+        if (o.getCurrentRoute() === '/failure/invalid_pin')
+          a.requestPinRetry();
       }
   }]),
   angular.module('kkWallet').controller('FooterController', ['$scope', 'VERSION', 'DeviceFeatureService', function(e, t, n)
@@ -1579,8 +1591,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       use_character_cipher: !0
     }
   }),
-  angular.module('kkWallet').controller('PassphraseController', ['$scope', 'DeviceBridgeService', 'NavigationService', function(e, t, n)
+  angular.module('kkWallet').controller('PassphraseController', ['$scope', 'DeviceBridgeService', 'NavigationService', 'PinLockService', function(e, t, n, pinLock)
   {
+    pinLock.state = pinLock.verifying;
     e.userInput = {
         passphrase: '',
         confirmPassphrase: ''
@@ -1594,9 +1607,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           e.userInput.confirmPassphrase = '')
       }
   }]),
-  angular.module('kkWallet').controller('PinController', ['$scope', '$routeParams', 'NavigationService', 'DeviceFeatureService', function(e, t, n, a)
+  angular.module('kkWallet').controller('PinController', ['$scope', '$routeParams', 'NavigationService', 'DeviceFeatureService', 'PinLockService', function(e, t, n, a, pinLock)
   {
-    var o = n.getPreviousRoute();
+    var prevRoute = n.getPreviousRoute();
     e.onKeyPress = function(k)
     {
       var pinPad = e.$$childTail
@@ -1614,10 +1627,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             pinPad.appendToPin(numkey)
       }
     }
+    pinLock.state = pinLock.verifying;
     e.showDeviceConfigurationButton = !1,
-      '/walletlist' === o ? (e.successRoute = o,
-        e.showDeviceConfigurationButton = !0) : o.startsWith('/send/') ? (e.successRoute = '/preparing',
-        n.setNextTransition('slideLeft')) : '/pin/pin_matrix_request_type_new_second' === n.getCurrentRoute() && a.features.initialized ? n.setNextTransition('slideRight') : n.setNextTransition('slideLeft')
+      '/walletlist' === prevRoute ? (e.successRoute = prevRoute,
+        e.showDeviceConfigurationButton = !0) : !prevRoute.startsWith('/lifeboat') && !prevRoute.startsWith('/device') ? (e.successRoute = prevRoute, n.setNextTransition('slideRight')) : '/pin/pin_matrix_request_type_new_second' === n.getCurrentRoute() && a.features.initialized ? n.setNextTransition('slideRight') : n.setNextTransition('slideLeft')
   }]),
   angular.module('kkWallet').controller('PinTimeoutController', ['$scope', '$routeParams', 'DeviceBridgeService', 'NavigationService', function(e, t, n, a)
   {
@@ -1637,7 +1650,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.progress = t,
       n.setNextTransition('slideLeft')
   }]),
-  angular.module('kkWallet').controller('ReceiveController', ['$rootScope', '$scope', '$routeParams', '$location', 'DeviceBridgeService', 'WalletNodeService', 'NavigationService', '$timeout', 'environmentConfig', 'ReceiveAddressService', function(e, t, n, a, o, i, c, s, r, l)
+  angular.module('kkWallet').controller('ReceiveController', ['$rootScope', '$scope', '$routeParams', '$location', 'DeviceBridgeService', 'WalletNodeService', 'NavigationService', '$timeout', 'environmentConfig', 'ReceiveAddressService', 'PinLockService', function(e, t, n, a, o, i, c, s, r, l, pinLock)
   {
     c.setNextTransition('slideLeft'),
       new ClipboardJS('.copy-to-clipboard-button');
@@ -1655,13 +1668,29 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       t.currency = t.wallet.coinType,
       t.maxDepth = r.maxReceiveAddresses - 1,
       t.isSingleAddressAccount = 'single' === t.wallet.addressStrategy
+      switch(pinLock.state)
+      {
+        case pinLock.idling:
+          l.clear()
+          o.getReceiveAddress(t.walletId, t.addressDepth)
+          break;
+        case pinLock.cancelling:
+          c.goToPrevious('slideRight')
+          return;
+        case pinLock.verifying:
+          break;
+      }
       t.$on('$destroy', function()
       {
-        l.clear(),
-          !u && d && '/pin/pin_matrix_request_type_current' !== a.path() && d.then(function()
-          {
-            o.cancel()
-          })
+        var ignorable =
+        [
+          '/pin/pin_matrix_request_type_current',
+          '/passphrase',
+          '/failure/invalid_pin'
+        ]
+        !u && d &&
+        _.indexOf(ignorable, a.path()) === -1 &&
+        (l.clear(), d.then(o.cancel))
       }),
       t.showAnotherAddress = function(e)
       {
@@ -1673,10 +1702,8 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             {
               var n = ['/receive', t.walletId, e].join('/'),
                 a = e > t.addressDepth ? 'slideLeft' : 'slideRight';
-              o.getReceiveAddress(t.walletId, e)
-              c.setNextTransition(a),
-              c.setNextDestination(n)
-            }, 500)
+              t.go(n, a, !0)
+            }, 5)
         })
       },
       t.$watch(l.value, function()
@@ -1684,7 +1711,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         t.unusedAddress = l.value
       }, !0)
   }]),
-  angular.module('kkWallet').controller('SendController', ['$scope', '$routeParams', 'DeviceBridgeService', 'ProgressService', 'NavigationService', 'WalletNodeService', 'TransactionService', 'FeeService', 'environmentConfig', 'DeviceFeatureService', 'CurrencyLookupService', 'ExchangeValidityService', 'ExchangeMarketInfoService', 'ShapeShiftAuthTokenService', function(e, t, n, progress, a, o, i, c, s, r, l, d, u, p)
+  angular.module('kkWallet').controller('SendController', ['$scope', '$routeParams', 'DeviceBridgeService', 'ProgressService', 'NavigationService', 'WalletNodeService', 'TransactionService', 'FeeService', 'environmentConfig', 'DeviceFeatureService', 'CurrencyLookupService', 'ExchangeValidityService', 'ExchangeMarketInfoService', 'ShapeShiftAuthTokenService', 'PinLockService', function(e, t, n, progress, a, o, i, c, s, r, l, d, u, p, pinLock)
   {
     function v()
     {
@@ -1753,7 +1780,16 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.wallet.id && (c.getMaximumTransactionAmount(e.wallet.id, t.subaccount, e.userInput.feeLevel),
         c.compute(e.wallet.id, t.subaccount, l.unformatAmount(e.currency, e.userInput.amount)))
     }
-    o.reload(undefined, t.wallet),
+    if (pinLock.state === pinLock.verifying)
+    {
+      e.preparingTransaction = true;
+      e.progress = progress;
+    }
+    else
+    {
+      e.preparingTransaction = false;
+      o.reload(undefined, t.wallet);
+    }
       e.feeLevels = [],
       e.estimatedFee = c.estimatedFee,
       e.isExchange = !1,
@@ -1786,7 +1822,6 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.currencySymbol = l.getCurrencySymbol(e.currency),
       e.singleAccount = 1 === o.wallets.length,
       e.showForm = !e.wallet.highConfidenceBalance.isEqualTo(0),
-      e.preparingTransaction = !1,
       e.fresh = o.getFreshStatus(),
       e.buttonText = 'Send',
       e.supportsSecureTransfer = r.get('deviceCapabilities.supportsSecureAccountTransfer'),
@@ -1908,14 +1943,14 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
   }]),
   angular.module('kkWallet').config(['DeviceBridgeServiceProvider', function(e)
   {
-    function t(e)
+    function t(e, transit)
     {
       return ['NavigationService', function(t)
       {
         var n = e;
         for (var a in this.request.message)
           this.request.message.hasOwnProperty(a) && (n = n.replace(':' + a, encodeURIComponent(_.snakeCase(this.request.message[a]))));
-        t.go(n, undefined, t.getCurrentRoute().startsWith('/receive'))
+        t.go(n, transit)
       }]
     }
 
@@ -1933,14 +1968,16 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           o.clearCachedToken(),
           e.invoke(t('/connect'), this)
       }]),
-      e.when('PinMatrixRequest', t('/pin/:type')),
-      e.when('PassphraseRequest', t('/passphrase')),
-      e.when('ButtonRequest', ['$injector', 'NavigationService', function(e)
+      e.when('PinMatrixRequest', t('/pin/:type', 'slideLeft')),
+      e.when('PassphraseRequest', t('/passphrase', 'slideLeft')),
+      e.when('ButtonRequest', ['$injector', 'PinLockService', function(e, pinLock)
       {
         if ('ButtonRequest_Address' !== this.request.message.code &&
             'ButtonRequest_Other' !== this.request.message.code)
         {
           var n, a = _.get(this, 'request.message.data');
+          if ('ButtonRequest_ConfirmOutput' === this.request.message.code)
+            pinLock.reset();
           a ? (n = a.split(':'),
             this.request.message.policy = n[0],
             this.request.message.state = n[1],
@@ -2007,11 +2044,11 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           },
           {
             message: 'Signing cancelled by user',
-            action: 0
+            action: 1
           },
           {
             message: 'Signing cancelled by user.',
-            action: 0
+            action: 1
           },
           {
             message: 'Wipe cancelled',
@@ -2048,10 +2085,6 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           {
             message: 'Exchange transaction cancelled',
             action: 0
-          },
-          {
-            message: 'Transaction cancelled',
-            action: 0
           }], function(e)
           {
             return i.endsWith(e.message)
@@ -2065,6 +2098,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           default:
             a.add(this.request.message),
               o.setNextDestination(),
+              o.setNextTransition('cross-fade'),
               e.invoke(t('/failure/:message'), this);
         }
       }]),
@@ -2117,13 +2151,14 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         t.set(this.request.message),
           e.go('/confirm-exchange')
       }]),
-      e.when('ReceiveAddress', ['NavigationService', 'ReceiveAddressService', '$timeout', function(nav, e, timeout)
+      e.when('Address', ['PinLockService', function(pinLock)
       {
-        var msg = this.request.message;
-        nav.go(['/receive', msg.account, msg.depth].join('/'),
-                undefined,
-                nav.getCurrentRoute().startsWith('/receive'))
-        timeout(function() { e.set(msg) }, 500)
+        if (pinLock.state === pinLock.verifying)
+          pinLock.reset();
+      }]),
+      e.when('ReceiveAddress', ['ReceiveAddressService', function(e)
+      {
+        e.set(this.request.message)
       }]),
       e.when('BlockcypherApiToken', ['DeviceFeatureService', function(e)
       {
@@ -2792,6 +2827,29 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       value: e
     }
   }]),
+  angular.module('kkWallet').factory('PinLockService', [function()
+  {
+    var validStates = {idle: 0, verify: 1, cancel: 2};
+    var currState = validStates.idle;
+    var pinLock =
+    {
+      reset: function() { currState = validStates.idle },
+      idling:     validStates.idle,
+      verifying:  validStates.verify,
+      cancelling: validStates.cancel
+    }
+    return Object.defineProperty(pinLock, "state",
+    {
+      get: function()
+      {
+        return currState || validStates.idle;
+      },
+      set: function(s)
+      {
+        if (s in Object.values(validStates)) currState = s;
+      }
+    })
+  }]),
   angular.module('kkWallet').factory('ShapeShiftAuthTokenService', ['DeviceBridgeService', '$rootScope', 'environmentConfig', 'membershipPlatform', function(e, t, n, a)
   {
     var o = a.url,
@@ -2930,7 +2988,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.status = n.status
   }]),
-  angular.module('kkWallet').controller('WalletController', ['$scope', '$routeParams', 'WalletNodeService', 'CurrencyLookupService', 'DeviceFeatureService', 'DeviceBridgeService', function(e, t, n, a, o, br)
+  angular.module('kkWallet').controller('WalletController', ['$scope', '$routeParams', 'WalletNodeService', 'CurrencyLookupService', 'DeviceFeatureService', 'DeviceBridgeService', 'PinLockService', function(e, t, n, a, o, br, pinLock)
   {
     function i()
     {
@@ -2955,6 +3013,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.receiveCurrencyName = c(),
         e.singleAccount = 1 === e.walletList.length)
     }
+    pinLock.reset(),
     e.walletList = n.wallets,
       e.walletStats = n.walletStats,
       e.walletId = t.wallet,
@@ -2969,8 +3028,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.receive = function()
       {
-        e.setNextTransition('slideLeft')
-        br.getReceiveAddress(e.walletId, 0);
+        e.go(['/receive', e.walletId].join('/'), 'slideLeft')
       },
       e.sendAllowed = function(t)
       {
@@ -3028,7 +3086,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         a.updateWalletName(e.walletId, e.wallet.name)
       })
   }]),
-  angular.module('kkWallet').controller('WalletListController', ['$scope', 'DeviceFeatureService', 'DeviceBridgeService', 'NavigationService', 'WalletNodeService', function(e, t, n, a, o)
+  angular.module('kkWallet').controller('WalletListController', ['$scope', 'DeviceFeatureService', 'DeviceBridgeService', 'NavigationService', 'WalletNodeService', 'PinLockService', function(e, t, n, a, o, pinLock)
   {
     function i()
     {
@@ -3045,7 +3103,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.loaded = !!e.wallets.length,
       e.fresh = o.getFreshStatus(),
       i(),
-      e.wallets.length || o.loadAccounts(),
+      e.wallets.length || (pinLock.state === pinLock.verifying) || o.loadAccounts(),
       '/label/initialize' === a.getPreviousRoute() ? a.setNextTransition('slideLeft') : a.setNextTransition('cross-fade'),
       e.showWalletList = function()
       {
@@ -3133,7 +3191,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.put('app/popup/failure/failure.tpl.html', '<section id=failure ng-controller=FailureController><header></header><div class="content failure"><div class=content-inner-with-button><div class=description><div class=alert-icon><span class="fa fa-exclamation-triangle"></span></div><div class="failure-list ng-scope" ng-repeat="failure in failures"><p>{{failure}}</p><notification></notification></div></div></div><a class=button ng-click=ok()>OK</a></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
       e.put('app/popup/failure/firmwareEraseCancelled.tpl.html', '<section id=firmware-erase-cancelled ng-controller=FailureController><header></header><div class="content failure"><div class=content-inner><div class=description><div class=alert-icon><span class="fa fa-exclamation-triangle"></span></div><p>Firmware erase cancelled. Disconnect and reconnect to reboot your<vendor-name after=.></vendor-name></p><notification></notification></div></div></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
       e.put('app/popup/failure/pinConfirmationFailed.tpl.html', '<section id=pin-confirmation-failed ng-controller=FailureController ng-hide=hidden><header><back-button class="button-left header-button" action=ok()></back-button></header><div class="content failure"><div class=content-inner-with-button><div class=description><div class=alert-icon><span class="fa fa-exclamation-triangle"></span></div><p>Your PIN choice failed. The PINs you entered did not match each other. Please start over.</p><notification></notification></div></div><a class=button ng-click=ok()>Start Over</a></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
-      e.put('app/popup/failure/pinInvalid.tpl.html', '<section id=pin-confirmation-failed ng-controller=FailureController ng-hide=hidden><header><back-button class="button-left header-button" action=cancelDeviceOperation();goBack();></back-button></header><div class="content failure"><div class=content-inner-with-button><div class=description><div class=alert-icon><span class="fa fa-exclamation-triangle"></span></div><p>The PIN you entered was incorrect. Please try entering your PIN again.</p><notification></notification></div></div><a class=button ng-click=ok()>Try Again</a></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
+      e.put('app/popup/failure/pinInvalid.tpl.html', '<section id=pin-confirmation-failed ng-controller=FailureController ng-hide=hidden><header><back-button ng-hide=showDeviceConfigurationButton class="button-left header-button" action=cancelPinRequest();></back-button><settings-button ng-show=showDeviceConfigurationButton class="button-left header-button" action=cancelDeviceOperation(); route="\'/lifeboat\'"></settings-button></header><div class="content failure"><div class=content-inner-with-button><div class=description><div class=alert-icon><span class="fa fa-exclamation-triangle"></span></div><p>The PIN you entered was incorrect. Please try entering your PIN again.</p><notification></notification></div></div><a class=button ng-click=ok()>Try Again</a></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
       e.put('app/popup/footer/footer.tpl.html', '<div ng-controller=FooterController>Connected: <span class=data><span ng-show=device.initialized ng-bind=device.label></span> <span ng-show=!device.initialized>Uninitialized</span></span> Software: <span class=data>v{{version}}</span> Firmware: <span class=data>v{{device.major_version}}.{{device.minor_version}}.{{device.patch_version}}</span></div>'),
       e.put('app/popup/initialize/initialize.tpl.html', '<section id=initialize ng-controller=InitializationController><div class=content><div class=content-inner><div class=content-inner-centering><h2><span class=cornflower-txt>Your <b><vendor-name></vendor-name></b> needs to be initialized.</span> Before you can use this<vendor-name after=,></vendor-name>it must be initialized. During this step, your private keys are generated.</h2><a class=button ng-click="go(\'/selectWordCount/label\', \'slideLeft\')">Initialize <b><vendor-name></vendor-name></b></a></div></div><a class=text-link-button ng-click="go(\'/label/recover\', \'slideLeft\')">or Recover<vendor-name></vendor-name></a></div><notification></notification><notification-message></notification-message></section>'),
       e.put('app/popup/selectWordCount/selectWordCount.tpl.html', '<section id=select-word-count ng-controller=ResetController><header><back-button class="button-left header-button" destination="\'/initialize\'"></back-button></header><div class=content><h2><span class=cornflower-txt><b>Seed Phrase Entropy</b></span> For Your<vendor-name></vendor-name></h2><form name=form novalidate><div class=form-input-container><div class=content-form-inner><div class=content-inner-centering><div class=help>Random 12, 18, or 24-word recovery sentence that’s used to derive numerous pairs of private and public keys.</div><label>Select Seed Phrase Length</label><br><div class=btn-group uib-dropdown><button type=button uib-dropdown-toggle ng-disabled=disabled>{{makeSeedDescription(resetRecoverData.word_count)}} <span class=caret></span></button><ul class=dropdown-menu uib-dropdown-menu role=menu aria-labelledby=single-button><li role=menuitem ng-repeat="word_count in validSeedLength" ng-click=setSeedLength(word_count)><a href=# ng-click=$event.preventDefault()>{{makeSeedDescription(word_count)}}</a></li></ul></div></div></div></div><button class=button type=submit ng-click=nextAction()>Select Word Count</button></form><notification></notification></div></section>'),
