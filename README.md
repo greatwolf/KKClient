@@ -36,9 +36,12 @@ This fork contains numerous improvements and bugfixes over the original client. 
  - Implemented a better PIN retry mechanism
  - Allow BIP39 seed length selection when initializing KeepKey
  - Removed Shapeshift advert overlay during startup load
+ - Nicer looking cryptocurrency icon design courtesy of cryptoicons.co project
+ - Use gasnow.org for Ethereum gas price estimation
 
 Altcoin Support:
 
+ - Bitcoin TESTNET
  - BitcoinSV
  - BitcoinGold
  - DigiByte
@@ -49,6 +52,9 @@ Altcoin Support:
  - Groestlcoin
  - Vertcoin
  - Fujicoin
+ - Syscoin*
+
+<sub>*Requires custom firmware support.</sub>
 
 ## How To Use
 
@@ -71,7 +77,7 @@ There are two ways to install this extension onto a Chromium-based browser(eg. s
  - Click on the `Load Unpacked` button on the upper left corner.
  - Find the extension path '../Extensions/idgiipeogajjpkgheijapngmlbohdhjg/6.4.0.1_0' and click `Select Folder` to reload the extension.
  - Setup a blockcypher API access token at [blockcypher.com](https://blockcypher.com).
- - Open 'background.js' file in a text editor. At the top of the file copy the API access token from the previous step into the `METADATA_API_TOKEN` variable and save. For example,
+ - Open 'apitokens.js' file in a text editor. At the top of the file copy the API access token from the previous step into the `METADATA_API_TOKEN` variable and save. For example,
  
         var METADATA_API_TOKEN = "d9a5e85023faa87914a191f6a741a2c4";
         // The line above is only for illustration and is not a valid api token!
