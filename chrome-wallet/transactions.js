@@ -124,6 +124,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Pivx',
+      currencySymbol: 'PIVX',
+      coinTypeCode: '119\'',
+      coinType: 119,
+      addressFormat: '^D\\w{26,34}$',
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'BitcoinCash',
       currencySymbol: 'BCH',
       coinTypeCode: '145\'',

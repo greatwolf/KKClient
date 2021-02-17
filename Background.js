@@ -15505,6 +15505,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             feeProfile: { MIN_FEE: 1e7 }
           },
           {
+            name: s.CoinName[s.CoinName.Pivx = 119] = "Pivx",
+            addressFormat: "^D\\w{26,34}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://blockbook.pivx.link",
+            ],
+            txUrlExplorer: "https://explorer.pivx.link/tx/",
+            feeProfile: { MIN_FEE: 1e4 }
+          },
+          {
             name: s.CoinName[s.CoinName.Zcash = 133] = "Zcash",
             addressFormat: "^t1[a-km-zA-HJ-NP-Z1-9]{33}$",
             dust: e.newDustCalculation(3000),
