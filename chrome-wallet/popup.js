@@ -1610,6 +1610,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
   angular.module('kkWallet').controller('PinController', ['$scope', '$routeParams', 'NavigationService', 'DeviceFeatureService', 'PinLockService', function(e, t, n, a, pinLock)
   {
     var prevRoute = n.getPreviousRoute();
+    var currRoute = n.getCurrentRoute();
     e.onKeyPress = function(k)
     {
       var pinPad = e.$$childTail
@@ -1627,7 +1628,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             pinPad.appendToPin(numkey)
       }
     }
-    pinLock.state = pinLock.verifying;
+    pinLock.state = currRoute === '/pin/pin_matrix_request_type_current'
+                  ? pinLock.verifying
+                  : pinLock.idling;
     e.showDeviceConfigurationButton = !1,
       '/walletlist' === prevRoute ? (e.successRoute = prevRoute,
         e.showDeviceConfigurationButton = !0) : !prevRoute.startsWith('/lifeboat') && !prevRoute.startsWith('/device') ? (e.successRoute = prevRoute, n.setNextTransition('slideRight')) : '/pin/pin_matrix_request_type_new_second' === n.getCurrentRoute() && a.features.initialized ? n.setNextTransition('slideRight') : n.setNextTransition('slideLeft')
@@ -1988,6 +1991,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       {
         function i()
         {
+          if (!o.wallets.length) return
           c = 1 < o.wallets.length ? '/walletList' : '/wallet/' + o.wallets[0].id
         }
         var c;
