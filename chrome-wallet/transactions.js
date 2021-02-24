@@ -58,6 +58,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Reddcoin',
+      currencySymbol: 'RDD',
+      coinTypeCode: '4\'',
+      coinType: 4,
+      addressFormat: '^R\\w{26,34}$',
+      dust: 1e8,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Ethereum',
       currencySymbol: 'ETH',
       coinTypeCode: '60\'',

@@ -4881,6 +4881,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var coinName = l.CoinName[e.coinName];
             switch(coinName)
             {
+              case 'Reddcoin':
+                t.setTimestamp(Math.trunc(Date.now() / 1e3))
               case 'Dash':
               case 'Qtum':
               case 'Ravencoin':
@@ -10898,6 +10900,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return {
               version: e.version,
               lockTime: e.lockTime,
+              timestamp: e.timestamp,
               inputs: r.map(e.inputs.list, a.fromTransactionInput),
               outputs: r.map(e.outputs.list, o.fromTransactionOutput)
             }
@@ -11054,6 +11057,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var i = e("lodash"),
       a = e("./AbstractChainedTransactionRequestHandler"),
       o = e("./RequestType"),
+      c = e("@keepkey/device-client/dist/global/coin-name"),
       s = function(e)
       {
         function t(t, n)
@@ -11070,6 +11074,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.isRequestForHistoricTransactionData(e))
             {
               var n = t;
+              var coinName = c.CoinName[this.transactionData.coinName];
+              switch(coinName)
+              {
+                case 'Reddcoin':
+                  this.response.setTimestamp(n.timestamp.valueOf() / 1e3);
+              }
               this.response.setVersion(i.isNumber(n.version) ? n.version : 1),
                 this.response.setLockTime(n.lockTime || 0)
             }
@@ -11082,6 +11092,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     "./AbstractChainedTransactionRequestHandler": 108,
     "./RequestType": 115,
+    "@keepkey/device-client/dist/global/coin-name": 160,
     lodash: 368
   }],
   113: [function(e, t, n)
@@ -15404,6 +15415,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.Reddcoin = 4] = "Reddcoin",
+            addressFormat: "^R\\w{26,34}$",
+            dust: 1e8,
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://rddblockexplorer.com",
+            ],
+            txUrlExplorer: "https://live.reddcoin.com/tx/",
+            feeProfile:
+            {
+              TRANSACTION_HEADER_SIZE: 14,
+              MIN_FEE: 1e3
+            }
+          },
+          {
             name: s.CoinName[s.CoinName.Dash = 5] = "Dash",
             addressFormat: "^[X7][a-km-zA-HJ-NP-Z1-9]{25,34}$",
             dust: e.oldDustCalculation(10000),
@@ -17336,6 +17363,24 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           type: "bool",
           name: "overwintered",
           id: 11
+        },
+        {
+          rule: "optional",
+          type: "uint32",
+          name: "version_group_id",
+          id: 12
+        },
+        {
+          rule: "optional",
+          type: "uint32",
+          name: "branch_id",
+          id: 13
+        },
+        {
+          rule: "optional",
+          type: "uint32",
+          name: "timestamp",
+          id: 14
         }]
       },
       {
@@ -18602,6 +18647,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           type: "uint32",
           name: "branch_id",
           id: 10
+        },
+        {
+          rule: "optional",
+          type: "uint32",
+          name: "timestamp",
+          id: 11
         }]
       },
       {
@@ -78872,7 +78923,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.transaction = function(t, n)
           {
-            var r = {
+            var r =
+            {
               blockHeight: 1,
               hash: i.fromHex(t.txid),
               addresses: e.gatherAddresses(t),
@@ -78881,11 +78933,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               confidence: t.confirmations ? 1 : 0,
               version: t.version,
               lockTime: t.locktime,
-              timestamp: new Date
+              timestamp: new Date(1e3 * t.time)
             };
+            if (n.name === 'Reddcoin')
+              r.timestamp = new Date(i.fromHex(t.hex.slice(-8)).LE().readUint32() * 1e3)
+
             return t.confirmations && (r.blockHash = i.fromHex(t.blockhash),
-                r.confirmations = t.confirmations,
-                r.timestamp = new Date(1e3 * t.time)),
+                r.confirmations = t.confirmations),
               r
           },
           e.isNotOpReturn = function(e)
