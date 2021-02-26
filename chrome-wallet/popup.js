@@ -1987,12 +1987,12 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       }]),
       e.when('WordRequest', t('/wordRequest')),
       e.when('CharacterRequest', t('/characterRequest/:word_pos/:character_pos')),
-      e.when('Success', ['$injector', 'NotificationMessageService', 'WalletNodeService', 'NavigationService', function(e, a, o)
+      e.when('Success', ['$injector', 'NotificationMessageService', 'WalletNodeService', 'DeviceBridgeService', function(e, a, o, br)
       {
         function i()
         {
           if (!o.wallets.length) return
-          c = 1 < o.wallets.length ? '/walletList' : '/wallet/' + o.wallets[0].id
+          c = '/walletList'
         }
         var c;
         switch (this.request.message.message)
@@ -2004,6 +2004,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           case 'Settings applied':
             a.set('Your device settings were successfully changed!'),
               c = '/device';
+              br.initialize();
             break;
           case 'PIN changed':
             a.set('Your PIN was successfully changed!'),

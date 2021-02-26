@@ -1067,9 +1067,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return i.DeviceClientManager.instance.getActiveClient().then(function(t)
             {
               return t.changeLabel(e.label)
-            }).then(function()
-            {
-              return r.MessageDispatcher.execute("Initialize")
             })
           },
           e
@@ -1132,9 +1129,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return i.DeviceClientManager.instance.getActiveClient().then(function(t)
             {
               return t.changePinTimeout(e.pinTimeout)
-            }).then(function()
-            {
-              return r.MessageDispatcher.execute("Initialize")
             })
           },
           e
@@ -16204,6 +16198,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "Success",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["ButtonRequest", "PinMatrixRequest"],
         userInteractionRequired: !0
       }),
