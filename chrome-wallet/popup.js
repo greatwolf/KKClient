@@ -389,7 +389,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         {
           label: '',
           pin_protection: !0,
-          password_protection: !1,
+          passphrase_protection: !1,
           word_count: 12,
           language: 'english',
           enforce_wordlist: !0,
@@ -1584,7 +1584,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
     return {
       label: '',
       pin_protection: !0,
-      password_protection: !1,
+      passphrase_protection: !1,
       word_count: 12,
       language: 'english',
       enforce_wordlist: !0,
