@@ -273,12 +273,11 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                 }, a);
                 return h(b)
             },
-            getPublicKey: function c(a) {
-                var b = angular.extend({}, {
+            getPublicKey: function c(walletId) {
+                return h({
                     messageType: 'GetPublicKey',
-                    addressN: [0]
-                }, a);
-                return h(b)
+                    walletId: walletId
+                })
             },
             getWalletNodes: function a(walletId) {
                 return h({

@@ -1937,6 +1937,48 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.$watch('userInput.feeLevel', v, !0),
       e.$watch('userInput.feeLevel', w)
   }]),
+  angular.module('kkWallet').controller('ViewXPubController', ['$rootScope', '$scope', '$routeParams', '$location', 'DeviceBridgeService', 'WalletNodeService', 'NavigationService', 'XPubAddressService', 'PinLockService', function(e, t, n, a, o, i, c, l, pinLock)
+  {
+    c.setNextTransition('slideLeft'),
+      new ClipboardJS('.copy-to-clipboard-button');
+    var d = new Promise(function(t)
+      {
+        e.$on('ButtonRequest', function(e, n)
+        {
+          'ButtonRequest_Address' === n.code && t(n.code)
+        })
+      }),
+      u = !1;
+      t.currency = i.getWalletById(n.walletId).coinType
+      switch(pinLock.state)
+      {
+        case pinLock.idling:
+          l.clear()
+          o.getPublicKey(n.walletId)
+          break;
+        case pinLock.cancelling:
+          c.goToPrevious('slideRight')
+          return;
+        case pinLock.verifying:
+          break;
+      }
+      t.$on('$destroy', function()
+      {
+        var ignorable =
+        [
+          '/pin/pin_matrix_request_type_current',
+          '/passphrase',
+          '/failure/invalid_pin'
+        ]
+        !u && d &&
+        _.indexOf(ignorable, a.path()) === -1 &&
+        (l.clear(), d.then(o.cancel))
+      }),
+      t.$watch(l.value, function()
+      {
+        t.unusedAddress = l.value
+      }, !0)
+  }]),
   angular.module('kkWallet').controller('SuccessController', ['$scope', '$routeParams', 'NavigationService', 'WalletNodeService', function(e, t, n)
   {
     e.message = decodeURIComponent(t.message),
@@ -2086,6 +2128,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             action: 1
           },
           {
+            message: 'Show extended public key cancelled',
+            action: 1
+          },
+          {
             message: 'Aborted',
             action: 1
           },
@@ -2164,6 +2210,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           pinLock.reset();
       }]),
       e.when('ReceiveAddress', ['ReceiveAddressService', function(e)
+      {
+        e.set(this.request.message)
+      }]),
+      e.when('PublicKey', ['XPubAddressService', function(e)
       {
         e.set(this.request.message)
       }]),
@@ -2570,6 +2620,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       {
         templateUrl: 'app/popup/receive/receive.tpl.html',
         goable: !0
+      }).when('/xpub/:walletId',
+      {
+        templateUrl: 'app/popup/xpub/xpub.tpl.html',
+        goable: !0
       }).when('/pin/pin_matrix_request_type_new_first',
       {
         templateUrl: 'app/popup/pin/newPin.tpl.html',
@@ -2834,6 +2888,22 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       value: e
     }
   }]),
+  angular.module('kkWallet').factory('XPubAddressService', [function()
+  {
+    var e = {};
+    return {
+      set: function n(t)
+      {
+        angular.copy(t, e)
+      },
+      clear: function t()
+      {
+        angular.copy(
+        {}, e)
+      },
+      value: e
+    }
+  }]),
   angular.module('kkWallet').factory('PinLockService', [function()
   {
     var validStates = {idle: 0, verify: 1, cancel: 2};
@@ -3026,6 +3096,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.walletId = t.wallet,
       e.fresh = n.getFreshStatus(),
       e.showSubAccounts = !1,
+      e.isSingleAddressAccount = 'single' === n.getWalletById(t.wallet).addressStrategy,
       s(),
       e.firmwareUpdateAvailable = o.features.firmwareUpdateAvailable,
       e.offerKeepKeyPurchase = 'KeepKey' !== o.get('deviceCapabilities.vendorName'),
@@ -3036,6 +3107,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.receive = function()
       {
         e.go(['/receive', e.walletId].join('/'), 'slideLeft')
+      },
+      e.viewXPub = function()
+      {
+        e.go(['/xpub', e.walletId].join('/'), 'slideLeft')
       },
       e.sendAllowed = function(t)
       {
@@ -3215,6 +3290,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.put('app/popup/send/send.tpl.html', '<section id=build-transaction ng-controller=SendController><header><back-button class="button-left header-button"></back-button></header><div class=content><div ng-show=showForm><account-balance account=wallet single-account=singleAccount loading=false name-display=name currency=currency fresh=fresh></account-balance><form name=form novalidate ng-class="{exchange: isExchange}"><div class=form-input-container><div class="content-form-inner sending"><div class=content-header><recipient-entry recipient=userInput.address field-name=dest form=form currency-name={{currency}} current-account=wallet.id disabled=preparingTransaction filter-recipient-for-exchange=false></recipient-entry></div><div class=exchange-images ng-class="{\'image-centered\': !userInput.address}"><div><img class=currency-logo ng-src={{accountCurrencyUrl}}><div class=centered>{{currencySymbol}}</div></div><i class="fa fa-arrow-right" ng-if="isExchange || userInput.address"></i><div class=shapeshift-exchange-container ng-if=isExchange><div class=shapeshift-fox-container><img class=fox src=assets/partner-logos/shapeshift.svg></div></div><i class="fa fa-arrow-right" ng-if=isExchange></i><div ng-if=destinationCurrency><img class=currency-logo ng-src={{destinationCurrencyUrl}}><div class=centered>{{destinationCurrencySymbol}}</div></div><div ng-if="userInput.address && !destinationCurrency"><img class=currency-logo ng-src={{accountCurrencyUrl}}><div class=centered>external address</div></div></div><div class="content-inner-centering sending" ng-class="{\'two-column\': isExchange}"><div class=amount-container><amount-entry amount=userInput.amount max-amount=maxSendAmount.toString() min-amount=minSendAmount.toString() max-reason=maxReason min-reason=minReason field-name=amount form=form disable=preparingTransaction currency=currency is-exchange-amount-label=false loading=!fresh.status></amount-entry><fee-selector ng-show="config.showFeeSelector && !isExchange && feeLevels.length > 1" fee-levels=feeLevels estimated-fees=estimatedFee.fee selected=userInput.feeLevel active="!preparingTransaction && userInput.amount > 0"></fee-selector></div><div class=value-container ng-show=isExchange><div class=value-display><label>Estimated receive amount:</label><div class="estimated-value value"><formatted-amount ng-show=estimatedReceiveAmount amount=estimatedReceiveAmount currency=destinationCurrency></formatted-amount>&nbsp;</div></div></div></div></div></div><div class=fee-container ng-class="{\'two-column\': isExchange}"><div class=value-container><div class="fee-display value-display"><label>Miner fee:</label><div class=value><formatted-amount class=fee ng-show=showFee() amount=getFee(userInput.feeLevel) currency=getFeeCurrency()></formatted-amount></div></div></div><div class=value-container ng-show=isExchange><div class="exchange-rate-display value-display"><label>Estimated rate:</label><div class=value><span>1&nbsp;{{currencySymbol}}&nbsp;&asymp;&nbsp;</span><formatted-amount amount=exchangeMarketInfo.rate currency=destinationCurrency></formatted-amount></div></div></div></div><div class="alert-info sending-alert" ng-show=exchangeDenied()><span ng-if="exchangeStatus.errorCode === \'geoRestriction\'">ShapeShift is not available in your area. Please see <a href={{exchangeStatus.url}} target=_blank>{{exchangeStatus.url}}</a> for more information.</span></div><button class=button type=submit ng-show="!showLogin || !isExchange" ng-disabled="preparingTransaction || !enableExchangeButton" ng-click=buildTransaction()>{{buttonText}}</button><div ng-show="showLogin && isExchange" class=login-prompt><span>You must log in to your ShapeShift Account in order to trade assets.</span> <button class=button ng-click=loginToSS()>Log in to ShapeShift</button></div></form><notification></notification></div><div ng-hide=showForm>Can\'t send from an account with a high confidence balance of 0</div></div><ng-include src="\'app/popup/send/preparing.tpl.html\'" ng-if=preparingTransaction></ng-include></section>'),
       e.put('app/popup/sending/sending.tpl.html', '<section id=sending><header><back-button class="button-left header-button" action=cancelDeviceOperation();></back-button></header><div class=content><h2><span class=cornflower-txt><b>Signing Transaction</b></span><br>follow the prompts on your<vendor-name after=...></vendor-name></h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div></div><a class=button ng-click=cancelDeviceOperation();>Cancel</a><notification></notification></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
       e.put('app/popup/success/buildingTransaction.tpl.html', '<section id=success ng-controller=SuccessController><header></header><div class=content><div class=content-no-button-inner><div class=content-inner-centering><h2><span class=cornflower-txt><b>Signing transaction.</b></span><br>Please wait while your<vendor-name></vendor-name>signs the transaction.</h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div><notification></notification></div></div></div></div></section>'),
+      e.put('app/popup/xpub/xpub.tpl.html', '<section id=xpub ng-controller=ViewXPubController><header><back-button class="button-left header-button"></back-button></header><div class=content><h2>{{currency}} <span class=cornflower-txt><b>XPub Address</b></span></h2><div class=content-inner><div class=content-inner-centering><div class=help>Confirm the address below is the same one shown on your<vendor-name></vendor-name>before using it.</div><qrcode ng-show=unusedAddress.address class=qrcode data={{unusedAddress.address}} size=160 version=7 error-correction-level=M target=_blank></qrcode><div class=address ng-show=unusedAddress.address><span class=bitcoin-receive-link>{{unusedAddress.address}}</span> <button class="copy-to-clipboard-button fa fa-clipboard" data-clipboard-text={{unusedAddress.address}}></button><notification></notification></div><div class=node-path>{{unusedAddress.nodePath}}</div></div></div></div><div class="content in-progress-overlay" ng-hide=unusedAddress.address><div class=content-no-button-inner><div class=content-inner-centering><h2><span class=cornflower-txt><b>Finding unused address.</b></span><br>Please wait while we<br>find an unused address...</h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div></div></div></div></div></section>'),
       e.put('app/popup/success/success.tpl.html', '<section id=success ng-controller=SuccessController><header></header><div class=content><h2><span class=cornflower-txt>Success!</span></h2><div>Your action was acknowleged by your <b><vendor-name after=.></vendor-name></b></div><div>{{message}}</div><notification></notification></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
       e.put('app/popup/success/updatingFirmware.tpl.html', '<section id=success ng-controller=SuccessController><div class=content><div class=content-no-button-inner><div class=content-inner-centering><h2><span class=cornflower-txt><b>Updating firmware.</b></span><br>Please wait while your<vendor-name after="\'s"></vendor-name>firmware is updated. Do not unplug the device.</h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div><notification></notification></div></div></div></div></section>'),
       e.put('app/popup/success/uploadComplete.tpl.html', '<section id=success ng-controller=SuccessController><header></header><div class="content success-upload-complete"><div class=content-no-button-inner><div class=content-inner-centering><h2><span class=cornflower-txt><b>Firmware update complete.</b></span><br>Please disconnect and reconnect your device, as well as close and reopen the KeepKey Client.</h2><div class=success></div><notification></notification></div></div></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
@@ -3222,7 +3298,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.put('app/popup/syncing/syncing.tpl.html', '<section id=syncing><header></header><div class=content><h2><span class=cornflower-txt><b>Syncing<vendor-name after=.></vendor-name></b></span><br>Please wait while we sync.</h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div></div><notification></notification></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer></section>'),
       e.put('app/popup/update-device/update-device.tpl.html', '<section id=firmware-available ng-controller=UpdateDeviceCtrl><div class=content><h2><span class=cornflower-txt><b>Device update</b> <span ng-if=skipable>available.</span> <span ng-if=!skipable>required.</span></span><p ng-if=deviceWipeRequired><i class="fa fa-exclamation-triangle" style="font-size: 60px;color: red;margin-top: 30px;"></i></p><p style="color: black; margin-bottom: 30px; padding: 10px; border: 3px solid black; display: block;" ng-if=deviceWipeRequired><b>YOUR SEED WILL BE WIPED BY THIS OPERATION. YOU WILL HAVE TO REINITIALIZE YOUR KEEPKEY. MAKE SURE THAT YOU HAVE YOUR SEED WORDS AVAILABLE BEFORE PROCEEDING.</b><br><b>If you are not sure how to recover your KeepKey, DO NOT CONTINUE. Unplug your KeepKey and contact support. We will let you know when you can upgrade without wiping your device.</b><br>Please contact <a href=mailto:support@keepkey.com target=_blank>support@keepkey.com</a> with any questions.</p><p>Unplug your KeepKey, then hold down the button while plugging it in to start the device update.</p></h2><a class="text-link-button cancel" ng-if=skipable ng-click=goToTop(false)>Skip</a><notification></notification></div></section>'),
       e.put('app/popup/verify/verify.tpl.html', '<section id=verify-device ng-controller=VerifyController><div class="layout starting-layout" ng-if=true><h1>Let\u2019s get started.</h1><p>We are going to verify that your KeepKey is secure and has not been tampered with.</p><p>This process is automatic, and should take less than two minutes. <b style=color:#333;>If the process is stopped, you will need to start again from the beginning.</b></p><i class="fa fa-check-square" ng-if=step1Done></i> <a class=button ng-click=startValidation()>Check your<vendor-name></vendor-name></a><p ng-show=status.step>Step: <span ng-bind=status.step></span></p><p ng-show=status.result>Result: <span ng-bind=status.result></span></p><p ng-show=status.sectorName>SectorName: <span ng-bind=status.sectorName></span></p></div></section>'),
-      e.put('app/popup/wallet/wallet.tpl.html', '<section id=wallet ng-controller=WalletController><header><back-button ng-hide=singleAccount class="button-left header-button"></back-button><settings-button ng-show=singleAccount class="button-left header-button"></settings-button><refresh-button class="button-right header-button"></refresh-button></header><div class=content><account-balance account=wallet loading=receiveDisabled() name-display=name single-account=singleAccount account-settings=accountSettings currency=currency fresh=fresh></account-balance><div class=menu><ul><li ng-if=firmwareUpdateAvailable><button class="menu-item notification" ng-click="go(\'/update-device\')" ng-show=firmwareUpdateAvailable>Update Firmware</button></li><li><button class=menu-item ng-click=send() ng-disabled=!sendAllowed()>Send/Trade {{sendCurrencyName}}</button></li><li><button class=menu-item ng-click=receive() ng-disabled=receiveDisabled()>Receive {{receiveCurrencyName}}</button></li><li><button class=menu-item ng-click=showTransactions()>Transactions</button></li><li ng-if=offerKeepKeyPurchase><button class=menu-item ng-click=openBuyKeepkeyWindow()>Buy a KeepKey</button></li><notification></notification></ul></div><div class=subaccounts ng-if=showSubAccounts><ul><li ng-repeat="subAccount in subAccounts" class=subaccount><img ng-src="assets/currency-logos/{{ subAccount.coinType | lowercase }}.png"><div class=asset-name>{{subAccount.coinType}}</div><formatted-amount ng-hide=loading amount=subAccount.balance currency=subAccount.coinType></formatted-amount><exchange-formatted-amount ng-hide=loading amount=subAccount.balance currency=subAccount.coinType></exchange-formatted-amount><button class="fa fa-list" ng-show=!isToken(subAccount.coinType) ng-click=showTransactions(subAccount.coinType) uib-tooltip="{{subAccount.coinType}} Transactions" tooltip-placement=top-right tooltip-popup-delay=500></button> <button class="fa fa-paper-plane-o" ng-click=send(subAccount.coinType) ng-disabled=!sendAllowed(subAccount.coinType) uib-tooltip="Send/Trade {{subAccount.coinType}}" tooltip-popup-delay=500></button></li></ul></div></div><div class=footer><div class=left><strong><device-label></device-label></strong> connected</div><div class="new-account-link text-link-button right" ng-if=singleAccount ng-click="go(\'/accountConfig\', \'slideLeft\')">Add Account</div><div class="wallet-name right" ng-if=!singleAccount ng-disabled=receiveDisabled()>{{data.coinType}} Account #{{wallet.accountNumber}}</div></div><notification-message></notification-message></section>'),
+      e.put('app/popup/wallet/wallet.tpl.html', '<section id=wallet ng-controller=WalletController><header><back-button ng-hide=singleAccount class="button-left header-button"></back-button><settings-button ng-show=singleAccount class="button-left header-button"></settings-button><refresh-button class="button-right header-button"></refresh-button></header><div class=content><account-balance account=wallet loading=receiveDisabled() name-display=name single-account=singleAccount account-settings=accountSettings currency=currency fresh=fresh></account-balance><div class=menu><ul><li ng-if=firmwareUpdateAvailable><button class="menu-item notification" ng-click="go(\'/update-device\')" ng-show=firmwareUpdateAvailable>Update Firmware</button></li><li><button class=menu-item ng-click=send() ng-disabled=!sendAllowed()>Send/Trade {{sendCurrencyName}}</button></li><li><button class=menu-item ng-click=receive() ng-disabled=receiveDisabled()>Receive {{receiveCurrencyName}}</button></li><li><button class=menu-item ng-click=showTransactions()>Transactions</button></li><li><button class=menu-item ng-click=viewXPub() ng-show=!isSingleAddressAccount>View XPub Address</button></li><li ng-if=offerKeepKeyPurchase><button class=menu-item ng-click=openBuyKeepkeyWindow()>Buy a KeepKey</button></li><notification></notification></ul></div><div class=subaccounts ng-if=showSubAccounts><ul><li ng-repeat="subAccount in subAccounts" class=subaccount><img ng-src="assets/currency-logos/{{ subAccount.coinType | lowercase }}.png"><div class=asset-name>{{subAccount.coinType}}</div><formatted-amount ng-hide=loading amount=subAccount.balance currency=subAccount.coinType></formatted-amount><exchange-formatted-amount ng-hide=loading amount=subAccount.balance currency=subAccount.coinType></exchange-formatted-amount><button class="fa fa-list" ng-show=!isToken(subAccount.coinType) ng-click=showTransactions(subAccount.coinType) uib-tooltip="{{subAccount.coinType}} Transactions" tooltip-placement=top-right tooltip-popup-delay=500></button> <button class="fa fa-paper-plane-o" ng-click=send(subAccount.coinType) ng-disabled=!sendAllowed(subAccount.coinType) uib-tooltip="Send/Trade {{subAccount.coinType}}" tooltip-popup-delay=500></button></li></ul></div></div><div class=footer><div class=left><strong><device-label></device-label></strong> connected</div><div class="new-account-link text-link-button right" ng-if=singleAccount ng-click="go(\'/accountConfig\', \'slideLeft\')">Add Account</div><div class="wallet-name right" ng-if=!singleAccount ng-disabled=receiveDisabled()>{{data.coinType}} Account #{{wallet.accountNumber}}</div></div><notification-message></notification-message></section>'),
       e.put('app/popup/walletConfig/walletConfig.tpl.html', '<section id=wallet-config ng-controller=WalletConfigController><header><back-button class="button-left header-button"></back-button><a class="button-right header-button refresh-button" ng-click=refresh()><div class="icon icon-refresh"></div></a></header><div class=content><div class="wallet online"><div class="account-form container"><header>Account Settings</header><div class=row><div class="label-column col-xs-4">Account ID:</div><div class="data-column col-xs-8"><div ng-bind=data.id></div></div></div><div class=row><div class="label-column col-xs-4">Name:</div><div class="data-column col-xs-8"><div contenteditable=true strip-br=true strip-tags=true nolinebreaks=true ng-model=wallet.name></div></div></div><div class=row><div class="label-column col-xs-4">Node path:</div><div class="data-column col-xs-8"><div ng-bind=data.nodePath></div></div></div><div class=row><div class="label-column col-xs-4">xpub:</div><div class="data-column col-xs-8"><div ng-bind=data.data.xpub></div></div></div></div></div><div class=menu><ul><li><button class=menu-item ng-click=delete()>Delete Account</button></li></ul></div></div><div class=footer><strong><device-label></device-label></strong> connected</div></section>'),
       e.put('app/popup/walletlist/header.tpl.html', '<header><settings-button class="button-left header-button"></settings-button><refresh-button class="button-right header-button"></refresh-button></header>'),
       e.put('app/popup/walletlist/loading.tpl.html', '<div class=content><div class=content-no-button-inner><div class=content-inner-centering><h2><span class=cornflower-txt><b>Loading Accounts.</b></span><br>Please wait while accounts<br>and balances are loaded...</h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div></div></div></div></div>'),

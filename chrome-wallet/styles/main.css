@@ -12251,6 +12251,7 @@ button.fa:focus {
 #label .content,
 #passphrase .content,
 #pin .content,
+#xpub .content,
 #receive .content {
   padding-top: 10px
 }
@@ -12263,6 +12264,7 @@ button.fa:focus {
 #label .content h2,
 #passphrase .content h2,
 #pin .content h2,
+#xpub .content h2,
 #receive .content h2 {
   padding-bottom: 10px;
   border-bottom: 1px solid #ececed
@@ -12435,6 +12437,17 @@ button.fa:focus {
   margin-bottom: 25px
 }
 
+#xpub .content-inner {
+  height: 302px
+}
+
+#xpub .content-inner-centering .address {
+  width: 300px;
+  margin: 0 auto;
+  overflow-wrap: break-word
+}
+
+#xpub .content,
 #receive .content {
   text-align: center
 }
@@ -12443,6 +12456,7 @@ button.fa:focus {
   margin: 10px 0 10px 0
 }
 
+#xpub .help,
 #receive .help {
   margin-top: 10px
 }

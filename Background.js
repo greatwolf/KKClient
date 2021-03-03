@@ -1000,7 +1000,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return r
             }).then(function()
             {
-              return g.getPublicKey(n, !1)
+              return g.getPublicKey(n, null, !1)
             }).then(function(e)
             {
               t.xpub = a.Configuration.debugXpub || e.xpub
@@ -3644,6 +3644,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e("./dispatchers/wipe"),
       e("./dispatchers/word-ack"),
       e("./dispatchers/enable-policy"),
+      e("./dispatchers/get-public-key"),
       e("./dispatchers/otherwise")
   },
   {
@@ -3686,7 +3687,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./dispatchers/reset": 41,
     "./dispatchers/set-shapeshift-auth-token": 42,
     "./dispatchers/wipe": 43,
-    "./dispatchers/word-ack": 44
+    "./dispatchers/word-ack": 44,
+    "./dispatchers/get-public-key": 461
   }],
   46: [function(e, t, n)
   {
@@ -7212,7 +7214,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             if (i.Configuration.apiTokenOverride)
               return Promise.resolve(i.Configuration.apiTokenOverride);
             var t = a.NodeVector.fromString("m/APIKEY/BLKCYP");
-            return e.getPublicKey(t, !1).then(function(e)
+            return e.getPublicKey(t, null, !1).then(function(e)
             {
               return r.DeterministicKeyGenerator.hex(e.node.public_key.toArrayBuffer())
             }).then(function(e)
@@ -8051,7 +8053,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getXpub = function(e, t, n)
           {
             var r = u.Configuration.getDebugXpubs(this.coinNameText, n);
-            return r ? Promise.resolve(r) : e.getPublicKey(t, !1).then(function(e)
+            return r ? Promise.resolve(r) : e.getPublicKey(t, null, !1).then(function(e)
             {
               return e.getXpub()
             })
@@ -11725,7 +11727,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   case 0:
                     return e = l,
-                      [4, this.client.getPublicKey(e, !1)];
+                      [4, this.client.getPublicKey(e, null, !1)];
                   case 1:
                     return t = r.sent(),
                       n = s.DeterministicKeyGenerator.base58(t.node.public_key.toArrayBuffer(), s.DeterministicKeyPrefixes.KK),
@@ -12585,7 +12587,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e()
         {}
-        return e.operation = function(e, t, n)
+        return e.operation = function(e, t, coinName, n)
           {
             return e.featuresService.promise.then(function(a)
             {
@@ -12594,6 +12596,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 var mask_harden = 0x7fffffff
                 var o = i.DeviceMessageHelper.factory("GetPublicKey");
                 o.setAddressN(r.NodeVector.fromString(t).toArray());
+                coinName && o.setCoinName(coinName);
                 switch ((o.address_n[1] || 0) & mask_harden)
                 {
                   // identify altcoins by SLIP0044 index
@@ -13290,7 +13293,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           r.firmwareUpload = i.partial(f.FirmwareUploadAction.operation, r, i),
           r.getAddress = i.partial(g.GetAddressAction.operation, r, i, i, i, null),
           r.getEthereumAddress = i.partial(w.GetEthereumAddressAction.operation, r, i, i),
-          r.getPublicKey = i.partial(h.GetPublicKeyAction.operation, r, i, i),
+          r.getPublicKey = i.partial(h.GetPublicKeyAction.operation, r, i, i, i),
           r.signMessage = i.partial(m.SignMessageAction.operation, r, i),
           r.encryptMessage = i.partial(b.EncryptMessageAction.operation, r, i),
           r.endSession = i.partial(y.EndSessionAction.operation, r),
@@ -80526,6 +80529,55 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../Configuration": 62,
     "@keepkey/device-client/dist/global/coin-name": 160,
     "@keepkey/device-client/dist/global/coin-type": 161
+  }],
+  461: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../../ui-messenger"),
+      i = e("../MessageDispatcher"),
+      a = e("../../account-list-manager"),
+      o = e("@keepkey/device-client/dist/global/coin-name"),
+      s = function()
+      {
+        function e()
+        {
+          this.messageType = "GetPublicKey",
+            this.responds = !1
+        }
+        return e.prototype.action = function(e)
+          {
+            var t = a.AccountListManager.findAccount(e.walletId),
+              nodePath;
+            var coinName = t.wallet.api.apiHelper.coinType.name;
+            return t.nodePathPromise.then(function(e)
+            {
+              return nodePath = e,
+                t.deviceClient.getPublicKey(nodePath, coinName, !1)
+            }).then(function(o)
+            {
+              if (!o) return;
+              t.deviceClient.getPublicKey(nodePath, coinName, !0);
+              return r.UiMessenger.sendMessageToUI("PublicKey",
+                {
+                  account: e.walletId,
+                  address: o.xpub,
+                  nodePath: nodePath.toString()
+                })
+            })
+          },
+          e
+      }();
+    i.MessageDispatcher.when(new s)
+  },
+  {
+    "../../account-list-manager": 2,
+    "../../ui-messenger": 122,
+    "../MessageDispatcher": 6,
+    "@keepkey/device-client/dist/global/coin-name": 160
   }],
 },
 {}, [1]);
