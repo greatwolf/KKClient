@@ -38,6 +38,7 @@ This fork contains numerous improvements and bugfixes over the original client. 
  - Removed Shapeshift advert overlay during startup load
  - Nicer looking cryptocurrency icon design courtesy of cryptoicons.co project
  - Use gasnow.org for Ethereum gas price estimation
+ - Viewable BIP44 XPub Address and QR code for a given wallet
 
 Altcoin Support:
 
@@ -53,8 +54,10 @@ Altcoin Support:
  - Vertcoin
  - Fujicoin
  - Syscoin*
+ - Pivx*
+ - Reddcoin*
 
-<sub>*Requires custom firmware support.</sub>
+<sub>*Requires [custom firmware](https://github.com/greatwolf/keepkey-firmware/tree/build-release) support.</sub>
 
 ## How To Use
 
