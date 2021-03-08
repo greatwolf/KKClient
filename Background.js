@@ -14893,8 +14893,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               return !!o.find([e], t.identity)
             });
+            if (!t)
+            {
+              var errmsg = `Unknown device or version: ${e.major_version}.${e.minor_version}.${e.patch_version}`
+              console.error(errmsg)
+              throw errmsg
+            }
             return void 0 === t.capabilities.supportsRecoveryDryRun && (t.capabilities.supportsRecoveryDryRun = !1),
-              t ? t.capabilities : void console.error("Unknown device or version")
+              t.capabilities
           },
           e.prototype.setValue = function(t, n)
           {
