@@ -15989,6 +15989,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e(e)
         {
+          e.revision = e.revision.toUTF8()
           this.data = e
         }
         return Object.defineProperty(e.prototype, "version",

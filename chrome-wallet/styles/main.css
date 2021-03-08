@@ -12243,6 +12243,19 @@ button.fa:focus {
   }
 }
 
+#about .content .features {
+  margin-top: 30px;
+  font-size: 11px;
+  text-align: left;
+  color: #999;
+  user-select: text
+}
+
+#about .content .features ul {
+  list-style-type: none;
+  padding-inline-start: 20px
+}
+
 #about .content,
 #add-account .content,
 #bip44-account-gap-violation .content,
