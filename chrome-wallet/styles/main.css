@@ -12285,7 +12285,23 @@ button.fa:focus {
 
 #about .content .applogo-icon {
   margin-bottom: 10px;
-  text-align: center;
+  text-align: center
+}
+
+#about .content .applogo-icon img {
+  vertical-align: top
+}
+
+#about .content .applogo-features {
+  display: inline-block;
+  text-align: left
+}
+
+#about .content .applogo-features ul {
+  list-style-type: none;
+  padding-inline-start: initial;
+  text-align: left;
+  font-size: 11px
 }
 
 #character-request .content,
