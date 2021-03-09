@@ -3035,8 +3035,14 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       }
     }
   }]),
-  angular.module('kkWallet').controller('SupportController', ['$scope', 'DeviceFeatureService', 'DeviceBridgeService', 'NavigationService', 'SupportService', function(e, t, n, a, o)
+  angular.module('kkWallet').controller('SupportController', ['$scope', 'DeviceFeatureService', 'DeviceBridgeService', 'NavigationService', 'SupportService', 'PinLockService', function(e, t, n, a, o, pinLock)
   {
+    if (pinLock.state === pinLock.cancelling)
+    {
+      a.goToPrevious('slideRight')
+      return;
+    }
+
     e.showApiToken = !1,
       '/device' === a.getPreviousRoute() && (n.getBlockcypherApiToken(),
         e.showApiToken = !0),
