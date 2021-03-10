@@ -13695,177 +13695,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         vendor: "keepkey.com",
         major_version: 5,
-        minor_version: 0,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 0,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 1,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 1,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 1,
-        patch_version: 2,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 10,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1,
-        hasPagedCoinTable: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 10,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 10,
-        patch_version: 2,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
         minor_version: 2,
         patch_version: 1,
         bootloader_mode: null
@@ -13874,153 +13703,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         vendorName: "KeepKey",
         firmwareImageAvailable: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 2,
-        patch_version: 2,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 2,
-        patch_version: 4,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 3,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 4,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 4,
-        patch_version: 2,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 5,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 5,
-        minor_version: 6,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
         upgradeSkipable: !1
       }
     },
@@ -14132,6 +13814,68 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         usesShapeshiftResponseV2: !0,
         upgradeSkipable: !1,
         hasPagedCoinTable: !0
+      }
+    },
+    {
+      identity:
+      {
+        vendor: "keepkey.com",
+        major_version: 5,
+        minor_version: 10,
+        patch_version: 0,
+        bootloader_mode: null
+      },
+      capabilities:
+      {
+        vendorName: "KeepKey",
+        firmwareImageAvailable: !0,
+        defaultMnemonicSeedLength: 12,
+        supportsCipheredKeyRecovery: !0,
+        supportsSecureAccountTransfer: !0,
+        usesProtectCallButtonRequests: !1,
+        usesShapeshiftResponseV2: !0,
+        upgradeSkipable: !1,
+        hasPagedCoinTable: !0
+      }
+    },
+    {
+      identity:
+      {
+        vendor: "keepkey.com",
+        major_version: 5,
+        minor_version: 10,
+        bootloader_mode: null
+      },
+      capabilities:
+      {
+        vendorName: "KeepKey",
+        firmwareImageAvailable: !0,
+        defaultMnemonicSeedLength: 12,
+        supportsCipheredKeyRecovery: !0,
+        supportsSecureAccountTransfer: !0,
+        usesProtectCallButtonRequests: !1,
+        usesShapeshiftResponseV2: !0,
+        upgradeSkipable: !0,
+        hasPagedCoinTable: !0
+      }
+    },
+    {
+      identity:
+      {
+        vendor: "keepkey.com",
+        major_version: 5,
+        bootloader_mode: null
+      },
+      capabilities:
+      {
+        vendorName: "KeepKey",
+        firmwareImageAvailable: !0,
+        defaultMnemonicSeedLength: 12,
+        supportsCipheredKeyRecovery: !0,
+        supportsSecureAccountTransfer: !0,
+        usesProtectCallButtonRequests: !1,
+        usesShapeshiftResponseV2: !0,
+        upgradeSkipable: !1
       }
     },
     {
@@ -14152,27 +13896,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       identity:
       {
         vendor: "keepkey.com",
-        major_version: 5,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
         major_version: 6,
         minor_version: 0,
-        patch_version: 0,
         bootloader_mode: null
       },
       capabilities:
@@ -14193,74 +13918,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         vendor: "keepkey.com",
         major_version: 6,
-        minor_version: 0,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 0,
-        patch_version: 2,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 0,
-        patch_version: 4,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 1,
-        patch_version: 0,
         bootloader_mode: null
       },
       capabilities:
@@ -14281,193 +13938,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       identity:
       {
         vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 1,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 2,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 2,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 2,
-        patch_version: 2,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 3,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 4,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 5,
-        patch_version: 1,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 6,
-        patch_version: 0,
-        bootloader_mode: null
-      },
-      capabilities:
-      {
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        defaultMnemonicSeedLength: 12,
-        supportsCipheredKeyRecovery: !0,
-        supportsSecureAccountTransfer: !0,
-        usesProtectCallButtonRequests: !1,
-        usesShapeshiftResponseV2: !0,
-        upgradeSkipable: !0,
-        hasPagedCoinTable: !0,
-        supportsRecoveryDryRun: !0
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        major_version: 6,
-        minor_version: 7,
-        patch_version: 0,
+        major_version: 7,
         bootloader_mode: null
       },
       capabilities:
@@ -14490,84 +13961,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         vendor: "keepkey.com",
         bootloader_mode: !0,
         major_version: 1,
-        minor_version: 0,
-        patch_version: 0
+        minor_version: 0
       },
       capabilities:
       {
         model: "K1-14AM",
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        bootloaderUpgradable: !0,
-        bootloaderUpgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        bootloader_mode: !0,
-        major_version: 1,
-        minor_version: 0,
-        patch_version: 1
-      },
-      capabilities:
-      {
-        model: "K1-14AM",
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        bootloaderUpgradable: !0,
-        bootloaderUpgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        bootloader_mode: !0,
-        major_version: 1,
-        minor_version: 0,
-        patch_version: 2
-      },
-      capabilities:
-      {
-        model: "K1-14AM",
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        bootloaderUpgradable: !0,
-        bootloaderUpgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        bootloader_mode: !0,
-        major_version: 1,
-        minor_version: 0,
-        patch_version: 3
-      },
-      capabilities:
-      {
-        model: "K1-14AM",
-        vendorName: "KeepKey",
-        firmwareImageAvailable: !0,
-        bootloaderUpgradable: !0,
-        bootloaderUpgradeSkipable: !1
-      }
-    },
-    {
-      identity:
-      {
-        vendor: "keepkey.com",
-        bootloader_mode: !0,
-        major_version: 1,
-        minor_version: 0,
-        patch_version: 4
-      },
-      capabilities:
-      {
-        model: "K1-14WL-S",
         vendorName: "KeepKey",
         firmwareImageAvailable: !0,
         bootloaderUpgradable: !0,
