@@ -4005,7 +4005,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.updateWallet = function(e)
           {
             console.assert(e, "wallet has no data property")
-            r.merge(this._wallet.data, e)
+            var data = this._wallet.data
+            if (data.txHist) data.txHist.length = 0
+            if (data.unspentTxs) data.unspentTxs.length = 0
+            if (data.unconfirmedTxs) data.unconfirmedTxs.length = 0
+            r.merge(data, e)
           },
           e
       }();
