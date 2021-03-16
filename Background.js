@@ -15387,11 +15387,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var r = e("lodash"),
       i = e("./device-policy-enum"),
       a = e("./coin-name"),
+      buffer = e("buffer").Buffer,
       o = function()
       {
         function e(e)
         {
-          e.revision = e.revision.toUTF8()
+          var rev = buffer(e.revision.toBuffer());
+          e.revision = rev.toString(rev.length > 20 ? '' : 'hex');
+          e.device_id = e.device_id.toLowerCase();
           this.data = e
         }
         return Object.defineProperty(e.prototype, "version",
@@ -15503,6 +15506,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     "./coin-name": 160,
     "./device-policy-enum": 162,
+    buffer: 299,
     lodash: 171
   }],
   164: [function(e, t, n)
