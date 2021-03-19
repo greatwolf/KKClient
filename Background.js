@@ -31525,11 +31525,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               type: e.type
             }
         },
-        r._classifyFromVersion = function(e)
+        r._classifyFromVersion = function(e, preferNetwork)
         {
           var t = {},
             n = d.get(e[0], "pubkeyhash"),
             i = d.get(e[0], "scripthash");
+          if (preferNetwork)
+          {
+            if (preferNetwork.pubkeyhash === e[0]) n = preferNetwork;
+            if (preferNetwork.scripthash === e[0]) i = preferNetwork;
+          }
           return n ? (t.network = n,
               t.type = r.PayToPublicKeyHash) : i && (t.network = i,
               t.type = r.PayToScriptHash),
@@ -31543,7 +31548,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           if (21 !== e.length)
             throw new TypeError("Address buffers must be exactly 21 bytes.");
           t = d.get(t);
-          var o = r._classifyFromVersion(e);
+          var o = r._classifyFromVersion(e, t);
           if (!o.network || t && t !== o.network)
             throw new TypeError("Address has mismatched network type.");
           if (!o.type || i && i !== o.type)
