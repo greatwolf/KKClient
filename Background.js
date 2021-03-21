@@ -8310,8 +8310,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = e.derive(t.toString()),
               r = new u.PublicKey(n.toObject().publicKey),
               i = r.toAddress(this.network).toString();
-              if (this.network.name === "bitcoincash")
-                i = bchaddr.toCashAddress(i)
             return {
               address: i,
               path: t,
@@ -31486,7 +31484,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         d = e("./networks"),
         c = e("./crypto/hash"),
         l = e("./util/js"),
-        p = e("./publickey");
+        p = e("./publickey"),
+        cashaddr = e("cashaddrjs");
       r.prototype._classifyArguments = function(e, t, a)
         {
           if ((e instanceof n || e instanceof Uint8Array) && 20 === e.length)
@@ -31585,8 +31584,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           if ("string" != typeof e)
             throw new TypeError("data parameter supplied is not a string.");
           e = e.trim();
-          var i = s.decode(e),
-            a = r._transformBuffer(i, t, n);
+          var a;
+          if ('bitcoincash' === t)
+          {
+            a = cashaddr.decode(e);
+            a.network = d.get(t);
+          }
+          else a = r._transformBuffer(s.decode(e), t, n);
+
           return a
         },
         r.fromPublicKey = function(e, t)
@@ -31684,6 +31689,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         },
         r.prototype.toString = function()
         {
+          if ('bitcoincash' === this.network.name)
+          {
+            var addr = cashaddr.encode(this.hashBuffer, this.type, this.network.name);
+            return addr
+          }
+
           return s.encode(this.toBuffer(), this.network.name)
         },
         r.prototype.inspect = function()
@@ -31703,6 +31714,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./script": 217,
     "./util/js": 235,
     "./util/preconditions": 236,
+    "cashaddrjs": 462,
     buffer: 299,
     lodash: 262
   }],
@@ -77959,6 +77971,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       f = e("../../services/transaction-cache-registry"),
       g = e("@keepkey/device-client/dist/node-vector"),
       h = e("../blockcypher-metadata/blockcypher-metadata-api"),
+      cashaddr = e("cashaddrjs"),
       m = function()
       {
         function e(e, t)
@@ -78195,8 +78208,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = e.derive(t.toString()),
               r = new u.PublicKey(n.toObject().publicKey),
               i = r.toAddress(this.network).toString();
-              if (this.network.name === "bitcoincash")
-                i = bchaddr.toCashAddress(i)
             return {
               address: i,
               path: t,
@@ -78254,6 +78265,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./blockbook-data-translator": 445,
     "@keepkey/device-client/dist/node-vector": 167,
     "bitcore-lib": 191,
+    "cashaddrjs": 462,
     lodash: 368
   }],
   445: [function(e, t, n)
@@ -79996,6 +80008,300 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../ui-messenger": 122,
     "../MessageDispatcher": 6,
     "@keepkey/device-client/dist/global/coin-name": 160
+  }],
+  462: [function(require, module, exports)
+  {
+    var convertBits = require("./util/convertBits"),
+        base32 = require("./util/base32"),
+        Buffer = require("buffer").Buffer
+
+    function hasSingleCase(string)
+    {
+      var lowerCase = string.toLowerCase();
+      var upperCase = string.toUpperCase();
+      var hasSingleCase  = string === lowerCase || string === upperCase;
+
+      return hasSingleCase;
+    }
+
+    function prefixToArray(prefix)
+    {
+      var result = [];
+      for (var i = 0; i < prefix.length; i++)
+        result.push(prefix.charCodeAt(i) & 31);
+
+      return result;
+    }
+
+    var GENERATOR1 = [0x98, 0x79, 0xf3, 0xae, 0x1e];
+    var GENERATOR2 = [0xf2bc8e61, 0xb76d99e2, 0x3e5fb3c4, 0x2eabe2a8, 0x4f43e470];
+    function polymod(data)
+    {
+      // Treat c as 8 bits + 32 bits
+      var c0 = 0, c1 = 1, C = 0;
+      for (var j = 0; j < data.length; j++)
+      {
+        // Set C to c shifted by 35
+        C = c0 >>> 3;
+        // 0x[07]ffffffff
+        c0 &= 0x07;
+        // Shift as a whole number
+        c0 <<= 5;
+        c0 |= c1 >>> 27;
+        // 0xffffffff >>> 5
+        c1 &= 0x07ffffff;
+        c1 <<= 5;
+        // xor the last 5 bits
+        c1 ^= data[j];
+        for (var i = 0; i < GENERATOR1.length; ++i)
+        {
+          if (C & (1 << i))
+          {
+            c0 ^= GENERATOR1[i];
+            c1 ^= GENERATOR2[i];
+          }
+        }
+      }
+      c1 ^= 1;
+      // Negative numbers -> large positive numbers
+      if (c1 < 0)
+      {
+        c1 ^= 1 << 31;
+        c1 += (1 << 30) * 2;
+      }
+      // Unless bitwise operations are used,
+      // numbers are consisting of 52 bits, except
+      // the sign bit. The result is max 40 bits,
+      // so it fits perfectly in one number!
+      return c0 * (1 << 30) * 4 + c1;
+    }
+
+    function getTypeBits(type)
+    {
+      switch (type)
+      {
+        case 'pubkeyhash': return 0;
+        case 'scripthash': return 8;
+        default: throw new Error('Invalid type:' + type);
+      }
+    }
+
+    function getHashSizeBits(hash)
+    {
+      switch (hash.length * 8)
+      {
+        case 160: return 0;
+        case 192: return 1;
+        case 224: return 2;
+        case 256: return 3;
+        case 320: return 4;
+        case 384: return 5;
+        case 448: return 6;
+        case 512: return 7;
+        default: throw new Error('Invalid hash size:' + hash.length);
+      }
+    }
+
+    function checksumToArray(checksum)
+    {
+      var result = [];
+      for (var i = 0; i < 8; ++i)
+      {
+        result.push(checksum & 31);
+        checksum /= 32;
+      }
+      return result.reverse();
+    }
+
+    var encode = function(hashBuffer, type, prefix)
+    {
+      prefix = prefix || 'bitcoincash';
+      if (!hasSingleCase(prefix))
+        throw new Error('Invalid prefix:' + prefix);
+
+      var eight0 = [0,0,0,0, 0,0,0,0];
+      var prefixData = prefixToArray(prefix).concat([0]);
+      var versionByte = getTypeBits(type) + getHashSizeBits(hashBuffer);
+      var arr =  Array.prototype.slice.call(hashBuffer, 0);
+      var payloadData = convertBits([versionByte].concat(arr), 8, 5);
+      var checksumData = prefixData.concat(payloadData).concat(eight0);
+      var payload = payloadData.concat(checksumToArray(polymod(checksumData)));
+
+      return prefix+ ':' + base32.encode(payload);
+    }
+
+    function validChecksum(prefix, payload)
+    {
+      var prefixData = prefixToArray(prefix).concat([0]);
+      return polymod(prefixData.concat(payload)) === 0;
+    }
+
+    function getType(versionByte)
+    {
+      switch (versionByte & 120)
+      {
+        case 0: return 'pubkeyhash';
+        case 8: return 'scripthash';
+        default: throw new Error('Invalid address type in version byte:' + versionByte);
+      }
+    }
+
+    function getHashSize(versionByte)
+    {
+      switch (versionByte & 7)
+      {
+        case 0: return 160;
+        case 1: return 192;
+        case 2: return 224;
+        case 3: return 256;
+        case 4: return 320;
+        case 5: return 384;
+        case 6: return 448;
+        case 7: return 512;
+      }
+    }
+
+    var decode = function(address)
+    {
+      if (!hasSingleCase(address))
+        throw new Error('Mixed case:' + address);
+      address = address.toLowerCase();
+
+      var pieces = address.split(':');
+      if (pieces.length !== 2)
+        throw new Error('Missing prefix:' + address);
+
+      var prefix = pieces[0], encodedPayload = pieces[1];
+      var payload = base32.decode(encodedPayload.toLowerCase());
+      if (!validChecksum(prefix, payload))
+        throw new Error('Invalid checksum:' + address);
+
+      var convertedBits = convertBits(payload.slice(0, -8), 5, 8, true);
+      var versionByte = convertedBits.shift();
+      var hash = convertedBits;
+      if (getHashSize(versionByte) !== hash.length * 8)
+        throw new Error('Invalid hash size:' + address);
+
+      var info =
+      {
+        hashBuffer: Buffer.from(hash),
+        type: getType(versionByte)
+      };
+      return info;
+    }
+
+    module.exports =
+    {
+      encode: encode,
+      decode: decode
+    }
+  },
+  {
+    "./util/convertBits": 463,
+    "./util/base32": 464,
+    buffer: 299
+  }],
+  463: [function(require, module, exports)
+  {
+    module.exports = function(data, from, to, strict)
+    {
+      strict = strict || false;
+      var accumulator = 0;
+      var bits = 0;
+      var result = [];
+      var mask = (1 << to) - 1;
+      for (var i=0; i<data.length; i++)
+      {
+        var value = data[i];
+        if (value < 0 || (value >> from) !== 0)
+          throw new Error('value ' + value);
+
+        accumulator = (accumulator << from) | value;
+        bits += from;
+        while (bits >= to)
+        {
+          bits -= to;
+          result.push((accumulator >> bits) & mask);
+        }
+      }
+      if (!strict)
+      {
+        if (bits > 0)
+          result.push((accumulator << (to - bits)) & mask);
+      }
+      else
+      {
+        if (bits >= from || ((accumulator << (to - bits)) & mask))
+          throw new Error('Conversion requires padding but strict mode was used');
+      }
+      return result;
+    }
+  },
+  {}],
+  464: [function(require, module, exports)
+  {
+    var $ = require('./util/preconditions');
+
+    /***
+     * Charset containing the 32 symbols used in the base32 encoding.
+     */
+    var CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+
+    /***
+     * Inverted index mapping each symbol into its index within the charset.
+     */
+    var  CHARSET_INVERSE_INDEX =
+    {
+      'q': 0, 'p': 1, 'z': 2, 'r': 3, 'y': 4, '9': 5, 'x': 6, '8': 7,
+      'g': 8, 'f': 9, '2': 10, 't': 11, 'v': 12, 'd': 13, 'w': 14, '0': 15,
+      's': 16, '3': 17, 'j': 18, 'n': 19, '5': 20, '4': 21, 'k': 22, 'h': 23,
+      'c': 24, 'e': 25, '6': 26, 'm': 27, 'u': 28, 'a': 29, '7': 30, 'l': 31,
+    };
+
+    /***
+     * Encodes the given array of 5-bit integers as a base32-encoded string.
+     *
+     * @param {Array} data Array of integers between 0 and 31 inclusive.
+     */
+    function encode(data)
+    {
+      $.checkArgument(data instanceof Array, 'Must be Array');
+      var base32 = '';
+      for (var i=0; i<data.length; i++)
+      {
+        var value = data[i];
+        $.checkArgument(0 <= value && value < 32, 'value ' + value);
+        base32 += CHARSET[value];
+      }
+      return base32;
+    }
+
+    /***
+     * Decodes the given base32-encoded string into an array of 5-bit integers.
+     *
+     * @param {string} base32 
+     */
+    function decode(base32)
+    {
+      $.checkArgument(typeof base32 === 'string', 'Must be base32-encoded string');
+      var data = [];
+      for (var i = 0; i < base32.length; i++)
+      {
+        var value = base32[i];
+        $.checkArgument(value in CHARSET_INVERSE_INDEX, 'value '+ value);
+        data.push(CHARSET_INVERSE_INDEX[value]);
+      }
+      return data;
+    }
+
+    module.exports =
+    {
+      encode: encode,
+      decode: decode,
+    }
+  },
+  {
+    "./util/preconditions": 236
   }],
 },
 {}, [1]);
