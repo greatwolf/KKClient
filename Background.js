@@ -14607,6 +14607,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 },
                 a.pubkeyhash = t.address_type,
                 a.scripthash = t.address_type_p2sh,
+                a.xpubkey = t.xpub_magic,
                 !t.contract_address || (a.isToken = !0,
                   a.contractAddressString = "0x" + t.contract_address.toHex(),
                   t.gas_limit = t.gas_limit || i.fromHex("000000000000000000000000000000000000000000000000000000000001e848"),
@@ -34538,8 +34539,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           var n = u.get(t);
           if (!n)
             return new m.InvalidNetworkArgument(t);
-          var i = e.slice(r.VersionStart, r.VersionEnd);
-          return v.integerFromBuffer(i) === n.xpubkey ? null : new m.InvalidNetwork(i)
+          var default_xpubmagic = 0x488b21e,
+              i = v.integerFromBuffer(e.slice(r.VersionStart, r.VersionEnd));
+          return (i === n.xpubkey || i === default_xpubmagic)
+              ? null
+              : new m.InvalidNetwork(i.toString(16))
         },
         r.prototype._buildFromPrivate = function(e)
         {
@@ -77982,7 +77986,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   name: this.coinType.name.toLowerCase(),
                   pubkeyhash: this.coinType.pubkeyhash,
-                  scripthash: this.coinType.scripthash
+                  scripthash: this.coinType.scripthash,
+                  xpubkey: this.coinType.xpubkey
                 })),
                 this._network
             },
