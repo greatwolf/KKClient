@@ -15014,7 +15014,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://bgold.atomicwallet.io"],
-            txUrlExplorer: "https://btgexplorer.com/tx/",
+            txUrlExplorer: "https://explorer.bitcoingold.org/insight/tx/",
             feeProfile:
             {
               MIN_FEE: 1e3
