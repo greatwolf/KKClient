@@ -31479,11 +31479,25 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         l = e("./util/js"),
         p = e("./publickey"),
         cashaddr = e("cashaddrjs");
+      var prefixToBuffer    = function(prefix)
+          {
+            var buf = [];
+            do
+            {
+              buf.push(prefix & 0xff);
+            } while(prefix >>= 8);
+            return new n(buf.reverse());
+          },
+          prefixFromBuffer  = function(buffer)
+          {
+            var prefixbuf = buffer.slice(0, -20);
+            return prefixbuf.reduce((prefix, byte) => (prefix << 8) + byte, 0);
+          };
       r.prototype._classifyArguments = function(e, t, a)
         {
           if ((e instanceof n || e instanceof Uint8Array) && 20 === e.length)
             return r._transformHash(e);
-          if ((e instanceof n || e instanceof Uint8Array) && 21 === e.length)
+          if ((e instanceof n || e instanceof Uint8Array) && 20 > e.length)
             return r._transformBuffer(e, t, a);
           if (e instanceof p)
             return r._transformPublicKey(e);
@@ -31520,12 +31534,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         r._classifyFromVersion = function(e, preferNetwork)
         {
           var t = {},
-            n = d.get(e[0], "pubkeyhash"),
-            i = d.get(e[0], "scripthash");
+            prefix = prefixFromBuffer(e),
+            n = d.get(prefix, "pubkeyhash"),
+            i = d.get(prefix, "scripthash");
           if (preferNetwork)
           {
-            if (preferNetwork.pubkeyhash === e[0]) n = preferNetwork;
-            if (preferNetwork.scripthash === e[0]) i = preferNetwork;
+            if (preferNetwork.pubkeyhash === prefix) n = preferNetwork;
+            if (preferNetwork.scripthash === prefix) i = preferNetwork;
           }
           return n ? (t.network = n,
               t.type = r.PayToPublicKeyHash) : i && (t.network = i,
@@ -31537,15 +31552,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           var a = {};
           if (!(e instanceof n) && !(e instanceof Uint8Array))
             throw new TypeError("Address supplied is not a buffer.");
-          if (21 !== e.length)
-            throw new TypeError("Address buffers must be exactly 21 bytes.");
+          if (e.length < 21 || 24 < e.length)
+            throw new TypeError("Address buffers must be between 21-24 bytes.");
           t = d.get(t);
           var o = r._classifyFromVersion(e, t);
           if (!o.network || t && t !== o.network)
             throw new TypeError("Address has mismatched network type.");
           if (!o.type || i && i !== o.type)
             throw new TypeError("Address has mismatched type.");
-          return a.hashBuffer = e.slice(1),
+          return a.hashBuffer = e.slice(-20),
             a.network = o.network,
             a.type = o.type,
             a
@@ -31659,16 +31674,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         },
         r.prototype.toBuffer = function()
         {
-          var pubkeyhash_view = new DataView(new ArrayBuffer(4))
-          var pubkeyhash = new Uint8Array(pubkeyhash_view.buffer)
-          var arrsize = pubkeyhash.byteLength, leadzero = true
-          pubkeyhash_view.setUint32(0, this.network[this.type], false)
-          
-          var e = new n(pubkeyhash.filter( (i) =>
-                                            {
-                                              return i > 0 && (leadzero = false),
-                                                    --arrsize == 0 || !leadzero
-                                            } )),
+          var e = prefixToBuffer(this.network[this.type]),
               t = n.concat([e, this.hashBuffer]);
           return t
         },
