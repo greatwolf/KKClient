@@ -31598,7 +31598,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             a = cashaddr.decode(e);
             a.network = d.get(t);
           }
-          else a = r._transformBuffer(s.decode(e), t, n);
+          else a = r._transformBuffer(s.decode(e, t), t, n);
 
           return a
         },
@@ -33182,6 +33182,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           else
             t && this.set(t)
         };
+      var getHashAlgo = function(coinType)
+      {
+        var hashAlgos =
+        {
+          'groestlcoin': 'groestl2'
+        };
+        return hashAlgos[coinType];
+      };
       s.prototype.set = function(e)
         {
           return this.buf = e.buf || this.buf || void 0,
@@ -33195,7 +33203,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               e = e.slice(0, -4)),
             s.checksum(e).toString("hex") === t.toString("hex")
         },
-        s.decode = function(e)
+        s.decode = function(e, coinType)
         {
           if ("string" != typeof e)
             throw new Error("Input must be a string");
@@ -33204,10 +33212,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             throw new Error("Input string too short");
           var r = t.slice(0, -4),
             a = t.slice(-4),
-            d = s.checksum(r);
-          if (a.toString("hex") === d.toString("hex")) return r
-
-          d = s.checksum(r, "groestl2")
+            d = s.checksum(r, getHashAlgo(coinType));
           if (a.toString("hex") === d.toString("hex")) return r
 
           throw new Error("Checksum mismatch");
@@ -33218,15 +33223,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         },
         s.encode = function(e, coinType)
         {
-          var hashType;
-          switch (coinType)
-          {
-            case "groestlcoin": hashType = "groestl2"; break;
-          }
           if (!n.isBuffer(e))
             throw new Error("Input must be a buffer");
           var t = new n(e.length + 4),
-            r = s.checksum(e, hashType);
+            r = s.checksum(e, getHashAlgo(coinType));
           return e.copy(t),
             r.copy(t, e.length),
             i.encode(t)
@@ -34408,7 +34408,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       "use strict";
 
-      function r(e)
+      function r(e, coinType)
       {
         if (e instanceof r)
           return e;
@@ -34418,11 +34418,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           throw new b.MustSupplyArgument;
         else if (i.isString(e) || v.isBuffer(e))
         {
-          var t = r.getSerializedError(e);
+          var t = r.getSerializedError(e, coinType);
           if (!t)
-            return this._buildFromSerialized(e);
-          if (v.isBuffer(e) && !r.getSerializedError(e.toString()))
-            return this._buildFromSerialized(e.toString());
+            return this._buildFromSerialized(e, coinType);
+          if (v.isBuffer(e) && !r.getSerializedError(e.toString(), coinType))
+            return this._buildFromSerialized(e.toString(), coinType);
           if (t instanceof b.ArgumentIsPrivateExtended)
             return new l(e).hdPublicKey;
           throw t
@@ -34523,7 +34523,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return new m.InvalidB58Char("(unknown)", e);
           try
           {
-            e = d.decode(e)
+            e = d.decode(e, t)
           }
           catch (t)
           {
@@ -34575,9 +34575,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           };
           return this._buildFromBuffers(t)
         },
-        r.prototype._buildFromSerialized = function(e)
+        r.prototype._buildFromSerialized = function(e, coinType)
         {
-          var t = d.decode(e),
+          var t = d.decode(e, coinType),
             n = {
               version: t.slice(r.VersionStart, r.VersionEnd),
               depth: t.slice(r.DepthStart, r.DepthEnd),
@@ -78118,7 +78118,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               var nodematcher = RegExp("/" + subindex + "/(\\d+)$");
               addresses = addresses.filter(node => nodematcher.test(node.path));
 
-              var hdPubKey = new u.HDPublicKey(wallet.xpub),
+              var hdPubKey = new u.HDPublicKey(wallet.xpub, self.network.name),
                   lastUsed = addresses.length && r.last(addresses).path.match(nodematcher)[1],
                   maxIndex = l.Configuration.BIP44_MAX_ADDRESS_GAP
                            + Number(lastUsed);
