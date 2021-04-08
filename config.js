@@ -38,12 +38,23 @@ export const CONFIG =
   {
     applicationId: "hmldnhmidmcofnbojkgfnibmhmjopbpc"
   },
-  selectedFeeService: "btcfee",
+  selectedFeeService: "blkhub",
   feeServices:
   {
     btcfee:
     {
       url: "https://btc-fee.net/api.json",
+      bytesPerFee: 1,
+      feePaths:
+      {
+        fast: "fast",
+        medium: "medium",
+        slow: "slow"
+      }
+    },
+    blkhub:
+    {
+      url: "https://fee.blkhub.net/api.json",
       bytesPerFee: 1,
       feePaths:
       {
