@@ -56,6 +56,7 @@ Altcoin Support:
  - Syscoin*
  - Pivx*
  - Reddcoin*
+ - Firo* (supports unshielded addresses only)
 
 <sub>*Requires [custom firmware](https://github.com/greatwolf/keepkey-firmware/tree/build-release) support.</sub>
 
