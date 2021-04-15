@@ -14983,6 +14983,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.Firo = 136] = "Firo",
+            addressFormat: "^a\\w{26,34}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://blockbook.firo.org",
+            ],
+            txUrlExplorer: "https://insight.firo.org/tx/",
+            feeProfile: { MIN_FEE: 1e3 }
+          },
+          {
             name: s.CoinName[s.CoinName.Komodo = 141] = "Komodo",
             addressFormat: "^R\\w{33}$",
             dust: e.newDustCalculation(3000),

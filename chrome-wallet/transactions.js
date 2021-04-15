@@ -150,6 +150,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Firo',
+      currencySymbol: 'FIRO',
+      coinTypeCode: '136\'',
+      coinType: 136,
+      addressFormat: '^a\\w{26,34}$',
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'BitcoinCash',
       currencySymbol: 'BCH',
       coinTypeCode: '145\'',

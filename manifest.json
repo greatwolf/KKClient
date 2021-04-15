@@ -24,6 +24,7 @@
      "https://api.blockcypher.com/v1/*",
      "https://api.etherscan.io/api/*",
      "https://blockbook.pivx.link/*",
+     "https://blockbook.firo.org/*",
      "https://keepkey-wallet.keepkey.com/*",
      "https://keepkey.shapeshift.io/*",
      "https://keepkey.shapeshift.com/*",
