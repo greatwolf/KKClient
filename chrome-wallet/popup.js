@@ -2005,11 +2005,12 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.goToPrevious('slideRight')
       }]
     }
-    e.when('disconnected', ['$injector', 'WalletNodeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', function(e, n, a, o)
+    e.when('disconnected', ['$injector', 'WalletNodeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', 'PinLockService', function(e, n, a, o, pinLock)
       {
         n.clear(),
           a.clear(),
           o.clearCachedToken(),
+          pinLock.reset(),
           e.invoke(t('/connect'), this)
       }]),
       e.when('PinMatrixRequest', t('/pin/:type', 'slideLeft')),
