@@ -7381,13 +7381,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var r = e("../../HttpClient"),
       i = function()
       {
-        function e(e, t)
+        function e(e, t, n)
         {
           this.maxConcurrent = e,
-            this.maxPerSecond = t,
-            this.pendingRequests = [],
-            this.requestsInProgress = 0,
-            this.requestLastSecond = 0
+          this.maxPerSecond = Math.max(0, t - 1),
+          this.cooldown = Math.max(1, n || 1) * 1e3,
+          this.pendingRequests = [],
+          this.requestsInProgress = 0,
+          this.requestLastSecond = 0
         }
         return e.prototype.get = function(e)
           {
@@ -7421,7 +7422,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 --e.requestLastSecond,
                   e.releasePostponedRequest()
-              }, 1001),
+              }, e.cooldown),
               ++this.requestsInProgress,
               ++this.requestLastSecond;
             var n = r.HttpClient.get(t.url).then(function(n)
@@ -77985,6 +77986,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       f = e("../../services/transaction-cache-registry"),
       g = e("@keepkey/device-client/dist/node-vector"),
       h = e("../blockcypher-metadata/blockcypher-metadata-api"),
+      b = e("./api-throttler"),
       cashaddr = e("cashaddrjs"),
       m = function()
       {
@@ -78087,24 +78089,33 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getRecentTransactions = function(e, t)
           {
             var n = this;
-            return this.walletApi.urlGenerator.getRecentTransactionsUrl(t, e).then(o.HttpClient.get).then(function(e)
-            {
-              var r = {};
-              e.items = e.items || e.txs || [];
-              return r[t] = {
-                  address: t,
-                  path: g.NodeVector.fromString("0")
-                },
-                p.BlockbookDataTranslator.transactionsToTransactionSummaries(e, r, n.coinType)
-            })
+            return  this.walletApi
+                        .urlGenerator
+                        .getRecentTransactionsUrl(t, e)
+                        .then(m.BBapiThrottler.get)
+                        .then(function(e)
+                        {
+                          var r = {};
+                          e.items = e.items || e.txs || [];
+                          return r[t] =
+                          {
+                            address: t,
+                            path: g.NodeVector.fromString("0")
+                          },
+                          p.BlockbookDataTranslator.transactionsToTransactionSummaries(e, r, n.coinType)
+                        })
           },
           e.prototype.getTransaction = function(e)
           {
             var t = this;
-            return this.walletApi.urlGenerator.getTransactionUrl(e.toHex()).then(o.HttpClient.get).then(function(e)
-            {
-              return p.BlockbookDataTranslator.transaction(e, t.coinType)
-            })
+            return  this.walletApi
+                        .urlGenerator
+                        .getTransactionUrl(e.toHex())
+                        .then(m.BBapiThrottler.get)
+                        .then(function(e)
+                        {
+                          return p.BlockbookDataTranslator.transaction(e, t.coinType)
+                        })
           },
           e.prototype.createUnusedAddress = function(e, t, n)
           {
@@ -78263,6 +78274,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return s
             })
           },
+          e.BBapiThrottler = new b.ApiThrottler(1, 8, 7),
+          e.BBapiThrottler.get = e.BBapiThrottler.get.bind(e.BBapiThrottler),
           e
       }();
     n.BlockbookApiHelper = m
@@ -78271,6 +78284,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../Configuration": 62,
     "../../HttpClient": 65,
     "../../big-number-filter": 67,
+    "./api-throttler": 73,
     "../../global/SubchainEnum": 88,
     "../../global/Wallet": 89,
     "../../services/insight-xpub-registry": 120,
