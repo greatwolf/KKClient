@@ -38,7 +38,8 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
             a.currencySymbol = b.getCurrencySymbol(a.currency),
             angular.isDefined(a.exchangeFormattedAmount) || (a.exchangeFormattedAmount = '...'),
             angular.isDefined(a.exchangeCurrencySymbol) || (a.exchangeCurrencySymbol = 'USD');
-            var d = function(fiat, crypto) {
+            var d = function(fiat, crypto)
+            {
                 if (void 0 === fiat || void 0 === crypto) return
 
                 var assetIds =
@@ -51,8 +52,10 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
                 var asset = assetIds[crypto] || crypto.toLowerCase()
                 fiat = fiat.toLowerCase()
                 var f = new XMLHttpRequest;
-                f.onreadystatechange = function() {
-                    if (4 == f.readyState && 200 == f.status) {
+                f.onreadystatechange = function()
+                {
+                    if (4 == f.readyState && 200 == f.status)
+                    {
                         var e = b.formatAmount(a.currency, a.amount)
                           , g = JSON.parse(f.responseText)[asset];
                         if (g)
@@ -68,14 +71,8 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
                 ,
                 f.open('GET', 'https://api.coingecko.com/api/v3/simple/price?ids=' + asset + '&vs_currencies=' + fiat, !0),
                 f.send(null)
-            };
-            d(a.exchangeCurrencySymbol, a.currency),
-            a.$watch('amount', function() {
-                d(a.exchangeCurrencySymbol, a.currency)
-            }),
-            a.$watch('currency', function() {
-                d(a.exchangeCurrencySymbol, a.currency)
-            })
+            }
+            a.$watch('amount', d.bind(null, a.exchangeCurrencySymbol, a.currency))
         }
         ],
         templateUrl: 'app/common/directives/exchangeFormattedAmount.tpl.html'
