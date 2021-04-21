@@ -3986,6 +3986,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.clearBalancePromise = function()
           {
             this._balancePromise = void 0
+            this._wallet._data.hasBalance = void 0
+            this._wallet._data.isStale = true
           },
           e.prototype.getWalletMetaData = function()
           {
@@ -4636,11 +4638,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t.prototype.getBalancePromise = function()
           {
             var e = this;
-            return this._balancePromise || (this._balancePromise = this.loadUnspentTransactionSummaries().then(function()
-              {
-                return [e.lowConfidenceBalance, e.highConfidenceBalance]
-              })),
-              this._balancePromise
+            if (!this._balancePromise)
+            {
+              this._balancePromise =  this.loadUnspentTransactionSummaries()
+                                          .then(() =>  [e.lowConfidenceBalance,
+                                                        e.highConfidenceBalance])
+            }
+            return this._balancePromise
           },
           t.prototype.getReceiveAddressDetails = function(e)
           {
@@ -4738,12 +4742,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t.prototype.loadUnspentTransactionSummaries = function()
           {
             var e = this;
-            return this.wallet.api.getTransactionSummaries(this.id, !0).then(function(t)
+            var resultPromise;
+            if (e.wallet.data.isStale)
+              resultPromise = this.wallet.api
+                                  .getTransactionSummaries(this.id, !0)
+                                  .then(function(t)
+                                  {
+                                    if (t) e.updateWallet(t)
+                                    else t = e.wallet.data
+                                    return t
+                                  })
+            else resultPromise = Promise.resolve(e.wallet.data)
+            return resultPromise.then(function(t)
             {
-              if (t) e.updateWallet(t)
-              else t = e.wallet.data
               if (!t.hasBalance)
               {
+                t.hasBalance = true
                 e.highConfidenceBalance = e.getHighConfidenceBalance().minus(e.pendingOutgoingAmounts.value)
                 e.lowConfidenceBalance = e.getLowConfidenceBalance().plus(e.pendingIncomingAmounts.value)
               }
