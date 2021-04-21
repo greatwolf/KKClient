@@ -63,6 +63,17 @@ export const CONFIG =
         slow: "slow"
       }
     },
+    mempoolspace:
+    {
+      url: "https://mempool.space/api/v1/fees/recommended",
+      bytesPerFee: 1,
+      feePaths:
+      {
+        fast: "fastestFee",
+        medium: "halfHourFee",
+        slow: "hourFee"
+      }
+    },
     earn:
     {
       url: "https://bitcoinfees.earn.com/api/v1/fees/recommended",
