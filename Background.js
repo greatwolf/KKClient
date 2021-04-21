@@ -6943,7 +6943,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   {
                     if (4 === l.readyState)
                       if (console.log("HTTP " + method + " " + aUrl + " (" + l.status + ")"),
-                        0 === l.status || 404 === l.status)
+                        0 === l.status || 404 === l.status || 503 === l.status)
                         e.send(aUrl, payload, contentType, method, resolveStatuses).then(function(e)
                         {
                           d(e)
@@ -78197,14 +78197,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             chainTasks.push(
               this.walletApi.urlGenerator
                   .deriveAddressesUrl(wallet.xpub)
-                  .then(o.HttpClient.get)
+                  .then(m.BBapiThrottler.get)
                   .then(processDerived)
                   .then(processUnconfirmedTxs)
                   .then(processTxHist))
             chainTasks.push(
               this.walletApi.urlGenerator
                   .getUtxoUrl(wallet.xpub)
-                  .then(o.HttpClient.get)
+                  .then(m.BBapiThrottler.get)
                   .then(processUtxoSummary))
 
             return Promise.all(chainTasks)
@@ -78274,7 +78274,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return s
             })
           },
-          e.BBapiThrottler = new b.ApiThrottler(1, 8, 7),
+          e.BBapiThrottler = new b.ApiThrottler(1, 7, 7),
           e.BBapiThrottler.get = e.BBapiThrottler.get.bind(e.BBapiThrottler),
           e
       }();
