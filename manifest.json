@@ -21,6 +21,7 @@
      "https://*.trezor.io/api/*",
      "https://*.atomicwallet.io/api/*",
      "https://*.guarda.co/api/*",
+     "https://*.binancechain.io/*",
      "https://api.blockcypher.com/v1/*",
      "https://api.etherscan.io/api/*",
      "https://blockbook.pivx.link/*",

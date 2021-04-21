@@ -14778,11 +14778,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://btc1.trezor.io",
-              "https://btc2.trezor.io",
-              "https://btc3.trezor.io",
-              "https://btc4.trezor.io",
-              "https://btc5.trezor.io",
+              "https://bitcoinblockexplorers.com",
             ],
             txUrlExplorer: "https://explorer.bitcoin.com/btc/tx/",
             feeProfile:
@@ -14815,11 +14811,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://ltc1.trezor.io",
-              "https://ltc2.trezor.io",
-              "https://ltc3.trezor.io",
-              "https://ltc4.trezor.io",
-              "https://ltc5.trezor.io",
+              "https://litecoinblockexplorer.net",
             ],
             txUrlExplorer: "https://insight.litecore.io/tx/",
             feeProfile:
@@ -14835,11 +14827,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://doge1.trezor.io",
-              "https://doge2.trezor.io",
-              "https://doge3.trezor.io",
-              "https://doge4.trezor.io",
-              "https://doge5.trezor.io",
+              "https://blockbook-dogecoin.binancechain.io",
             ],
             txUrlExplorer: "https://blockchair.com/dogecoin/transaction/",
             feeProfile:
@@ -14871,11 +14859,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://dash1.trezor.io",
-              "https://dash2.trezor.io",
-              "https://dash3.trezor.io",
-              "https://dash4.trezor.io",
-              "https://dash5.trezor.io",
+              "https://dashblockexplorer.com",
             ],
             txUrlExplorer: "https://insight.dash.org/insight/tx/",
             feeProfile:
@@ -14899,8 +14883,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://dgb1.trezor.io",
-              "https://dgb2.trezor.io",
+              "https://digibyteblockexplorer.com",
             ],
             txUrlExplorer: "https://digiexplorer.info/tx/",
             feeProfile:
@@ -14915,11 +14898,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://vtc1.trezor.io",
-              "https://vtc2.trezor.io",
-              "https://vtc3.trezor.io",
-              "https://vtc4.trezor.io",
-              "https://vtc5.trezor.io",
+              "https://vtcblocks.com",
             ],
             txUrlExplorer: "http://insight.vertcoin.org/tx/",
             feeProfile: { MIN_FEE: 1e5 }
@@ -14984,11 +14963,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://zec1.trezor.io",
-              "https://zec2.trezor.io",
-              "https://zec3.trezor.io",
-              "https://zec4.trezor.io",
-              "https://zec5.trezor.io",
+              "https://zecblockexplorer.com",
             ],
             txUrlExplorer: "https://blockchair.com/zcash/transaction/",
             feeProfile:
