@@ -8197,9 +8197,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getTransactionSummaries = function(e)
           {
             var t = this;
-            return this.loadWallet(e).then(function()
+            return this.loadWallet(e).then(function(wallet)
             {
-              return t.transactionSummaryCache[e]
+              return wallet._data || t.transactionSummaryCache[e]
             })
           },
           e.prototype.getRecentTransactions = function(e, t)
@@ -8288,7 +8288,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   }),
                   o.forEach(function(e)
                   {
-                    e.vin.forEach(function()
+                    e.vin.forEach(function(e)
                     {
                       r.remove(o, function(t)
                       {
@@ -8422,7 +8422,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   hash: i.fromHex(t.txid),
                   blockHeight: t.blockheight,
                   value: a.floatToAmount(e.value).negated(),
-                  outputIndex: e.n,
+                  outputIndex: e.vout,
                   confidence: 1,
                   isConfirmed: !!(0 < t.confirmations),
                   confirmations: t.confirmations,
@@ -8458,7 +8458,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                           hash: i.fromHex(e.txid),
                           blockHeight: t.blockheight,
                           value: a.floatToAmount(e.value).negated(),
-                          outputIndex: e.n
+                          outputIndex: e.vout
                         }
                     })
                   }))
