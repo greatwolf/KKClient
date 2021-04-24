@@ -57,6 +57,7 @@ Altcoin Support:
  - Pivx*
  - Reddcoin*
  - Firo* (supports unshielded addresses only)
+ - SmartCash*
 
 <sub>*Requires [custom firmware](https://github.com/greatwolf/keepkey-firmware/tree/build-release) support.</sub>
 
