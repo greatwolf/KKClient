@@ -15023,6 +15023,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.SmartCash = 224] = "SmartCash",
+            addressFormat: "^S\\w{26,34}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            insight:
+            [
+              "https://insight.smartcash.cc/api",
+            ],
+            txUrlExplorer: "https://insight.smartcash.cc/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e5,
+              servicer: 'roundup-per-kb-fee-service'
+            }
+          },
+          {
             name: s.CoinName[s.CoinName.BitcoinSV = 236] = "BitcoinSV",
             addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
             dust: e.newDustCalculation(3000),
@@ -32689,6 +32705,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             r.createHash("sha512").update(e).digest()
         },
         i.sha512.blocksize = 1024,
+        i.keccak = function(e)
+        {
+          return o.checkArgument(a.isBuffer(e)),
+            r.createHash("keccak").update(e).digest()
+        },
         i.groestl = function(e)
         {
           return o.checkArgument(a.isBuffer(e)),
@@ -33188,7 +33209,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         var hashAlgos =
         {
-          'groestlcoin': 'groestl2'
+          'groestlcoin': 'groestl2',
+          'smartcash': 'keccak'
         };
         return hashAlgos[coinType];
       };
@@ -57320,6 +57342,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       i = e("md5.js"),
       a = e("ripemd160"),
       o = e("sha.js"),
+      keccak = e("keccak"),
       groestl = e("groestl.js"),
       s = e("cipher-base");
     r(n, s),
@@ -57336,6 +57359,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return e = e.toLowerCase(),
           "md5" === e ? new i :
           "rmd160" === e || "ripemd160" === e ? new a :
+          "keccak" === e ? new n(keccak('keccak256')) :
           "groestl" === e ? new n(groestl()):
           new n(o(e))
       }
@@ -57343,6 +57367,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     "cipher-base": 302,
     inherits: 358,
+    keccak: 362,
     "md5.js": 370,
     ripemd160: 412,
     "sha.js": 423,

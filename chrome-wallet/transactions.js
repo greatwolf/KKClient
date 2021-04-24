@@ -176,6 +176,19 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'SmartCash',
+      currencySymbol: 'SMART',
+      coinTypeCode: '224\'',
+      coinType: 224,
+      addressFormat: '^S\\w{26,34}$',
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'BitcoinSV',
       currencySymbol: 'BSV',
       coinTypeCode: '236\'',
