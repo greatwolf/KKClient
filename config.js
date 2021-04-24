@@ -54,13 +54,13 @@ export const CONFIG =
     },
     blkhub:
     {
-      url: "https://fee.blkhub.net/api.json",
+      url: "https://blkhub.net/api/fee-estimates",
       bytesPerFee: 1,
       feePaths:
       {
-        fast: "fast",
-        medium: "medium",
-        slow: "slow"
+        fast: "4",
+        medium: "144",
+        slow: "504"
       }
     },
     mempoolspace:
