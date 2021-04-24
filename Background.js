@@ -15023,6 +15023,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.SmartCash = 224] = "SmartCash",
+            addressFormat: "^S\\w{26,34}$",
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            insight:
+            [
+              "https://insight.smartcash.cc/api",
+            ],
+            txUrlExplorer: "https://insight.smartcash.cc/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e5,
+              servicer: 'roundup-per-kb-fee-service'
+            }
+          },
+          {
             name: s.CoinName[s.CoinName.BitcoinSV = 236] = "BitcoinSV",
             addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
             dust: e.newDustCalculation(3000),
