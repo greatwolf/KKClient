@@ -14540,6 +14540,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.feeProfile = e.feeProfile || {},
           this.exchangeForbidden = !!this.configuration.exchangeForbidden
         }
+        var b58regex = function(prefix, len)
+        {
+          var b58Chars = '[^\\W0OlI_]',
+              len = len || prefix.length,
+              lower = 27 - len, upper = lower + 8
+          return `^${prefix}${b58Chars}{${lower},${upper}}$`
+        }
         return e.newDustCalculation = function(e)
           {
             return new a.BigNumber(e).div(1e3).times(182).decimalPlaces(0, a.BigNumber.ROUND_UP).toString()
@@ -14838,7 +14845,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Reddcoin = 4] = "Reddcoin",
-            addressFormat: "^R\\w{26,34}$",
+            addressFormat: b58regex('R'),
             dust: 1e8,
             defaultDecimals: 8,
             blockbook:
@@ -14854,7 +14861,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Dash = 5] = "Dash",
-            addressFormat: "^[X7][a-km-zA-HJ-NP-Z1-9]{25,34}$",
+            addressFormat: b58regex('[X7]', 1),
             dust: e.oldDustCalculation(10000),
             defaultDecimals: 8,
             blockbook:
@@ -14870,7 +14877,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Groestlcoin = 17] = "Groestlcoin",
-            addressFormat: "^F\\w{33}$",
+            addressFormat: b58regex('[F3]', 1),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://grsbook.guarda.co"],
@@ -14878,7 +14885,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.DigiByte = 20] = "DigiByte",
-            addressFormat: "^D\\w{33}$",
+            addressFormat: b58regex('[DS]', 1),
             dust: e.oldDustCalculation(10000),
             defaultDecimals: 8,
             blockbook:
@@ -14893,7 +14900,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Vertcoin = 28] = "Vertcoin",
-            addressFormat: "^V\\w{33}$",
+            addressFormat: b58regex('[V3]', 1),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook:
@@ -14905,7 +14912,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Syscoin = 57] = "Syscoin",
-            addressFormat: "^S\\w{26,34}$",
+            addressFormat: b58regex('S'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook:
@@ -14934,7 +14941,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Fujicoin = 75] = "Fujicoin",
-            addressFormat: "^F\\w{26,34}$",
+            addressFormat: b58regex('F'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook:
@@ -14946,7 +14953,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Pivx = 119] = "Pivx",
-            addressFormat: "^D\\w{26,34}$",
+            addressFormat: b58regex('D'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook:
@@ -14958,7 +14965,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Zcash = 133] = "Zcash",
-            addressFormat: "^t1[a-km-zA-HJ-NP-Z1-9]{33}$",
+            addressFormat: b58regex('t1'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook:
@@ -14974,7 +14981,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Firo = 136] = "Firo",
-            addressFormat: "^a\\w{26,34}$",
+            addressFormat: b58regex('a'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook:
@@ -14986,7 +14993,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.Komodo = 141] = "Komodo",
-            addressFormat: "^R\\w{33}$",
+            addressFormat: b58regex('R'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://kmdbook.guarda.co"],
@@ -15023,8 +15030,17 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.Ravencoin = 175] = "Ravencoin",
+            addressFormat: b58regex('R'),
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook: ["https://ravencoin.atomicwallet.io"],
+            txUrlExplorer: "https://ravencoin.network/tx/",
+            feeProfile: { MIN_FEE: 1e6 }
+          },
+          {
             name: s.CoinName[s.CoinName.SmartCash = 224] = "SmartCash",
-            addressFormat: "^S\\w{26,34}$",
+            addressFormat: b58regex('S'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             insight:
@@ -15051,17 +15067,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
-            name: s.CoinName[s.CoinName.Ravencoin = 175] = "Ravencoin",
-            addressFormat: "^R\\w{33}$",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8,
-            blockbook: ["https://ravencoin.atomicwallet.io"],
-            txUrlExplorer: "https://ravencoin.network/tx/",
-            feeProfile: { MIN_FEE: 1e6 }
-          },
-          {
             name: s.CoinName[s.CoinName.Qtum = 2301] = "Qtum",
-            addressFormat: "^Q\\w{33}$",
+            addressFormat: b58regex('[QM]', 1),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             blockbook: ["https://qtumbook.guarda.co"],

@@ -10,7 +10,6 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'BTC',
       coinTypeCode: '0\'',
       coinType: 0,
-      addressFormat: '^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$',
       dust: 546,
       decimals: 8,
       amountParameters:
@@ -23,7 +22,6 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'TEST',
       coinTypeCode: '1\'',
       coinType: 1,
-      addressFormat: '^[2mn][a-km-zA-HJ-NP-Z1-9]{25,34}$',
       dust: 546,
       decimals: 8,
       amountParameters:
@@ -36,7 +34,6 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'LTC',
       coinTypeCode: '2\'',
       coinType: 2,
-      addressFormat: '^L[a-km-zA-HJ-NP-Z1-9]{26,33}$',
       dust: 1e5,
       decimals: 8,
       amountParameters:
@@ -49,7 +46,6 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'DOGE',
       coinTypeCode: '3\'',
       coinType: 3,
-      addressFormat: '^D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}$',
       dust: 1e8,
       decimals: 8,
       amountParameters:
@@ -62,7 +58,6 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'RDD',
       coinTypeCode: '4\'',
       coinType: 4,
-      addressFormat: '^R\\w{26,34}$',
       dust: 1e8,
       decimals: 8,
       amountParameters:
@@ -71,142 +66,10 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
-      name: 'Ethereum',
-      currencySymbol: 'ETH',
-      coinTypeCode: '60\'',
-      coinType: 60,
-      addressFormat: '^(0x)?[0-9a-fA-F]{40}$',
-      dust: 1,
-      decimals: 18,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 18,
-        EXPONENTIAL_AT: [-19, 9]
-      }
-    },
-    {
       name: 'Dash',
       currencySymbol: 'DASH',
       coinTypeCode: '5\'',
       coinType: 5,
-      addressFormat: '^X[a-km-zA-HJ-NP-Z1-9]{25,34}$',
-      dust: 546,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'DigiByte',
-      currencySymbol: 'DGB',
-      coinTypeCode: '20\'',
-      coinType: 20,
-      addressFormat: '^D\\w{33}$',
-      dust: 546,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'Syscoin',
-      currencySymbol: 'SYS',
-      coinTypeCode: '57\'',
-      coinType: 57,
-      addressFormat: '^S\\w{26,34}$',
-      dust: 3000,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'Fujicoin',
-      currencySymbol: 'FJC',
-      coinTypeCode: '75\'',
-      coinType: 75,
-      addressFormat: '^F\\w{26,34}$',
-      dust: 3000,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'Pivx',
-      currencySymbol: 'PIVX',
-      coinTypeCode: '119\'',
-      coinType: 119,
-      addressFormat: '^D\\w{26,34}$',
-      dust: 3000,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'Firo',
-      currencySymbol: 'FIRO',
-      coinTypeCode: '136\'',
-      coinType: 136,
-      addressFormat: '^a\\w{26,34}$',
-      dust: 3000,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'BitcoinCash',
-      currencySymbol: 'BCH',
-      coinTypeCode: '145\'',
-      coinType: 145,
-      addressFormat: '(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^bitcoincash:[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{25,55}$)|(^bitcoincash:[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{25,55}$)',
-      dust: 546,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'SmartCash',
-      currencySymbol: 'SMART',
-      coinTypeCode: '224\'',
-      coinType: 224,
-      addressFormat: '^S\\w{26,34}$',
-      dust: 3000,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'BitcoinSV',
-      currencySymbol: 'BSV',
-      coinTypeCode: '236\'',
-      coinType: 236,
-      addressFormat: '^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$',
-      dust: 546,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'BitcoinGold',
-      currencySymbol: 'BTG',
-      coinTypeCode: '156\'',
-      coinType: 156,
-      addressFormat: '^[AG][a-km-zA-HJ-NP-Z1-9]{25,34}$',
       dust: 546,
       decimals: 8,
       amountParameters:
@@ -219,7 +82,6 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'GRS',
       coinTypeCode: '17\'',
       coinType: 17,
-      addressFormat: '^F\\w{33}$',
       dust: 546,
       decimals: 8,
       amountParameters:
@@ -228,37 +90,10 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
-      name: 'Komodo',
-      currencySymbol: 'KMD',
-      coinTypeCode: '141\'',
-      coinType: 141,
-      addressFormat: '^R\\w{33}$',
-      dust: 546,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'Qtum',
-      currencySymbol: 'QTUM',
-      coinTypeCode: '2301\'',
-      coinType: 2301,
-      addressFormat: '^Q\\w{33}$',
-      dust: 546,
-      decimals: 8,
-      amountParameters:
-      {
-        DECIMAL_PLACES: 8
-      }
-    },
-    {
-      name: 'Ravencoin',
-      currencySymbol: 'RVN',
-      coinTypeCode: '175\'',
-      coinType: 175,
-      addressFormat: '^R\\w{33}$',
+      name: 'DigiByte',
+      currencySymbol: 'DGB',
+      coinTypeCode: '20\'',
+      coinType: 20,
       dust: 546,
       decimals: 8,
       amountParameters:
@@ -271,8 +106,56 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'VTC',
       coinTypeCode: '28\'',
       coinType: 28,
-      addressFormat: '^V\\w{33}$',
       dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Syscoin',
+      currencySymbol: 'SYS',
+      coinTypeCode: '57\'',
+      coinType: 57,
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Ethereum',
+      currencySymbol: 'ETH',
+      coinTypeCode: '60\'',
+      coinType: 60,
+      dust: 1,
+      decimals: 18,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 18,
+        EXPONENTIAL_AT: [-19, 9]
+      }
+    },
+    {
+      name: 'Fujicoin',
+      currencySymbol: 'FJC',
+      coinTypeCode: '75\'',
+      coinType: 75,
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Pivx',
+      currencySymbol: 'PIVX',
+      coinTypeCode: '119\'',
+      coinType: 119,
+      dust: 3000,
       decimals: 8,
       amountParameters:
       {
@@ -284,7 +167,102 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       currencySymbol: 'ZEC',
       coinTypeCode: '133\'',
       coinType: 133,
-      addressFormat: '^t1[a-km-zA-HJ-NP-Z1-9]{33}$',
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Firo',
+      currencySymbol: 'FIRO',
+      coinTypeCode: '136\'',
+      coinType: 136,
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Komodo',
+      currencySymbol: 'KMD',
+      coinTypeCode: '141\'',
+      coinType: 141,
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'BitcoinCash',
+      currencySymbol: 'BCH',
+      coinTypeCode: '145\'',
+      coinType: 145,
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'BitcoinGold',
+      currencySymbol: 'BTG',
+      coinTypeCode: '156\'',
+      coinType: 156,
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Ravencoin',
+      currencySymbol: 'RVN',
+      coinTypeCode: '175\'',
+      coinType: 175,
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'SmartCash',
+      currencySymbol: 'SMART',
+      coinTypeCode: '224\'',
+      coinType: 224,
+      dust: 3000,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'BitcoinSV',
+      currencySymbol: 'BSV',
+      coinTypeCode: '236\'',
+      coinType: 236,
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
+      name: 'Qtum',
+      currencySymbol: 'QTUM',
+      coinTypeCode: '2301\'',
+      coinType: 2301,
       dust: 546,
       decimals: 8,
       amountParameters:
