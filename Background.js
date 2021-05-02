@@ -4763,8 +4763,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               if (!t.hasBalance)
               {
                 t.hasBalance = true
-                e.highConfidenceBalance = e.getHighConfidenceBalance().minus(e.pendingOutgoingAmounts.value)
-                e.lowConfidenceBalance = e.getLowConfidenceBalance().plus(e.pendingIncomingAmounts.value)
+                e.highConfidenceBalance = e.getHighConfidenceBalance()
+                e.lowConfidenceBalance = e.getLowConfidenceBalance()
               }
               return t
             }).then(function()
@@ -4794,12 +4794,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           t.prototype.getLowConfidenceBalance = function()
           {
-            var e = new h.BigNumber(0);
-            return i.each(this.unconfirmed_txrefs, function(t)
-              {
-                (t.value.isLessThanOrEqualTo(0) || t.confidence < s.Configuration.highConfidenceThreshhold) && (e = e.plus(t.value))
-              }),
-              e
+            var unconfirmed_receive = this.unconfirmed_txrefs
+                                          .filter(n => !n.isConfirmed)
+                                          .map(n => n.value)
+                                          .reduce((a, b) => a.plus(b), new h.BigNumber(0))
+            var unconfirmed_spent = this.wallet
+                                        .data
+                                        .txHist
+                                        .filter(n => !n.isConfirmed)
+                                        .filter(n => n.value.isNegative())
+                                        .map(n => n.value)
+                                        .reduce((a, b) => a.plus(b), new h.BigNumber(0))
+            return unconfirmed_receive.plus(unconfirmed_spent)
           },
           t.prototype.convertAddressDetailToLegacy = function(e)
           {
@@ -78300,7 +78306,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return s
             })
           },
-          e.BBapiThrottler = new b.ApiThrottler(1, 7, 7),
+          e.BBapiThrottler = new b.ApiThrottler(4, 7, 7),
           e.BBapiThrottler.get = e.BBapiThrottler.get.bind(e.BBapiThrottler),
           e
       }();
