@@ -4062,6 +4062,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                         }),
                       t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e)),
                       t.bitcoinGoldLegacy && n.push(t.bitcoinGoldLegacy.loadAccounts(e)),
+                      t.bitcoinSVLegacy && n.push(t.bitcoinSVLegacy.loadAccounts(e)),
                       n.push(t.loadEthereumAndTokens(e))
                     ),
                 Promise.all(n)
@@ -4103,16 +4104,20 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                                                              "m/44'/" + coin.coinTypeCode)
                 }),
                 t.bitcoinCashLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinCash)),
-                t.bitcoinSVLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV)),
+                t.bitcoinSVLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinSV), "BitcoinCash"),
                 t.bitcoinGoldLegacy = t.addBitcoinFork(s.CoinType.get(o.CoinName.BitcoinGold)),
                 t.erc20Tokens = new c.EtherbookTokenAccountListLoader
             })
           },
-          e.prototype.addBitcoinFork = function(e)
+          e.prototype.addBitcoinFork = function(e, legacyname)
           {
             if (!e) return undefined
 
-            return new p.BlockbookAccountListLoader(o.CoinName[e.name], "m/44'/" + s.CoinType.get(o.CoinName.Bitcoin).coinTypeCode, d.WalletSelectors.hasTxHistory)
+            legacyname = legacyname || "Bitcoin"
+            return new p.BlockbookAccountListLoader(
+                        o.CoinName[e.name],
+                        "m/44'/" + s.CoinType.get(o.CoinName[legacyname]).coinTypeCode,
+                        d.WalletSelectors.hasTxHistory)
           },
           e
       }();
