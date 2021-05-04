@@ -1,6 +1,6 @@
 # ![KKClient Logo](/images/icon.png) KKClient
 
-![Release downloads](https://img.shields.io/github/downloads/greatwolf/KKClient/total?cacheSeconds=600)
+[![Release downloads](https://img.shields.io/github/downloads/greatwolf/KKClient/total?cacheSeconds=600)](https://github.com/greatwolf/KKClient/releases)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 A simple cryptocurrency wallet that integrates with the KeepKey device.
