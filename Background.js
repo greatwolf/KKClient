@@ -78220,6 +78220,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
             var processUtxoSummary = function(resp)
             {
+              if (!resp.length && resp.utxos) resp = resp.utxos
               wallet.unspentTxs = resp.map(function(unspentTx)
               {
                 return p.BlockbookDataTranslator.utxoSummary(unspentTx, self.coinType)
