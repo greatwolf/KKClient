@@ -14879,7 +14879,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             [
               "https://dashblockexplorer.com",
             ],
-            txUrlExplorer: "https://insight.dash.org/insight/tx/",
+            txUrlExplorer: "https://explorer.mydashwallet.org/tx/",
             feeProfile:
             {
               MIN_FEE: 1e3,
