@@ -6969,6 +6969,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               new Promise(function(d, c)
               {
                 var l = new XMLHttpRequest;
+                l.timeout = 10000;
                 l.onreadystatechange = function()
                   {
                     if (4 === l.readyState)
