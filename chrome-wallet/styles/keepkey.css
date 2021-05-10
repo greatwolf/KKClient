@@ -372,6 +372,45 @@ th
 
 @font-face
 {
+  font-family: FontAwesome;
+  src: url(../fonts/fontawesome-webfont.eot?v=4.7.0);
+  src: url(../fonts/fontawesome-webfont.eot?#iefix&v=4.7.0) format('embedded-opentype'), url(../fonts/fontawesome-webfont.woff2?v=4.7.0) format('woff2'), url(../fonts/fontawesome-webfont.woff?v=4.7.0) format('woff'), url(../fonts/fontawesome-webfont.ttf?v=4.7.0) format('truetype'), url(../fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular) format('svg');
+  font-weight: 400;
+  font-style: normal
+}
+
+.fa
+{
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+}
+
+.fa-chevron-first:before
+{
+  content: "\f053\f053"
+}
+
+.fa-chevron-prev:before
+{
+  content: "\f053"
+}
+
+.fa-chevron-next:before
+{
+  content: "\f054"
+}
+
+.fa-chevron-last:before
+{
+  content: "\f054\f054"
+}
+
+@font-face
+{
   font-family: "Glyphicons Halflings";
   src: url(../fonts/glyphicons-halflings-regular.eot);
   src: url(../fonts/glyphicons-halflings-regular.eot?#iefix) format("embedded-opentype"), url(../fonts/glyphicons-halflings-regular.woff2) format("woff2"), url(../fonts/glyphicons-halflings-regular.woff) format("woff"), url(../fonts/glyphicons-halflings-regular.ttf) format("truetype"), url(../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular) format("svg")
@@ -9852,11 +9891,28 @@ a:hover
 
 .transaction-list h1
 {
+  display: flex;
   margin: 0;
   -webkit-margin-before: 21px;
   height: 18px;
   font-size: 20px;
   color: #666
+}
+
+.transaction-list h1 .wallet-title
+{
+  flex-grow: 1;
+}
+
+.transaction-list h1 .page-nav
+{
+  padding: 0 5px;
+  color: #999
+}
+
+.transaction-list h1 .page-nav.disabled
+{
+  color: #ddd
 }
 
 .transaction-list h5

@@ -2497,7 +2497,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             var t = o.AccountListManager.findAccount(e.accountId, d.CoinName[e.subAccount]),
               n, i, c;
-            return t.getTransactionHistory().then(function(e)
+            var pageSize = 8,
+                page = Math.max(1, e.page || 1);
+            return t.getTransactionHistory(page, pageSize).then(function(e)
             {
               n = r.map(e, function(e)
               {
@@ -2517,6 +2519,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               })
             }).then(function()
             {
+              var pageTotal = Math.ceil(t.wallet.data.txHist.length / pageSize)
               return a.UiMessenger.sendMessageToUI("TransactionHistory",
               {
                 id: e.accountId,
@@ -2524,7 +2527,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 name: i,
                 accountNumber: c,
                 coinType: s.CoinType.get(t.coinType).name,
-                txHist: n
+                txHist: n,
+                page: page,
+                pages: pageTotal || 1
               })
             })
           },
@@ -3911,10 +3916,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return e
             })
           },
-          e.prototype.getTransactionHistory = function()
+          e.prototype.getTransactionHistory = function(page, pageSize)
           {
             var e = this;
-            return this.getTransactions().then(function(t)
+            return this.getTransactions(page, pageSize).then(function(t)
             {
               return e.extractTransactionHistory(t)
             })
@@ -4613,10 +4618,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.exchangeTransactionBuilder = p.TransactionBuilderFactory.chainedTransactionExchange(this),
               this.transferTransactionBuilder = p.TransactionBuilderFactory.chainedTransactionTransfer(this)
           },
-          t.prototype.getTransactions = function()
+          t.prototype.getTransactions = function(page, pageSize)
           {
             var e = this;
-            return this.wallet.api.getTransactionSummaries(this.id, !1).then(function(t)
+            return this.wallet.api.getTransactionSummaries(this.id, page > 1).then(function(t)
             {
               e.wallet.update(t),
                 e.updateAddressesFromChains(),
@@ -4627,10 +4632,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   return e.hash.toHex()
                 }).value();
-              var n = i.map(e.wallet.data.txHist, function(t)
-              {
-                return e.getTx(t.hash)
-              });
+              pageSize = pageSize || e.wallet.data.txHist.length;
+              var txHistPages = i.chunk(e.wallet.data.txHist, pageSize);
+              var n =  i.get(txHistPages, Math.min(page - 1, txHistPages.length), [])
+                        .map(t => e.getTx(t.hash));
               return Promise.all(n)
             })
           },
@@ -4750,7 +4755,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var resultPromise;
             if (e.wallet.data.isStale)
               resultPromise = this.wallet.api
-                                  .getTransactionSummaries(this.id, !0)
+                                  .getTransactionSummaries(this.id)
                                   .then(function(t)
                                   {
                                     if (t) e.updateWallet(t)
@@ -8205,9 +8210,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 })
               })
           },
-          e.prototype.getTransactionSummaries = function(e)
+          e.prototype.getTransactionSummaries = function(e, staleOk)
           {
             var t = this;
+            if (t.transactionSummaryCache[e] && staleOk)
+              return Promise.resolve(t.transactionSummaryCache[e])
             return this.loadWallet(e).then(function(wallet)
             {
               return wallet._data || t.transactionSummaryCache[e]
@@ -78110,12 +78117,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 })
               })
           },
-          e.prototype.getTransactionSummaries = function(e)
+          e.prototype.getTransactionSummaries = function(e, staleOk)
           {
             var t = this;
-            return this.loadWallet(e).then(function()
+            if (t.walletDataCache[e] && staleOk)
+              return Promise.resolve(t.walletDataCache[e])
+            return this.loadWallet(e).then(function(wallet)
             {
-              return t.walletDataCache[e]
+              return wallet._data || t.walletDataCache[e]
             })
           },
           e.prototype.getRecentTransactions = function(e, t)
@@ -78307,7 +78316,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return s
             })
           },
-          e.BBapiThrottler = new b.ApiThrottler(4, 7, 7),
+          e.BBapiThrottler = new b.ApiThrottler(4, 8, 7),
           e.BBapiThrottler.get = e.BBapiThrottler.get.bind(e.BBapiThrottler),
           e
       }();

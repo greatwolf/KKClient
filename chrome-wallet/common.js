@@ -283,10 +283,11 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                     accountId: walletId
                 })
             },
-            getTransactionHistory: function d(a, b) {
+            getTransactionHistory: function d(a, b, page) {
                 var c = {
                     messageType: 'GetTransactionHistory',
-                    accountId: a
+                    accountId: a,
+                    page: page || 1
                 };
                 return b && (c.subAccount = b),
                 h(c)
