@@ -15064,9 +15064,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             insight:
             [
-              "https://insight.smartcash.cc/api",
+              "http://insight.smartcash.cc/api",
             ],
-            txUrlExplorer: "https://insight.smartcash.cc/tx/",
+            txUrlExplorer: "http://insight.smartcash.cc/tx/",
             feeProfile:
             {
               MIN_FEE: 1e5,
