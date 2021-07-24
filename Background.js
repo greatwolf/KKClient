@@ -14532,7 +14532,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e[e.CyberMiles = 646] = "CyberMiles",
         e[e["Crypto.com"] = 647] = "Crypto.com",
         e[e.Populous = 648] = "Populous",
-        e[e.ODEM = 649] = "ODEM"
+        e[e.ODEM = 649] = "ODEM",
+        e[e.FOX = 650] = "FOX"
     })(r = n.CoinName || (n.CoinName = {}))
   },
   {}],
@@ -15383,6 +15384,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           {
             name: s.CoinName[s.CoinName.ODEM],
+            addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
+            dust: 1,
+            defaultDecimals: 18
+          },
+          {
+            name: s.CoinName[s.CoinName.FOX],
             addressFormat: "^(0x)?[0-9a-fA-F]{40}$",
             dust: 1,
             defaultDecimals: 18

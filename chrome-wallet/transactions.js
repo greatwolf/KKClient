@@ -423,6 +423,20 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
         DECIMAL_PLACES: 18,
         EXPONENTIAL_AT: [-19, 9]
       }
+    },
+    {
+      name: 'FOX',
+      currencySymbol: 'FOX',
+      coinTypeCode: '60\'',
+      coinType: 60,
+      addressFormat: '^(0x)?[0-9a-fA-F]{40}$',
+      dust: 1,
+      decimals: 18,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 18,
+        EXPONENTIAL_AT: [-19, 9]
+      }
     }])
   }]).controller('TransactionListController', ['$scope', '$routeParams', 'WalletNodeService', function(a, b, c)
   {
