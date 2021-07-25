@@ -5,7 +5,7 @@
 
 A simple cryptocurrency wallet that integrates with the KeepKey device.
 
-This fork is an attempt to continue support and improve upon the original KeepKey Chrome Extension. The code is based off of Shapeshift's last original release of the KeepKey Client found in [Google's Chrome App store](https://keepkey.zendesk.com/hc/en-us/articles/360001411570-Getting-Started-Initializing-Your-KeepKey-Device).
+This fork is an attempt to continue support and improve upon the original KeepKey Chrome Extension. The code is based off of Shapeshift's last original release of the KeepKey Client found in [Google's Chrome App store](https://chrome.google.com/webstore/detail/keepkey-client/idgiipeogajjpkgheijapngmlbohdhjg).
 
 ## Motivation
 
