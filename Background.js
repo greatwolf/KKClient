@@ -4449,17 +4449,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.transferTransactionBuilder = s.TransactionBuilderFactory.ethereumTransactionTransfer(this),
               this.exchangeTransactionBuilder = s.TransactionBuilderFactory.ethereumTransactionExchange(this)
           },
-          t.prototype.getTransactions = function()
+          t.prototype.getTransactions = function(page, pageSize)
           {
             var e = this;
-            return this.wallet.api.getTransactionSummaries(this.id).then(function(t)
+            var txStart = pageSize * (page - 1),
+                txEnd = txStart + pageSize;
+            return this.wallet.api.getTransactionSummaries(this.id, page > 1).then(function(t)
             {
               return e.wallet.update(t),
                 e.wallet.data.txHist = i.uniqBy(e.wallet.data.txHist, function(e)
                 {
                   return e.hash.toHex()
                 }),
-                e.wallet.data.txHist
+                e.wallet.data.txHist.slice(txStart, txEnd)
             })
           },
           t.prototype.extractTransactionHistory = function(e)
@@ -7070,6 +7072,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
 
         return i.delete(url)
       },
+      clear_urlcache: expire_cache,
       push_ttl: function(msec)
       {
         msec && ttl_queue.push(msec)
@@ -79787,13 +79790,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 })
               })
           },
-          e.prototype.getTransactionSummaries = function(t)
+          e.prototype.getTransactionSummaries = function(t, staleOk)
           {
             var n = this,
               i = this.addressRegistry.getAddress(t),
               o, s;
             return this.walletApi.urlGenerator.getTransactionsUrl(i).then(function(t)
             {
+              if(!staleOk) e.EBapiThrottler.clear_urlcache(t)
               return e.EBapiThrottler.push_ttl(30000).get(t)
             }).then(function(e)
             {
