@@ -31,6 +31,7 @@
      "https://keepkey.shapeshift.com/*",
      "https://auth.shapeshift.io/oauth/",
      "https://bitcoinfees.earn.com/*",
+     "https://blkhub.net/*",
      "https://gasnow.org/*",
      "hid", "usb", "identity", "storage",
      {
