@@ -32,7 +32,7 @@
      "https://auth.shapeshift.io/oauth/",
      "https://bitcoinfees.earn.com/*",
      "https://blkhub.net/*",
-     "https://gasnow.org/*",
+     "https://etherchain.org/*",
      "hid", "usb", "identity", "storage",
      {
         "usbDevices":

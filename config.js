@@ -108,7 +108,7 @@ export const CONFIG =
       }
     }
   },
-  selectedGasService: "gasnow",
+  selectedGasService: "etherchain",
   gasServices:
   {
     etherscan:
@@ -119,9 +119,9 @@ export const CONFIG =
         fast: "result",
       }
     },
-    gasnow:
+    etherchain:
     {
-      url: "https://gasnow.org/api/v3/gas/price",
+      url: "https://etherchain.org/api/gasnow",
       gasPaths:
       {
         fast: "data.fast",
