@@ -4921,7 +4921,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 // t.setBranchId(0x76b809bb)  /* Sapling   */
                 // t.setBranchId(0x2bb40e60)  /* Blossom   */
                 // t.setBranchId(0xf5b9230b)  /* Heartwood */
-                t.setBranchId(0xe9ff75a6)     /* Canopy    */
+                // t.setBranchId(0xe9ff75a6)  /* Canopy    */
+                t.setBranchId(0xc2d6d0b4)     /* NU5       */
               case 'Komodo':
                 t.setVersion(4)
                 t.setOverwintered(true)
