@@ -14982,9 +14982,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://blockbook.pivx.link",
+              "https://pivx.flitswallet.app",
             ],
-            txUrlExplorer: "https://explorer.pivx.link/tx/",
+            txUrlExplorer: "https://zkbitcoin.com/tx/",
             feeProfile: { MIN_FEE: 1e4 }
           },
           {
