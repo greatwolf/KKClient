@@ -13068,6 +13068,36 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       upgradable: !1,
       upgradeSkipable: !0,
       tag: "v2.0.0"
+    },
+    {
+      hash: "e1ad2667d1924e4ddbeb623bd6939e94114d8471b84f8fb056e0c9abf0c4e4f4",
+      upgradable: !1,
+      upgradeSkipable: !0,
+      tag: "v2.1.0"
+    },
+    {
+      hash: "a3f8c745ff33cd92a7e95d37c76c65523d258a70352ea44a232038ec4ec38dea",
+      upgradable: !1,
+      upgradeSkipable: !0,
+      tag: "v2.1.1"
+    },
+    {
+      hash: "3b97596ed612aa29a74a7f51f33ea85fd6e0cfe7340dfbb96f0c17077b363498",
+      upgradable: !1,
+      upgradeSkipable: !0,
+      tag: "v2.1.2"
+    },
+    {
+      hash: "e6685ab14844d0a381d658d77e13d6145fe7ae80469e5a5360210ae9c3447a77",
+      upgradable: !1,
+      upgradeSkipable: !0,
+      tag: "v2.1.3"
+    },
+    {
+      hash: "fe98454e7ebd4aef4a6db5bd4c60f52cf3f58b974283a7c1e1fcc5fea02cf3eb",
+      upgradable: !1,
+      upgradeSkipable: !0,
+      tag: "v2.1.4"
     }]
   },
   {}],
