@@ -11470,7 +11470,7 @@ h6 {
 #build-transaction .fee-container {
   display: flex;
   justify-content: center;
-  padding-top: 15px;
+  padding-top: 25px;
   position: relative
 }
 
@@ -11789,7 +11789,7 @@ h6 {
 }
 
 .content-form-inner.sending .exchange-images .currency-logo {
-  height: 50px;
+  height: 60px;
   margin: 0 auto;
   display: block
 }
