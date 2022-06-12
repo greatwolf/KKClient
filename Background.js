@@ -3004,15 +3004,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return e.prototype.action = function(e)
           {
             var t;
-            return a.DeviceClientManager.instance.getActiveClient().then(function(n)
+            var act = a.DeviceClientManager.instance.getActiveClient().then(function(n)
             {
               return t = n,
                 t.recoveryDevice(e)
-            }).then(function()
-            {
-              return i.AccountListManager.clearAccountList(),
-                r.MessageDispatcher.execute("Initialize", t)
-            })
+            });
+            return e.dry_run
+                ? act
+                : act.then(function()
+                  {
+                    return i.AccountListManager.clearAccountList(),
+                      r.MessageDispatcher.execute("Initialize", t)
+                  })
           },
           e
       }();
