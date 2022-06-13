@@ -12618,6 +12618,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     });
     var r = e("../node-vector"),
       i = e("../device-message-helper"),
+      s = e("./action-helper"),
       a = function()
       {
         function e()
@@ -12639,7 +12640,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     o.setEcdsaCurveName('secp256k1-groestl')
                 }
                 return o.setShowDisplay(n),
-                  e.writeToDevice(o)
+                  e.writeToDevice(o).catch(s.ActionHelper.ignoreCancelledAction)
               }
               return Promise.reject("getPublicKey: device not initialized")
             })
@@ -12650,6 +12651,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "../device-message-helper": 153,
+    "./action-helper": 126,
     "../node-vector": 167
   }],
   141: [function(e, t, n)
