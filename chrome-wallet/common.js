@@ -48,6 +48,7 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
                   "BitcoinSV" : "bitcoin-cash-sv",
                   "BitcoinGold" : "bitcoin-gold",
                   "Firo" : "zcoin",
+                  "BAT" : "basic-attention-token",
                   "FOX" : "shapeshift-fox-token",
                 }
                 var asset = assetIds[crypto] || crypto.toLowerCase()
