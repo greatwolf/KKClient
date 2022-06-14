@@ -6969,54 +6969,59 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return e.send(aUrl, null, null, "DELETE", [200, 204])
           },
-          e.send = function(aUrl, payload, contentType, method, resolveStatuses, decode)
+          e.send = function(aUrl, payload, contentType, method, resolveStatuses, decode = JSON.parse, retries = 7)
           {
-            return decode || (decode = JSON.parse),
-              new Promise(function(d, c)
+            return new Promise(function(d, c)
               {
                 var l = new XMLHttpRequest;
                 l.timeout = 10000;
                 l.onreadystatechange = function()
+                {
+                  if (4 !== l.readyState) return
+
+                  console.log("HTTP " + method + " " + aUrl + " (" + l.status + ")")
+                  if (0 === l.status || 404 === l.status || 503 === l.status)
                   {
-                    if (4 === l.readyState)
-                      if (console.log("HTTP " + method + " " + aUrl + " (" + l.status + ")"),
-                        0 === l.status || 404 === l.status || 503 === l.status)
-                        e.send(aUrl, payload, contentType, method, resolveStatuses).then(function(e)
-                        {
-                          d(e)
-                        }).catch(function(e)
-                        {
-                          c(e)
-                        });
-                      else if (-1 !== r.indexOf(resolveStatuses, l.status))
-                      l.response ? d(decode(l.response)) : d("");
-                    else
+                    if (1 > --retries) return c("HTTP " + method + " " + aUrl + " (" + l.status + ")")
+                    e.send(aUrl, payload, contentType, method, resolveStatuses, decode, retries)
+                      .then(function(e)
+                      {
+                        d(e)
+                      })
+                      .catch(function(e)
+                      {
+                        c(e)
+                      });
+                  }
+                  else if (-1 !== r.indexOf(resolveStatuses, l.status))
+                    l.response ? d(decode(l.response)) : d("");
+                  else
+                  {
+                    var p;
+                    try
                     {
-                      var p;
-                      try
+                      p = r.merge(
                       {
-                        p = r.merge(
-                        {
-                          httpStatus: l.status
-                        }, JSON.parse(l.response))
-                      }
-                      catch (t)
-                      {
-                        p = {
-                          httpStatus: l.status,
-                          error: t,
-                          response: l.response
-                        }
-                      }
-                      finally
-                      {
-                        c(p)
+                        httpStatus: l.status
+                      }, JSON.parse(l.response))
+                    }
+                    catch (t)
+                    {
+                      p = {
+                        httpStatus: l.status,
+                        error: t,
+                        response: l.response
                       }
                     }
-                  },
-                  l.open(method, aUrl, !0),
-                  contentType && l.setRequestHeader("Content-Type", contentType),
-                  l.send(payload)
+                    finally
+                    {
+                      c(p)
+                    }
+                  }
+                },
+                l.open(method, aUrl, !0),
+                contentType && l.setRequestHeader("Content-Type", contentType),
+                l.send(payload)
               })
           },
           e
