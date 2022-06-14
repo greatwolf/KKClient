@@ -5699,7 +5699,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 outputAddressType: 2,
                 addressN: n
               }),
-              e
+              e.outputs.list
+          }).then(function(outputs)
+          {
+            var shuffle = Math.trunc(Math.random() * 100) % outputs.length
+            outputs.splice(shuffle, 0, outputs.pop())
+            return e
           })
         },
         t
