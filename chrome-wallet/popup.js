@@ -166,7 +166,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.$watch('walletList.length', function()
       {
-        e.walletList.length !== d && e.go('/walletlist', 'slideRight')
+        e.walletList.length > d && e.go('/walletlist', 'slideRight')
       })
   }]),
   angular.module('kkWallet').controller('ButtonRequestController', ['$scope', '$routeParams', 'DeviceBridgeService', 'ProxyInfoService', 'NavigationService', 'DeviceFeatureService', function(e, t, n, a, o, i)
