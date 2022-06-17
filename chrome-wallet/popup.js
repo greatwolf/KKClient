@@ -104,7 +104,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           e.showFirmwareButton = !t || c
       }, !0)
   }]),
-  angular.module('kkWallet').controller('AccountConfigController', ['$scope', '$routeParams', 'WalletNodeService', 'DeviceFeatureService', 'DeviceBridgeService', 'NotificationMessageService', 'CurrencyLookupService', function(e, t, n, a, o, i, c)
+  angular.module('kkWallet').controller('AccountConfigController', ['$scope', '$routeParams', 'WalletNodeService', 'DeviceFeatureService', 'DeviceBridgeService', 'NotificationMessageService', 'CurrencyLookupService', 'PinLockService', function(e, t, n, a, o, i, c, pinLock)
   {
     function s()
     {
@@ -139,7 +139,9 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
     });
     l && (e.walletName = l.name),
       e.device = a.features,
-      e.creating = !1;
+      e.creating = pinLock.state === pinLock.verifying;
+    if (pinLock.state === pinLock.cancelling) i.clear();
+
     var d = e.walletList.length;
     e.addAccount = function()
       {

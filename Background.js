@@ -1187,10 +1187,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               throw "Not possible to change account name when an apiTokenOverride is in use";
             return t.nodePathPromise.then(function(n)
             {
-              return t.name = e.accountName,
-                t.deviceClient.encryptAccountName(n, e.accountName)
+              return t.deviceClient.encryptAccountName(n, e.accountName)
             }).then(function(n)
             {
+              t.name = e.accountName
               return t.wallet.api.updateStoredMetadata(e.accountId,
               {
                 encrypted_name: n
@@ -16078,6 +16078,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "CipheredKeyValue",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["PinMatrixRequest", "PassphraseRequest", "ButtonRequest"],
         userInteractionRequired: !1
       }),
