@@ -78,6 +78,18 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Namecoin',
+      currencySymbol: 'NMC',
+      coinTypeCode: '7\'',
+      coinType: 7,
+      dust: 1e4,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Groestlcoin',
       currencySymbol: 'GRS',
       coinTypeCode: '17\'',

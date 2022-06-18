@@ -14945,6 +14945,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.Namecoin = 7] = "Namecoin",
+            addressFormat: b58regex('[NM]', 1),
+            dust: e.oldDustCalculation(10000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://nmc1.trezor.io",
+            ],
+            txUrlExplorer: "https://nmc.tokenview.com/en/tx/",
+            feeProfile:
+            {
+              MIN_FEE: 1e5,
+              servicer: 'granular-per-kb-fee-service'
+            }
+          },
+          {
             name: s.CoinName[s.CoinName.Groestlcoin = 17] = "Groestlcoin",
             addressFormat: b58regex('[F3]', 1),
             dust: e.newDustCalculation(3000),
