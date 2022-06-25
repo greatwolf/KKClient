@@ -15981,6 +15981,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         messageType: a.request,
         resolveMessage: "Success",
         rejectMessage: "Failure",
+        retryFailure: "Failure_PinInvalid",
         interstitialMessages: ["WordRequest", "PinMatrixRequest", "CharacterRequest", "ButtonRequest"],
         userInteractionRequired: !0
       }),
