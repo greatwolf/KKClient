@@ -223,6 +223,12 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         o(t, 'active'),
         n())
     }
+
+    function sendEnter()
+    {
+      e.done = !0
+      a.sendEnter()
+    }
     for (e.getEmptyArray = function(e)
       {
         return Array(e)
@@ -240,6 +246,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.wordCount += 6;
     e.wordLength = 4,
       e.sendInProgress = !1,
+      e.done = !1,
       e.getCharAtCurrentPosition = function(t, n)
       {
         return t < e.model.currentWord || t === e.model.currentWord && n < e.model.currentCharacterPosition ? '*' : t === e.model.currentWord && n === e.model.currentCharacterPosition ? '|' : '-'
@@ -285,26 +292,30 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.moreWordsAvailable = -1 !== [11, 17].indexOf(e.model.currentWord) && 3 <= e.model.currentCharacterPosition,
       e.onKeyPress = function(t)
       {
-        if (t.preventDefault(),
-          !e.sendInProgress)
+        t.preventDefault()
+        if (e.sendInProgress) return
+
+        var n = t.keyCode
+        switch (n)
         {
-          var n = t.keyCode;
-          13 === n ? i(e.enterClasses, function()
-          {
-            a.sendEnter()
-          }) : 8 === n ? i(e.backspaceClasses, function()
-          {
-            a.sendBackspace()
-          }) : 32 === n ? i(e.spaceBarClasses, function()
-          {
-            a.sendCharacter(' ')
-          }) : 65 <= n && 90 >= n && i(e.letterClasses, function()
-          {
-            a.sendCharacter(String.fromCharCode(n).toLowerCase())
-          })
+          case 8:
+            i(e.backspaceClasses, a.sendBackspace)
+            break
+          case 13:
+            i(e.enterClasses, sendEnter)
+            break
+          case 32:
+            i(e.spaceBarClasses, a.sendCharacter.bind(a, ' '))
+            break
+          default:
+            if (65 <= n && n <= 90)
+            {
+              i(e.letterClasses,
+                a.sendCharacter.bind(a, String.fromCharCode(n).toLowerCase()))
+            }
         }
       },
-      e.send = a.sendEnter
+      e.send = i.bind(null, e.enterClasses, sendEnter)
   }]).factory('RecoveryCipherModel', ['DeviceBridgeService', 'NavigationService', function(e, t)
   {
     var n = {
@@ -3257,7 +3268,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.put('app/popup/buttonRequest/sign-exchange.tpl.html', '<section id=button-request ng-controller=SignExchangeController><header><back-button class="button-left header-button" action=cancelExchangeRequest();></back-button></header><div id=confirm-exchange class=content ng-class=buttonRequestType><div class=content-confirming-inner><div class=content-inner-centering><h2><span class=cornflower-txt>On your <b><vendor-name after=,></vendor-name></b> confirm the ShapeShift exchange summary.</span> Make sure the details are accurate.<ng-include src="\'app/popup/buttonRequest/shapeshift-terms-of-service.tpl.html\'"></ng-include></h2><notification></notification></div></div><a class="text-link-button cancel" ng-click=cancelExchangeRequest();>Cancel</a></div></section>'),
       e.put('app/popup/buttonRequest/signTx.tpl.html', '<section id=button-request ng-controller=SignTxController><header><back-button class="button-left header-button" action=cancelDeviceOperation();></back-button></header><div id=transaction class=content ng-class=buttonRequestType><div class=content-confirming-inner><div class=content-inner-centering><h2><span class=cornflower-txt>On your <b><vendor-name after=,></vendor-name></b> confirm the transaction summary.</span> Make sure the details are accurate.</h2><notification></notification></div></div><a class="text-link-button cancel" ng-click=cancelDeviceOperation();>Cancel</a></div></section>'),
       e.put('app/popup/buttonRequest/wipeDevice.tpl.html', '<section id=button-request ng-controller=ButtonRequestController><header><back-button class="button-left header-button" action=cancelDeviceOperation();></back-button></header><div id=wipe-device class=content ng-class=buttonRequestType><div class=content-confirming-inner><div class=content-inner-centering><h2><span class=cornflower-txt>On your <b><vendor-name after=,></vendor-name></b> confirm you want to wipe your device.</span> This will remove all of its private keys and settings.</h2><notification></notification></div></div><a class="text-link-button cancel" ng-click=cancelDeviceOperation();>Cancel</a></div></section>'),
-      e.put('app/popup/characterRequest/characterRequest.tpl.html', '<section id=character-request ng-controller=CharacterRequestController tabindex=0 focus ng-keydown=onKeyPress($event)><header><back-button class="button-left header-button" action=cancelDeviceOperation();goBack();></back-button></header><div class=content><h2><span class=cornflower-txt><b>Enter your recovery sentence</b></span></h2><div class="active-keys clearfix"><div class=legend-header>Available Keys</div><div class="key letter" ng-class=letterClasses uib-tooltip-template="\'app/popup/characterRequest/letterTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help letters"><i class=fa ng-class=letterIcon></i> A - Z</div><div class="key space-bar" ng-class=spaceBarClasses uib-tooltip-template="\'app/popup/characterRequest/spaceTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help space"><i class=fa ng-class=spaceBarIcon></i> Space</div><div class="key end-of-key" ng-class=enterClasses uib-tooltip-template="\'app/popup/characterRequest/enterTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help enter"><i class=fa ng-class=enterIcon></i> Enter</div><div class="key backspace" ng-class=backspaceClasses uib-tooltip-template="\'app/popup/characterRequest/deleteTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help delete"><i class=fa ng-class=backspaceIcon></i> Delete</div></div><div class="word-list clearfix"><div class=column ng-repeat="columnIndex in [0, 1, 2] track by columnIndex"><div ng-repeat="wordIndex in getColumnArray(wordCount, columnIndex) track by $index"><span class=checkmark-container><span ng-show=wordCompleted(wordIndex) class="fa fa-check"></span></span> <span class=word-index>{{wordIndex + 1}}.</span> <span class=word-representation ng-repeat="characterIndex in getEmptyArray(wordLength) track by $index">{{getCharAtCurrentPosition(wordIndex, $index)}}</span></div></div></div><div class=more-words-message ng-show=moreWordsAvailable>Type a space to enter more words</div><button class=button disabled ng-disabled=enterClasses.disabled ng-click=send()>Done</button><notification></notification></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer><div class=overlay ng-show=sendInProgress></div></section>'),
+      e.put('app/popup/characterRequest/characterRequest.tpl.html', '<section id=character-request ng-controller=CharacterRequestController tabindex=0 focus ng-keydown=onKeyPress($event)><header><back-button class="button-left header-button" action=cancelDeviceOperation();goBack();></back-button></header><div class=content><h2><span class=cornflower-txt><b>Enter your recovery sentence</b></span></h2><div class="active-keys clearfix"><div class=legend-header>Available Keys</div><div class="key letter" ng-class=letterClasses uib-tooltip-template="\'app/popup/characterRequest/letterTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help letters"><i class=fa ng-class=letterIcon></i> A - Z</div><div class="key space-bar" ng-class=spaceBarClasses uib-tooltip-template="\'app/popup/characterRequest/spaceTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help space"><i class=fa ng-class=spaceBarIcon></i> Space</div><div class="key end-of-key" ng-class=enterClasses uib-tooltip-template="\'app/popup/characterRequest/enterTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help enter"><i class=fa ng-class=enterIcon></i> Enter</div><div class="key backspace" ng-class=backspaceClasses uib-tooltip-template="\'app/popup/characterRequest/deleteTooltip.tpl.html\'" tooltip-placement=bottom tooltip-append-to-body=true tooltip-class="key-help delete"><i class=fa ng-class=backspaceIcon></i> Delete</div></div><div class="word-list clearfix"><div class=column ng-repeat="columnIndex in [0, 1, 2] track by columnIndex"><div ng-repeat="wordIndex in getColumnArray(wordCount, columnIndex) track by $index"><span class=checkmark-container><span ng-show=wordCompleted(wordIndex) class="fa fa-check"></span></span> <span class=word-index>{{wordIndex + 1}}.</span> <span class=word-representation ng-repeat="characterIndex in getEmptyArray(wordLength) track by $index">{{getCharAtCurrentPosition(wordIndex, $index)}}</span></div></div></div><div class=more-words-message ng-show=moreWordsAvailable>Type a space to enter more words</div><button class=button disabled ng-disabled=enterClasses.disabled ng-click=send()>Done</button><notification></notification></div><footer ng-include="\'app/popup/footer/footer.tpl.html\'"></footer><div class=overlay ng-show=sendInProgress></div><div ng-hide="!done" class="content in-progress-overlay"><div class=content-no-button-inner><div class=content-inner-centering><h2><span class=cornflower-txt><b>Checking Recovery Seed.</b></span><br>Waiting on Keepkey. Check device\'s onscreen display..</h2><div id=loader><div></div><div></div><div></div><div></div><div></div><div class=second-top></div><div class=top></div></div></div></div></div></section>'),
       e.put('app/popup/characterRequest/deleteTooltip.tpl.html', '<div>Use the <b>&lt;delete&gt;</b> or <b>&lt;backspace&gt;</b> key to make corrections to what you have typed.</div>'),
       e.put('app/popup/characterRequest/enterTooltip.tpl.html', '<div>Use the <b>&lt;enter&gt;</b> key to submit your mnemonic key after you type the last letter of the last word. The <b>&lt;enter&gt;</b> key is only active on the 12th, 18th and 24th words and only after 3 or 4 characters are typed.</div>'),
       e.put('app/popup/characterRequest/letterTooltip.tpl.html', '<div>The only characters that are valid in a mnemonic key are alphabetic characters. The first four characters of every valid mnemonic word are unique, so this screen will only let you type up to four characters per word.</div>'),
