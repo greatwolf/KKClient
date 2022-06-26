@@ -3233,7 +3233,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 o.UiMessenger.sendMessageToUI("Failure",
                 {
-                  message: JSON.stringify(err)
+                  message: JSON.stringify(err.message || err)
                 })
               })
           },
