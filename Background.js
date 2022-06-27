@@ -5532,62 +5532,71 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       p = e("../../global/summable-list"),
       u = e("@keepkey/device-client/dist/device-message-helper"),
       f = e("@keepkey/device-client/dist/global/coin-type"),
-      g = function(e)
+      addr = e("./lib/address");
+    var identifyOutputScriptType = function(tx)
+    {
+      var coinName = f.CoinType.get(tx.coinName).name,
+          detail = addr.fromString(tx.address, coinName.toLowerCase())
+      if (detail.type === 'pubkeyhash') return 0
+      if (detail.type === 'scripthash') return 1
+      throw "unknown scriptType";
+    }
+    var g = function(e)
+    {
+      function t(t, n)
       {
-        function t(t, n)
+        var r = e.call(this, t, n) || this;
+        return r.inputs = new p.SummableList,
+          r.outputs = new p.SummableList,
+          r.signatures = [],
+          r._serializedTransaction = new a(0),
+          r
+      }
+      return r(t, e),
+        Object.defineProperty(t.prototype, "exchangeDestination",
         {
-          var r = e.call(this, t, n) || this;
-          return r.inputs = new p.SummableList,
-            r.outputs = new p.SummableList,
-            r.signatures = [],
-            r._serializedTransaction = new a(0),
-            r
-        }
-        return r(t, e),
-          Object.defineProperty(t.prototype, "exchangeDestination",
+          get: function e()
           {
-            get: function e()
+            if (!this.options.exchangeDestination)
+              throw "exchangeDestination not set";
+            return this.options.exchangeDestination
+          },
+          enumerable: !0,
+          configurable: !0
+        }),
+        Object.defineProperty(t.prototype, "destinationAccount",
+        {
+          get: function e()
+          {
+            if (!this.options.destinationAccount)
+              throw "destinationAccount not set";
+            return this.options.destinationAccount
+          },
+          enumerable: !0,
+          configurable: !0
+        }),
+        t.prototype.estimateSignatureActions = function()
+        {
+          var e = 0;
+          return e += this.outputs.length,
+            e += 2 * this.inputs.length,
+            this.inputs.list.forEach(function(t)
             {
-              if (!this.options.exchangeDestination)
-                throw "exchangeDestination not set";
-              return this.options.exchangeDestination
-            },
-            enumerable: !0,
-            configurable: !0
-          }),
-          Object.defineProperty(t.prototype, "destinationAccount",
-          {
-            get: function e()
-            {
-              if (!this.options.destinationAccount)
-                throw "destinationAccount not set";
-              return this.options.destinationAccount
-            },
-            enumerable: !0,
-            configurable: !0
-          }),
-          t.prototype.estimateSignatureActions = function()
-          {
-            var e = 0;
-            return e += this.outputs.length,
-              e += 2 * this.inputs.length,
-              this.inputs.list.forEach(function(t)
-              {
-                e += t.transaction.inputs.length + t.transaction.outputs.length
-              }),
-              e
-          },
-          t.prototype.serialize = function()
-          {
-            return Promise.resolve(this._serializedTransaction)
-          },
-          t.prototype.saveSerializedData = function(e)
-          {
-            i.get(e, "serialized_tx") && (this._serializedTransaction = a.concat([this._serializedTransaction, e.serialized_tx])),
-              i.get(e, "signature_index") && !this.signatures[e.signature_index] && (this.signatures[e.signature_index] = e.signature)
-          },
-          t
-      }(o.TransactionBuffer);
+              e += t.transaction.inputs.length + t.transaction.outputs.length
+            }),
+            e
+        },
+        t.prototype.serialize = function()
+        {
+          return Promise.resolve(this._serializedTransaction)
+        },
+        t.prototype.saveSerializedData = function(e)
+        {
+          i.get(e, "serialized_tx") && (this._serializedTransaction = a.concat([this._serializedTransaction, e.serialized_tx])),
+            i.get(e, "signature_index") && !this.signatures[e.signature_index] && (this.signatures[e.signature_index] = e.signature)
+        },
+        t
+    }(o.TransactionBuffer);
     n.ChainedTransactionBuffer = g;
     var h = function(e)
     {
@@ -5652,7 +5661,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           var r = new s.NewExchangeTransactionOutput;
           return r.address = n,
             r.value = e.amount,
-            r.scriptType = 0,
+            r.scriptType = identifyOutputScriptType(e),
             r.outputAddressType = 3,
             r.exchangeContract = t,
             r.exchangeReturnNodeVector = e.exchangeDestination.refundAddressNodeVector,
@@ -5723,7 +5732,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             e.outputs.add(
             {
               value: e.amount,
-              scriptType: 0,
+              scriptType: identifyOutputScriptType(e),
               outputAddressType: 0,
               address: e.address
             }),
@@ -5780,6 +5789,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../services/TransactionSelector": 106,
     "../../services/TransactionSigner/HistoricalTransaction": 110,
     "../../services/TransactionSigner/OutputTransactionTypes": 114,
+    "./lib/address": 192,
     "./transaction-builder": 60,
     "@keepkey/device-client/dist/device-message-helper": 153,
     "@keepkey/device-client/dist/global/coin-type": 161,
@@ -11224,7 +11234,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 n = new s.DeviceMessageHelper.messageFactories.TxOutputType;
               return n.setAddress(t.address),
                 n.setAmount(c.BigNumberUtils.toLong(t.value)),
-                n.setScriptType(this.isPayToScriptOutput(t.address) ? 1 : 0),
+                n.setScriptType(t.scriptType),
                 n.setAddressType(0),
                 n
             },
@@ -11260,14 +11270,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               var i = new s.DeviceMessageHelper.messageFactories.TxOutputType;
               return i.setAddress(t.address),
                 i.setAmount(c.BigNumberUtils.toLong(t.value)),
-                i.setScriptType(this.isPayToScriptOutput(t.address) ? 1 : 0),
+                i.setScriptType(t.scriptType),
                 i.setAddressType(3),
                 i.setExchangeType(r),
                 i
-            },
-            t.prototype.isPayToScriptOutput = function(e)
-            {
-              return e && (e.startsWith("3") || e.startsWith("9") || e.startsWith("A"))
             },
             t.messageNames = ["TxRequest_" + i.RequestType[i.RequestType.TXOUTPUT]],
             t)
