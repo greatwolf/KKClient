@@ -3224,6 +3224,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       {
         e.loaded = !!e.wallets.length,
           i()
+        if (e.loaded) pinLock.reset()
       }),
       e.signup = function(e, n)
       {
