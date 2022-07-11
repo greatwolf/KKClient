@@ -4064,13 +4064,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     ? console.log("Etherscan and Insight accounts can't be loaded when an API token override is being used")
                     : (s.CoinType
                         .getCoinList()
+                        .filter(coin => coin.name !== "Bitcoin")  // ignore here -- handled by 'loadBtcAndForks' below
                         .forEach(function(coin)
                         {
                           n.push( t[coin.name.toLowerCase()].loadAccounts(e) )
                         }),
-                      t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e)),
-                      t.bitcoinGoldLegacy && n.push(t.bitcoinGoldLegacy.loadAccounts(e)),
-                      t.bitcoinSVLegacy && n.push(t.bitcoinSVLegacy.loadAccounts(e)),
+                      n.push(t.loadBtcAndForks(e)),
                       n.push(t.loadEthereumAndTokens(e))
                     ),
                 Promise.all(n)
@@ -4090,10 +4089,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return this.bitcoin.loadAccounts(e).then(function()
             {
               var n = [];
-              return t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e)),
-                t.bitcoinGoldLegacy && n.push(t.bitcoinGoldLegacy.loadAccounts(e)),
-                Promise.all(n)
-            }).then(function() {})
+              t.bitcoinCashLegacy && n.push(t.bitcoinCashLegacy.loadAccounts(e));
+              t.bitcoinSVLegacy && n.push(t.bitcoinSVLegacy.loadAccounts(e));
+              t.bitcoinGoldLegacy && n.push(t.bitcoinGoldLegacy.loadAccounts(e));
+              return Promise.all(n)
+            })
           },
           e.prototype.initializeAccountListLoaders = function(e)
           {
