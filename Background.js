@@ -6984,7 +6984,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return e.send(aUrl, null, null, "DELETE", [200, 204])
           },
-          e.send = function(aUrl, payload, contentType, method, resolveStatuses, decode = JSON.parse, retries = 7)
+          e.send = function(aUrl, payload, contentType, method, resolveStatuses, decode = JSON.parse)
           {
             return new Promise(function(d, c)
               {
@@ -6997,16 +6997,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   console.log("HTTP " + method + " " + aUrl + " (" + l.status + ")")
                   if (0 === l.status || 404 === l.status || 503 === l.status)
                   {
-                    if (1 > --retries) return c("HTTP " + method + " " + aUrl + " (" + l.status + ")")
-                    e.send(aUrl, payload, contentType, method, resolveStatuses, decode, retries)
-                      .then(function(e)
-                      {
-                        d(e)
-                      })
-                      .catch(function(e)
-                      {
-                        c(e)
-                      });
+                    return c("HTTP " + method + " " + aUrl + " (" + l.status + ")")
                   }
                   else if (-1 !== r.indexOf(resolveStatuses, l.status))
                     l.response ? d(decode(l.response)) : d("");
@@ -7439,72 +7430,89 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var r = e("../../HttpClient"),
       i = function()
       {
-        function e(e, t, n)
+        function e(e, t = 7)
         {
-          this.maxConcurrent = e,
-          this.maxPerSecond = Math.max(0, t - 1),
-          this.cooldown = Math.max(1, n || 1) * 1e3,
-          this.pendingRequests = [],
-          this.requestsInProgress = 0,
-          this.requestLastSecond = 0
+          this.maxPerSecond = Math.min(Math.max(0.25, e), 10)
+          this.maxRetry = Math.min(Math.max(0, t), 100)
+          this.retry = this.maxRetry
+          this.msPerCall = Math.trunc(1000 / this.maxPerSecond)
+          this.prevCallTime = 0
+          this.cooldown = this.msPerCall
+          this.pendingRequests = []
         }
-        return e.prototype.get = function(e)
+        e.prototype.processPendingRequests = function()
+        {
+          if (this.pendingRequests.length == 0)
           {
-            if (this.exceedingRateLimit())
-            {
-              console.warn("API rate exceeded: Postponing call to " + e);
-              var t = {
-                  url: e
-                },
-                n = new Promise(function(e, n)
-                {
-                  t.resolve = e,
-                    t.reject = n
-                });
-              return this.pendingRequests.push(t),
-                n
-            }
-            return this.sendRequest(
-            {
-              url: e
-            })
-          },
-          e.prototype.exceedingRateLimit = function()
+            this.cooldown = this.msPerCall
+            return
+          }
+          if (this.timerId) return
+
+          var self = this, nextReq = self.pendingRequests[0]
+          const request_handled = true
+          this.timerId = setTimeout(function()
           {
-            return this.requestsInProgress > this.maxConcurrent || this.requestLastSecond > this.maxPerSecond
-          },
-          e.prototype.sendRequest = function(t)
-          {
-            var e = this;
-            setTimeout(function()
+            console.warn(`API retrying request: [${self.retry} attempts left] ${nextReq.url}`)
+            self.retry--
+            nextReq
+              .requester()
+              .then(function(resp)
               {
-                --e.requestLastSecond,
-                  e.releasePostponedRequest()
-              }, e.cooldown),
-              ++this.requestsInProgress,
-              ++this.requestLastSecond;
-            var n = r.HttpClient.get(t.url).then(function(n)
-            {
-              return --e.requestsInProgress,
-                e.releasePostponedRequest(),
-                t.resolve && t.resolve(n),
-                n
-            }).catch(function(n)
-            {
-              t.reject && t.reject(n)
-            });
-            return n
-          },
-          e.prototype.releasePostponedRequest = function()
+                return nextReq.resolve(resp), request_handled
+              })
+              .catch(function(err)
+              {
+                if (self.retry) return !request_handled
+
+                console.warn(`API failed request: exhausted attempts ${nextReq.url}`);
+                return nextReq.reject(err), request_handled
+              })
+              .then(function(is_handled)
+              {
+                if (is_handled)
+                {
+                  self.pendingRequests.shift()
+                  self.retry = self.maxRetry
+                }
+                else self.cooldown = Math.min(self.cooldown, 2000) * 2
+                self.timerId = null
+                self.processPendingRequests()
+              })
+          }, self.cooldown)
+        }
+        e.prototype.throttle_request = function(req)
+        {
+          var now = Date.now()
+          this.prevCallTime = Math.max(now, this.prevCallTime + this.msPerCall)
+          var delay = Math.max(10, this.prevCallTime - now)
+          return new Promise(resolve => setTimeout(resolve, delay)).then(req)
+        }
+        return e.prototype.get = function(url)
+        {
+          var self = this;
+          return new Promise(function(resolve, reject)
           {
-            if (!this.exceedingRateLimit() && 0 < this.pendingRequests.length)
-            {
-              var e = this.pendingRequests.shift();
-              console.warn("resuming call to " + e.url),
-                this.sendRequest(e)
-            }
-          },
-          e
+            var requester = r.HttpClient.get.bind(null, url)
+            self.throttle_request(requester)
+                .then(resolve)
+                .catch(function(err)
+                {
+                  if (!self.maxRetry) return reject(err)
+
+                  console.warn(`API failed request: Queued for retry ${url}`);
+                  self.pendingRequests.push(
+                  {
+                    url: url,
+                    requester: requester,
+                    resolve: resolve,
+                    reject: reject,
+                  })
+                  setTimeout(self.processPendingRequests.bind(self), 2000)
+                })
+          })
+        },
+        e
       }();
     n.ApiThrottler = i
   },
@@ -7740,7 +7748,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return a.EtherscanDataTranslator.transactionList(a.EtherscanDataTranslator.externalTransactionList(e, n)).txHist
             })
           },
-          e.ESapiThrottler = new c.ApiThrottler(1, 2),
+          e.ESapiThrottler = new c.ApiThrottler(2, 2),
           e.CQapiThrottler = l.HttpClient,
           e
       }();
@@ -78397,7 +78405,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               return s
             })
           },
-          e.BBapiThrottler = new b.ApiThrottler(4, 8, 7),
+          e.BBapiThrottler = new b.ApiThrottler(4, 7),
           e.BBapiThrottler.get = e.BBapiThrottler.get.bind(e.BBapiThrottler),
           e
       }();
