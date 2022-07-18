@@ -33,7 +33,7 @@
      "https://bitcoinfees.earn.com/*",
      "https://blkhub.net/*",
      "https://etherchain.org/*",
-     "hid", "usb", "identity", "storage",
+     "hid", "usb", "identity", "storage", "notifications",
      {
         "usbDevices":
         [
