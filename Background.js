@@ -14949,7 +14949,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://dashblockexplorer.com",
+              "https://dash.atomicwallet.io",
             ],
             txUrlExplorer: "https://explorer.mydashwallet.org/insight/tx/",
             feeProfile:
@@ -14979,7 +14979,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: b58regex('[F3]', 1),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
-            blockbook: ["https://grsbook.guarda.co"],
+            blockbook: ["https://blockbook.groestlcoin.org"],
             txUrlExplorer: "https://blockchair.com/groestlcoin/transaction/"
           },
           {
@@ -14989,7 +14989,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://digibyteblockexplorer.com",
+              "https://digiexplorer.info",
             ],
             txUrlExplorer: "https://digiexplorer.info/tx/",
             feeProfile:
@@ -15133,7 +15133,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: b58regex('R'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
-            blockbook: ["https://ravencoin.atomicwallet.io"],
+            blockbook: ["https://blockbook.ravencoin.org"],
             txUrlExplorer: "https://ravencoin.network/tx/",
             feeProfile: { MIN_FEE: 1e6 }
           },
