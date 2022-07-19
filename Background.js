@@ -8092,6 +8092,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               console.error(e),
                 console.error("Cannot load additional " + n.coinNameText + " accounts.")
+              throw e
             }).then(function(i)
             {
               if (n.selector(i))
