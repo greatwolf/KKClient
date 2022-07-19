@@ -46,6 +46,7 @@ Altcoin Support:
  - BitcoinSV
  - BitcoinGold
  - DigiByte
+ - Namecoin
  - Zcash (supports unshielded addresses only)
  - Komodo
  - Ravencoin
