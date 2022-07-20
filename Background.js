@@ -7962,14 +7962,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return "https://api.etherscan.io/api?module=account&action=txlist&address=0x" + e + "&sort=asc&apikey=" + t
+              return "https://api.etherscan.io/api?module=account&action=txlist&address=0x" + e + "&sort=desc&apikey=" + t
             })
           },
           e.prototype.getInternalTransactionsUrl = function(e)
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return "https://api.etherscan.io/api?module=account&action=txlistinternal&address=0x" + e + "&sort=asc&apikey=" + t
+              return "https://api.etherscan.io/api?module=account&action=txlistinternal&address=0x" + e + "&sort=desc&apikey=" + t
             })
           },
           e.prototype.getPartialTransactionUrl = function()
