@@ -14904,7 +14904,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             [
               "https://litecoinblockexplorer.net",
             ],
-            txUrlExplorer: "https://insight.litecore.io/tx/",
+            txUrlExplorer: "https://blockchair.com/litecoin/transaction/",
             feeProfile:
             {
               INPUT_SIZE: 149,
