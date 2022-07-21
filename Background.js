@@ -8168,6 +8168,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.xpubRegistry = d.InsightXpubRegistry.instance,
           this.transactionSummaryCache = {}
         }
+        var byConfirmations = function(a, b)
+        {
+          return a.confirmations - b.confirmations
+        }
         return Object.defineProperty(e.prototype, "network",
           {
             get: function e()
@@ -8207,8 +8211,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               if (e)
                 return t.extendChains(e.data, [a.Subchain.EXTERNAL, a.Subchain.CHANGE])
-            }).then(function()
+            }).then(function(e)
             {
+              if (e)
+                e.txHist.sort(byConfirmations)
               return r
             }) : Promise.reject("the xpub for " + e + " is not registered.")
           },
