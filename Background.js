@@ -2576,6 +2576,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                               {
                                 return a.AccountListLoader.getInstance().loadAccounts(e)
                               })
+                        .then(function(loadStatus)
+                        {
+                          var cancelledLoad = function(p)
+                          {
+                            return p.status === 'rejected'
+                                && p.reason.endsWith('Cancel request')
+                          }
+                          var isCancel = loadStatus.findIndex(cancelledLoad) !== -1
+                          if (isCancel)
+                            return Promise.reject('Wallets not loaded due to cancel request')
+                          return loadStatus
+                        })
                         .then(o.AccountListManager.setAccountsLoaded),
               e.then(i.UiMessenger.sendAccountsToUi.bind(i.UiMessenger))
           },
@@ -4072,8 +4084,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                       n.push(t.loadBtcAndForks(e)),
                       n.push(t.loadEthereumAndTokens(e))
                     ),
-                Promise.all(n)
-            }).then(function() {})
+                Promise.allSettled(n)
+            })
           },
           e.prototype.loadEthereumAndTokens = function(e)
           {
@@ -8092,7 +8104,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               console.error(e),
                 console.error("Cannot load additional " + n.coinNameText + " accounts.")
-              throw e
+              return Promise.reject(e)
             }).then(function(i)
             {
               if (n.selector(i))
