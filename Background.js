@@ -78317,13 +78317,13 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var handleBadXpubResponse = function(err)
             {
               new Notification(`Failed to load ${self.coinType.name} wallet`,
-                              {body: `${err}`, icon: "/images/icon.png"})
+                              {body: JSON.stringify(err), icon: "/images/icon.png"})
               return JSON.parse(`{"page":1,"totalPages":1,"address":"${wallet.xpub}","balance":"0","unconfirmedBalance":"0","unconfirmedTxs":0}`)
             }
             var handleBadUtxoResponse = function(err)
             {
               new Notification(`Failed to load ${self.coinType.name} wallet`,
-                              {body: `${err}`, icon: "/images/icon.png"})
+                              {body: JSON.stringify(err), icon: "/images/icon.png"})
               return []
             }
             var processDerived = function(resp)
