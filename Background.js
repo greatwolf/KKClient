@@ -346,21 +346,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               chrome.hid.onDeviceAdded.removeListener(devConnectHandler),
                 chrome.hid.onDeviceRemoved.removeListener(n);
               var e = d.getAll();
-              o.each(e, function(e)
+               o.each(e, e => e.close()),
+               h.DeviceClientManager
+                .instance
+                .getActiveClient()
+                .then(function(e)
                 {
-                  e.close()
-                }),
-                h.DeviceClientManager.instance.getActiveClient().then(function(e)
-                {
-                  return e.cancel().then(e.endSession).catch(e.endSession).then(c.AccountListManager.clearAccountList)
-                }).catch(function(e)
-                {
-                  console.error(e)
-                }),
-                chrome.runtime.getBackgroundPage(function(e)
-                {
-                  e.close()
+                  return e.cancel()
+                          .then(e.endSession)
+                          .catch(e.endSession)
+                          .then(c.AccountListManager.clearAccountList)
                 })
+                .catch(console.error),
+                setTimeout(chrome.runtime.getBackgroundPage, 500, e => e.close())
             })
         })
       })
