@@ -11966,7 +11966,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var i = e("lodash"),
       a = e("./message-dispatcher/MessageDispatcher"),
       o = e("bytebuffer"),
-      s = e("./account-list-manager");
+      s = e("./account-list-manager"),
+      c = e("./device-message-helper");
     e("./message-dispatcher/message-dispatcher-config");
     var d = function()
     {
@@ -12012,7 +12013,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e.messageListener = function(t, n, r)
         {
           if (e.isIncomingMessage(n))
-            return console.debug("UI --> Proxy: [%s]\n%s", t.messageType, JSON.stringify(t, null, 4)),
+            return console.debug("UI --> proxy: [%s]\n%s", t.messageType, JSON.stringify(t, c.DeviceMessageHelper.buffer2Hex, 4)),
               a.MessageDispatcher.dispatch(t, r)
         },
         e.isIncomingMessage = function(e)
@@ -12029,6 +12030,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./account-list-manager": 2,
     "./message-dispatcher/MessageDispatcher": 6,
     "./message-dispatcher/message-dispatcher-config": 45,
+    "./device-message-helper": 153,
     bytebuffer: 300,
     lodash: 368
   }],
