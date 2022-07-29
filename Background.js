@@ -11990,7 +11990,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             !e.isDisabled)
           {
             var a = r(n);
-            console.debug("proxy --> UI: [" + t + "] " + a),
+            console.debug("proxy --> UI: [%s]\n%s", t, JSON.stringify(a, null, 4)),
               chrome.runtime.sendMessage(
               {
                 messageType: t,
@@ -12012,7 +12012,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e.messageListener = function(t, n, r)
         {
           if (e.isIncomingMessage(n))
-            return console.debug("UI --> Proxy: [" + t.messageType + "] " + t),
+            return console.debug("UI --> Proxy: [%s]\n%s", t.messageType, JSON.stringify(t, null, 4)),
               a.MessageDispatcher.dispatch(t, r)
         },
         e.isIncomingMessage = function(e)
@@ -13511,7 +13511,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               e.transport.deviceInUse = !1;
               var n = S.DeviceMessageHelper.hydrate(t);
-              console.log("device --> proxy: [%s]\n", t.$type.name, JSON.stringify(n, S.DeviceMessageHelper.buffer2Hex, 4)),
+              console.log("device --> proxy: [%s]\n%s", t.$type.name, JSON.stringify(n, S.DeviceMessageHelper.buffer2Hex, 4)),
                 t && e.deviceMessenger.receive.call(e.deviceMessenger, t) && (e.emit(n.typeName, n),
                   n.request_type && e.emit(n.typeName + "_" + n.request_type, n))
             }).catch(function(t)
@@ -19609,7 +19609,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         function sendHelper(t, e)
         {
           var r = o.DeviceMessageStates.getHostMessageState(e.$type.name)
-          console.log("proxy --> device:\n    [%s] %s\n    WaitFor: %s", e.$type.name, a.DeviceMessageHelper.toPrintable(e), r && r.resolveMessage),
+          console.log("proxy --> device: [%s]\n%s\nWaitFor: %s", e.$type.name, a.DeviceMessageHelper.toPrintable(e), r && r.resolveMessage),
             t.transport.write.call(t.transport, e).then(function()
             {
               0 === t.writeRequestInProgress.length && t.dequeueMessage()
@@ -19855,10 +19855,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var t = this,
               n = e.encodeAB(),
               i = new r(8 + n.byteLength).writeByte(35).writeByte(35).writeUint16(this.getMsgType(e.$type.name)).writeUint32(n.byteLength).append(n).reset();
-            return console.log("adding message to the queue"),
+            return console.debug("adding message to the queue"),
               this.pendingWriteQueue.then(function()
               {
-                return console.log("sending message"),
+                return console.debug("sending message"),
                   t._write(i)
               })
           },
