@@ -165,6 +165,12 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                 }, a);
                 return h(b)
             },
+            pingDevice: function(msg) {
+                return h({
+                    messageType: 'Ping',
+                    message: msg
+                })
+            },
             wipeDevice: function a() {
                 return h({
                     messageType: 'Wipe'
@@ -272,6 +278,12 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                     showDisplay: !1
                 }, a);
                 return h(b)
+            },
+            getEntropy: function c(bytelength) {
+                return h({
+                    messageType: 'GetEntropy',
+                    bytelength: bytelength
+                })
             },
             getPublicKey: function c(walletId) {
                 return h({

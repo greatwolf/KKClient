@@ -3632,6 +3632,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e("./dispatchers/firmware-update"),
       e("./dispatchers/get-address"),
       e("./dispatchers/get-blockcypher-api-token"),
+      e("./dispatchers/get-entropy"),
       e("./dispatchers/get-exchange-market-info"),
       e("./dispatchers/get-maximum-transaction-amount"),
       e("./dispatchers/get-transaction-history"),
@@ -3645,6 +3646,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e("./dispatchers/passphrase"),
       e("./dispatchers/pin-matrix-ack"),
       e("./dispatchers/pin-matrix-retry"),
+      e("./dispatchers/ping"),
       e("./dispatchers/recovery-device"),
       e("./dispatchers/reload-balances"),
       e("./dispatchers/request-currency-exchange"),
@@ -3698,7 +3700,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./dispatchers/set-shapeshift-auth-token": 42,
     "./dispatchers/wipe": 43,
     "./dispatchers/word-ack": 44,
-    "./dispatchers/get-public-key": 461
+    "./dispatchers/get-public-key": 461,
+    "./dispatchers/ping": 465,
+    "./dispatchers/get-entropy": 467
   }],
   46: [function(e, t, n)
   {
@@ -13361,12 +13365,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       o = e("./actions/character-ack-action"),
       s = e("./actions/initialize-action"),
       d = e("./actions/cancel-action"),
+      pingdev = e("./actions/ping-device-action"),
       c = e("./actions/wipe-device-action"),
       l = e("./actions/reset-device-action"),
       p = e("./actions/recover-device-action"),
       u = e("./actions/pin-matrix-ack-action"),
       f = e("./actions/firmware-upload-action"),
       g = e("./actions/get-address-action"),
+      entropy = e("./actions/get-entropy-action"),
       h = e("./actions/get-public-key-action"),
       m = e("./actions/sign-message-action"),
       b = e("./actions/encrypt-message-action"),
@@ -13394,6 +13400,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           r.rawFirmwareStreamFactory = n,
           r.initialize = i.partial(s.InitializeAction.operation, r, i),
           r.cancel = i.partial(d.CancelAction.operation, r),
+          r.pingDevice = i.partial(pingdev.PingDeviceAction.operation, r, i),
           r.wipeDevice = i.partial(c.WipeDeviceAction.operation, r),
           r.resetDevice = i.partial(l.ResetDeviceAction.operation, r, i),
           r.recoveryDevice = i.partial(p.RecoverDeviceAction.operation, r, i),
@@ -13402,6 +13409,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           r.characterAck = i.partial(o.CharacterAckAction.operation, r, i),
           r.firmwareUpload = i.partial(f.FirmwareUploadAction.operation, r, i),
           r.getAddress = i.partial(g.GetAddressAction.operation, r, i, i, i, null),
+          r.getEntropy = i.partial(entropy.GetEntropyAction.operation, r, i),
           r.getEthereumAddress = i.partial(w.GetEthereumAddressAction.operation, r, i, i),
           r.getPublicKey = i.partial(h.GetPublicKeyAction.operation, r, i, i, i),
           r.signMessage = i.partial(m.SignMessageAction.operation, r, i),
@@ -13557,6 +13565,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./entropy-request-message-handler": 156,
     "./features-service": 157,
     "./stateful-device-messenger": 169,
+    "./actions/ping-device-action": 466,
+    "./actions/get-entropy-action": 468,
     events: 296,
     lodash: 171
   }],
@@ -80496,6 +80506,132 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "./util/preconditions": 236
+  }],
+  465: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../MessageDispatcher"),
+      a = e("@keepkey/device-client/dist/device-client-manager"),
+      o = function()
+      {
+        function e()
+        {
+          this.messageType = "Ping",
+            this.responds = !0
+        }
+        return e.prototype.action = function(e)
+          {
+            return a.DeviceClientManager
+                    .instance
+                    .getActiveClient()
+                    .then(t => t.pingDevice(e))
+          },
+          e
+      }();
+    r.MessageDispatcher.when(new o)
+  },
+  {
+    "../MessageDispatcher": 6,
+    "@keepkey/device-client/dist/device-client-manager": 151
+  }],
+  466: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../device-message-helper"),
+      i = function()
+      {
+        function e()
+        {}
+        return e.operation = function(e, msg)
+          {
+            var protomsg = r.DeviceMessageHelper.factory("Ping");
+            return protomsg.setMessage(`KeepKey Message Ping: ${msg.message || 'OK'}`),
+              e.writeToDevice(protomsg)
+          },
+          e
+      }();
+    n.PingDeviceAction = i
+  },
+  {
+    "../device-message-helper": 153
+  }],
+  467: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../MessageDispatcher"),
+      a = e("@keepkey/device-client/dist/device-client-manager"),
+      ui = e("../../ui-messenger"),
+      o = function()
+      {
+        function e()
+        {
+          this.messageType = "GetEntropy",
+            this.responds = !0
+        }
+        return e.prototype.action = function(e)
+          {
+            return a.DeviceClientManager
+                    .instance
+                    .getActiveClient()
+                    .then(function(t)
+                    {
+                      return t.getEntropy(e)
+                    })
+                    .then(function(msg)
+                    {
+                      var entropybits = msg.entropy.toString('hex')
+                      ui.UiMessenger
+                        .sendMessageToUI("Entropy",
+                        {
+                          entropybits: entropybits
+                        })
+                    })
+          },
+          e
+      }();
+    r.MessageDispatcher.when(new o)
+  },
+  {
+    "../MessageDispatcher": 6,
+    "../../ui-messenger": 122,
+    "@keepkey/device-client/dist/device-client-manager": 151
+  }],
+  468: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../device-message-helper"),
+      i = function()
+      {
+        function e()
+        {}
+        return e.operation = function(e, msg)
+          {
+            var protomsg = r.DeviceMessageHelper.factory("GetEntropy");
+            return protomsg.setSize(msg.bytelength),
+              e.writeToDevice(protomsg)
+          },
+          e
+      }();
+    n.GetEntropyAction = i
+  },
+  {
+    "../device-message-helper": 153
   }],
 },
 {}, [1]);

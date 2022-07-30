@@ -2032,8 +2032,13 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.when('PassphraseRequest', t('/passphrase', 'slideLeft')),
       e.when('ButtonRequest', ['$injector', 'PinLockService', function(e, pinLock)
       {
-        if ('ButtonRequest_Address' !== this.request.message.code &&
-            'ButtonRequest_Other' !== this.request.message.code)
+        const ignorable =
+        [
+          'ButtonRequest_Address',
+          'ButtonRequest_GetEntropy',
+          'ButtonRequest_Other',
+        ]
+        if (!ignorable.includes(this.request.message.code))
         {
           var n, a = _.get(this, 'request.message.data');
           if ('ButtonRequest_ConfirmOutput' === this.request.message.code)
@@ -2091,8 +2096,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             e.invoke(n(), this);
             break;
           default:
-            a.set(this.request.message.message);
-            c = '/success/:message';
+            a.set(this.request.message.message) && (c = '/success/:message');
         }
         c && e.invoke(t(c), this)
       }]),
@@ -2745,6 +2749,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       set: function n(t)
       {
         e = t
+        return !!e
       },
       clear: function t()
       {
