@@ -4486,7 +4486,11 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var t = this;
             return i.map(e, function(e)
             {
-              return c.HistoryTransaction.fromEthereumTransaction(e, t.address, t.wallet.api.getTransactionExplorerUrl(e.hash))
+              return c.HistoryTransaction
+                      .fromEthereumTransaction(
+                        e,
+                        t.address.slice(2).toLowerCase(),
+                        t.wallet.api.getTransactionExplorerUrl(e.hash))
             })
           },
           t
@@ -7577,7 +7581,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               h, m;
             return t.getEthereumAddress(g, !1).then(function(e)
             {
-              return h = e.address.toHex(),
+              return h = e.address_str,
                 t.encryptNodeVector(f)
             }).then(function(e)
             {
@@ -7976,14 +7980,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return "https://api.etherscan.io/api?module=account&action=txlist&address=0x" + e + "&sort=desc&apikey=" + t
+              return "https://api.etherscan.io/api?module=account&action=txlist&address=" + e + "&sort=desc&apikey=" + t
             })
           },
           e.prototype.getInternalTransactionsUrl = function(e)
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return "https://api.etherscan.io/api?module=account&action=txlistinternal&address=0x" + e + "&sort=desc&apikey=" + t
+              return "https://api.etherscan.io/api?module=account&action=txlistinternal&address=" + e + "&sort=desc&apikey=" + t
             })
           },
           e.prototype.getPartialTransactionUrl = function()
@@ -7994,14 +7998,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return "https://api.etherscan.io/api?module=account&action=balance&address=0x" + e + "&tag=latest&apikey=" + t
+              return "https://api.etherscan.io/api?module=account&action=balance&address=" + e + "&tag=latest&apikey=" + t
             })
           },
           e.prototype.getWalletTokenUrl = function(e, t)
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(n)
             {
-              return "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=" + t + "&address=0x" + e + "&tag=latest&apikey=" + n
+              return "https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=" + t + "&address=" + e + "&tag=latest&apikey=" + n
             })
           },
           e.prototype.getWebsiteTransactionUrl = function(e)
@@ -8017,8 +8021,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(n)
             {
-              return e = e.startsWith("0x") ? e : "0x" + e,
-                "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
+              return "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
             })
           },
           e.prototype.getBlockchainDataUrl = function()
@@ -8032,8 +8035,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(t)
             {
-              return e = e.startsWith("0x") ? e : "0x" + e,
-                "https://api.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=" + e + "&sort=asc&apikey=" + t
+              return "https://api.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=" + e + "&sort=asc&apikey=" + t
             })
           },
           e
@@ -8131,7 +8133,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getXpub = function(e, t, n)
           {
             var r = u.Configuration.getDebugXpubs(this.coinNameText, n);
-            return r ? Promise.resolve(r) : e.getPublicKey(t, null, !1).then(function(e)
+            return r ? Promise.resolve(r) : e.getPublicKey(t, this.coinNameText, !1).then(function(e)
             {
               return e.getXpub()
             })
@@ -8315,7 +8317,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.extendChains = function(e, t)
           {
             var n = this,
-              i = new u.HDPublicKey(e.xpub),
+              i = new u.HDPublicKey(e.xpub, n.network.name),
               a = [],
               o = f.TransactionCacheRegistry.getInstance(e.id);
             return e.chains || (e.chains = [],
@@ -80128,7 +80130,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.prototype.getWalletUrl = function(e)
           {
-            return Promise.resolve([this.rootUrl, 'v2', 'address', '0x' + e].join('/'))
+            return Promise.resolve([this.rootUrl, 'v2', 'address', e].join('/'))
           },
           e.prototype.getWebsiteTransactionUrl = function(e)
           {
@@ -80147,8 +80149,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             return Promise.resolve(r.Configuration.etherscanApiToken).then(function(n)
             {
-              return e = e.startsWith("0x") ? e : "0x" + e,
-                "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
+              return "https://api.etherscan.io/api?module=account&action=txlist&startblock=" + t + "&address=" + e + "&sort=asc&apikey=" + n
             })
           },
           e.prototype.getBlockchainDataUrl = function()
