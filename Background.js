@@ -2238,25 +2238,17 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return e.prototype.action = function(e)
           {
             var t = a.AccountListManager.findAccount(e.account),
-              n = t.coinType === o.CoinName.Ethereum,
-              i;
-            return t.getReceiveAddressDetails(e.depth).then(function(e)
+              n = t.coinType === o.CoinName.Ethereum;
+            return t.getReceiveAddressDetails(e.depth).then(function(i)
             {
-              return i = e,
-                n ? t.deviceClient.getEthereumAddress(i.nodePath, !1) : t.deviceClient.getAddress(i.nodePath, i.coinType, !1)
-            }).then(function(o)
-            {
-              if (!o) return;
-              n ? t.deviceClient.getEthereumAddress(i.nodePath, !0) : t.deviceClient.getAddress(i.nodePath, i.coinType, !0);
-              var s;
-              return s = o.address_str ? o.address_str : n && o.address ? "0x" + o.address.toHex() : o.address,
-                r.UiMessenger.sendMessageToUI("ReceiveAddress",
-                {
-                  account: e.account,
-                  depth: e.depth,
-                  address: s,
-                  nodePath: i.nodePath.toString()
-                })
+              r.UiMessenger.sendMessageToUI("ReceiveAddress",
+              {
+                account: e.account,
+                depth: e.depth,
+                address: i.address,
+                nodePath: i.nodePath.toString()
+              })
+              return n ? t.deviceClient.getEthereumAddress(i.nodePath, !0) : t.deviceClient.getAddress(i.nodePath, i.coinType, !0);
             })
           },
           e
@@ -7134,7 +7126,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           return this.sendMessageToUi(e.$type.name, e),
             null
         },
-        e.messageNames = ["Address", "ButtonRequest", "CharacterRequest", "Failure", "PinMatrixRequest", "Success", "PassphraseRequest", "WordRequest"],
+        e.messageNames = ["Address", "EthereumAddress", "ButtonRequest", "CharacterRequest", "Failure", "PinMatrixRequest", "Success", "PassphraseRequest", "WordRequest"],
         e
     }();
     n.MessageForwarder = r
@@ -80185,24 +80177,28 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         }
         return e.prototype.action = function(e)
           {
-            var t = a.AccountListManager.findAccount(e.walletId),
-              nodePath;
+            var t = a.AccountListManager.findAccount(e.walletId);
             var coinName = t.wallet.api.apiHelper.coinType.name;
-            return t.nodePathPromise.then(function(e)
-            {
-              return nodePath = e,
-                t.deviceClient.getPublicKey(nodePath, coinName, !1)
-            }).then(function(o)
-            {
-              if (!o) return;
-              t.deviceClient.getPublicKey(nodePath, coinName, !0);
-              return r.UiMessenger.sendMessageToUI("PublicKey",
-                {
-                  account: e.walletId,
-                  address: o.xpub,
-                  nodePath: nodePath.toString()
-                })
-            })
+            return t.nodePathPromise
+                    .then(function(nodePath)
+                    {
+                      r.UiMessenger.sendMessageToUI("PublicKey",
+                      {
+                        account: e.walletId,
+                        address: t.wallet.data.xpub,
+                        nodePath: nodePath.toString()
+                      })
+                      return t.deviceClient.getPublicKey(nodePath, coinName, !0)
+                    })
+                    .then(function(o)
+                    {
+                      if (!o) return;
+                      return r.UiMessenger.sendMessageToUI("XPubAddress",
+                      {
+                        address: o.xpub,
+                        typename: "XPubAddress"
+                      })
+                    })
           },
           e
       }();
