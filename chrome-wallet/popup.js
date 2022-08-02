@@ -2930,7 +2930,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
   }]),
   angular.module('kkWallet').factory('PinLockService', [function()
   {
-    var validStates = {idle: 0, verify: 1, cancel: 2};
+    var validStates = Object.freeze({idle: 0, verify: 1, cancel: 2});
     var currState = validStates.idle;
     var pinLock =
     {
@@ -2939,7 +2939,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       verifying:  validStates.verify,
       cancelling: validStates.cancel
     }
-    return Object.defineProperty(pinLock, "state",
+    Object.defineProperty(pinLock, "state",
     {
       get: function()
       {
@@ -2950,6 +2950,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         if (s in Object.values(validStates)) currState = s;
       }
     })
+    return Object.freeze(pinLock)
   }]),
   angular.module('kkWallet').factory('ShapeShiftAuthTokenService', ['DeviceBridgeService', '$rootScope', 'environmentConfig', 'membershipPlatform', function(e, t, n, a)
   {
