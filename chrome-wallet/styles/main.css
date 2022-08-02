@@ -11819,6 +11819,7 @@ h6 {
 
 .content-inner-centering {
   position: relative;
+  letter-spacing: 0.02em;
   top: 50%;
   transform: translateY(-50%)
 }
@@ -11832,6 +11833,13 @@ h6 {
 
 .content-inner-centering.sending.two-column {
   justify-content: space-between
+}
+
+.content-inner-footer {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #confirm-word {
@@ -12524,6 +12532,18 @@ button.fa:focus {
 
 #receive .address-nav:hover {
   color: #777
+}
+
+#xpub .address-verify.msg,
+#receive .address-verify.msg {
+  font-weight: 700;
+  color: forestgreen;
+}
+
+#xpub .address-verify.verifyicon,
+#receive .address-verify.verifyicon {
+  font-size: 36px;
+  padding-right: 5px;
 }
 
 #acknowledgement title {
