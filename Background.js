@@ -79803,12 +79803,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         }
         return e.prototype.action = function()
           {
-            var e;
-            return a.DeviceClientManager.instance.getActiveClient().then(function(t)
-            {
-              return e = t,
-                e.endSession()
-            })
+            return a.DeviceClientManager
+                    .instance
+                    .getActiveClient()
+                    .then(t => t.endSession())
           },
           e
       }();
