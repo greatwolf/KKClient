@@ -220,7 +220,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       h = e("@keepkey/device-client/dist/device-client-manager"),
       m = e("@keepkey/device-client/dist/device-client"),
       b = e("./modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service"),
-      y = e("../manifest.json");
+      y = e("../manifest.json"),
+      BIP39Session = e("./bip39-session-service").BIP39Session;
     console.log("Keepkey Chrome Application Wallet:", y.version),
       chrome.app.runtime.onLaunched.addListener(function()
       {
@@ -299,6 +300,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               y = void 0,
               c.AccountListManager.clearAccountList(),
               b.BlockcypherApiTokenService.apiTokenPromise = null,
+              BIP39Session.clear(),
               s.UiMessenger.sendMessageToUI("disconnected",
               {
                 deviceId: e
@@ -375,7 +377,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./ui-messenger": 122,
     "@keepkey/device-client/dist/device-client": 152,
     "@keepkey/device-client/dist/device-client-manager": 151,
-    lodash: 368
+    lodash: 368,
+    "./bip39-session-service": 469
   }],
   2: [function(e, t, n)
   {
@@ -2929,6 +2932,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     var r = e("../MessageDispatcher"),
       i = e("../../account-list-manager"),
       a = e("@keepkey/device-client/dist/device-client-manager"),
+      BIP39Session = e("./bip39-session-service").BIP39Session,
+      ui = e("../../ui-messenger"),
+      handleSend = function(client, e, mismatch)
+      {
+        client  = mismatch
+                ? client.then(t => t.cancel())
+                : client.then(t => t.sendPassphrase(e.passphrase))
+        return client.then(function()
+        {
+          e.passphrase = ""
+        })
+      },
       o = function()
       {
         function e()
@@ -2938,13 +2953,29 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         }
         return e.prototype.action = function(e)
           {
-            return a.DeviceClientManager.instance.getActiveClient().then(function(t)
-              {
-                return t.sendPassphrase(e.passphrase)
-              }).then(function()
-              {
-                e.passphrase = ""
-              })
+            var activeClient = a.DeviceClientManager
+                                .instance
+                                .getActiveClient()
+            if (!BIP39Session.active)
+            {
+              BIP39Session.initiate(e.passphrase)
+              return handleSend(activeClient, e, false)
+            }
+            return BIP39Session
+                    .isSame(e.passphrase)
+                    .then(function (sameSession)
+                    {
+                      handleSend(activeClient, e, !sameSession).then(function()
+                      {
+                        if (!sameSession)
+                          ui.UiMessenger
+                            .sendMessageToUI("Conflicting Passphrase",
+                            {
+                              type: 'Passphrase',
+                              message: `BIP39 Passphrase Mismatch`
+                            })
+                      })
+                    })
           },
           e
       }();
@@ -2953,7 +2984,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     "../../account-list-manager": 2,
     "../MessageDispatcher": 6,
-    "@keepkey/device-client/dist/device-client-manager": 151
+    "../../ui-messenger": 122,
+    "@keepkey/device-client/dist/device-client-manager": 151,
+    "./bip39-session-service": 469
   }],
   36: [function(e, t, n)
   {
@@ -80629,6 +80662,57 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "../device-message-helper": 153
+  }],
+  469: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+
+    var buffer = e("buffer").Buffer
+    var pbkdf2 = e("pbkdf2").pbkdf2
+    const ROUNDS = 100000
+    const KEYLEN = 16
+    const DIGEST = 'sha512'
+    var sessionid, salt
+    var setSession = function(_, hash) { sessionid = hash }
+    n.BIP39Session = function() {}
+    n.BIP39Session.initiate = function(passphrase)
+    {
+      salt = new buffer(KEYLEN)
+      crypto.getRandomValues(salt)
+      pbkdf2(passphrase, salt, ROUNDS, KEYLEN, DIGEST, setSession)
+    }
+    n.BIP39Session.isSame = function(passphrase)
+    {
+      return new Promise(function(resolve)
+      {
+        pbkdf2(passphrase, salt, ROUNDS, KEYLEN, DIGEST, function(_, hash)
+        {
+          resolve(hash.compare(sessionid) == 0)
+        })
+      })
+    }
+    n.BIP39Session.clear = function()
+    {
+      sessionid = undefined
+      salt = undefined
+    }
+    Object.defineProperty(n.BIP39Session, "active",
+    {
+      get: function t()
+      {
+        return !!(sessionid && salt)
+      },
+      enumerable: !0,
+      configurable: !1
+    })
+  },
+  {
+    buffer: 299,
+    pbkdf2: 380
   }],
 },
 {}, [1]);
