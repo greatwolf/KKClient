@@ -390,6 +390,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       },
       e.togglePassphrase = function(e)
       {
+        n.setNextTransition('slideLeft'),
         o.enablePassphrase(
           {
             enabled: !e.passphrase_protection
