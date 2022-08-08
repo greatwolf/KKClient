@@ -394,8 +394,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         o.enablePassphrase(
           {
             enabled: !e.passphrase_protection
-          }),
-          o.initialize()
+          })
       },
       e.supportsRecoveryDryRun = i.get('deviceCapabilities.supportsRecoveryDryRun'),
       e.recoveryDryRun = function()
@@ -2084,13 +2083,15 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
               c = '/initialize';
             break;
           case 'Settings applied':
-            a.set('Your device settings were successfully changed!');
-              if (o.wallets.length)
-              {
-                c = '/device';
-                br.initialize();
-              }
-              else c = '/lifeboat';
+            var settings_msg = 'Your device settings were successfully changed!'
+            if (o.wallets.length)
+            {
+              c = '/device';
+              settings_msg += ' Reinitializing accounts.'
+              setTimeout(br.reinitialize, 1500);
+            }
+            else c = '/lifeboat';
+            a.set(settings_msg);
             break;
           case 'PIN changed':
             a.set('Your PIN was successfully changed!'),
@@ -3166,7 +3167,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       e.sendAllowed = function(t)
       {
         var a = n.getWalletById(e.walletId, t);
-        return !a.highConfidenceBalance.isZero()
+        return !!a && !a.highConfidenceBalance.isZero()
       },
       e.isToken = function(e)
       {

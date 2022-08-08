@@ -408,6 +408,11 @@ angular.module('kkCommon').provider('DeviceBridgeService', function() {
                     messageType: 'ResetFirstRun'
                 })
             },
+            reinitialize: function a() {
+                return h({
+                    messageType: 'Reinitialize'
+                })
+            },
             verifyDevice: function a() {
                 return h({
                     messageType: 'VerifyDevice'

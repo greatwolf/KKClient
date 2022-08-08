@@ -3682,6 +3682,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       e("./dispatchers/word-ack"),
       e("./dispatchers/enable-policy"),
       e("./dispatchers/get-public-key"),
+      e("./dispatchers/reinitalize"),
       e("./dispatchers/otherwise")
   },
   {
@@ -3727,7 +3728,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "./dispatchers/word-ack": 44,
     "./dispatchers/get-public-key": 461,
     "./dispatchers/ping": 465,
-    "./dispatchers/get-entropy": 467
+    "./dispatchers/get-entropy": 467,
+    "./dispatchers/reinitalize": 470
   }],
   46: [function(e, t, n)
   {
@@ -80711,6 +80713,52 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     buffer: 299,
     pbkdf2: 380
+  }],
+  470: [function(e, t, n)
+  {
+    "use strict";
+    Object.defineProperty(n, "__esModule",
+    {
+      value: !0
+    });
+    var r = e("../MessageDispatcher"),
+      i = e("../../account-list-manager"),
+      a = e("./modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service"),
+      ui = e("./ui-messenger"),
+      o = e("./bip39-session-service"),
+      s = function()
+      {
+        function e()
+        {
+          this.messageType = "Reinitialize",
+            this.responds = !1
+        }
+        return e.prototype.action = function()
+          {
+            return new Promise(function(resolve)
+            {
+              i.AccountListManager.clearAccountList()
+              a.BlockcypherApiTokenService.apiTokenPromise = null
+              o.BIP39Session.clear()
+              ui.UiMessenger.sendMessageToUI("disconnected",
+              {
+                message: "Reinitializing Session"
+              })
+              r.MessageDispatcher.execute("Cancel")
+              r.MessageDispatcher.execute("Initialize")
+              resolve()
+            })
+          },
+          e
+      }();
+    r.MessageDispatcher.when(new s)
+  },
+  {
+    "../../account-list-manager": 2,
+    "../MessageDispatcher": 6,
+    "./modules/keepkeyjs/blockchainApis/blockcypher-metadata/blockcypher-api-token-service": 70,
+    "./ui-messenger": 122,
+    "./bip39-session-service": 469
   }],
 },
 {}, [1]);
