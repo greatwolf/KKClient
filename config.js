@@ -38,7 +38,7 @@ export const CONFIG =
   {
     applicationId: "hmldnhmidmcofnbojkgfnibmhmjopbpc"
   },
-  selectedFeeService: "blkhub",
+  selectedFeeService: "btcfee",
   feeServices:
   {
     btcfee:

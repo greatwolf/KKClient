@@ -14959,7 +14959,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://litecoinblockexplorer.net",
+              "https://litecoin.blockbook.chains.klever.io",
             ],
             txUrlExplorer: "https://blockchair.com/litecoin/transaction/",
             feeProfile:
