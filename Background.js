@@ -14158,6 +14158,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       identity:
       {
+        vendor: "keepkey.com",
+        bootloader_mode: !0,
+        major_version: 2,
+        minor_version: 1
+      },
+      capabilities:
+      {
+        vendorName: "KeepKey",
+        firmwareImageAvailable: !0,
+        bootloaderUpgradable: !1,
+        bootloaderUpgradeSkipable: !0
+      }
+    },
+    {
+      identity:
+      {
         vendor: "bitcointrezor.com",
         major_version: 1,
         minor_version: 3,
@@ -14554,12 +14570,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       isBootloaderUpdater: !0
     },
     {
-      file: "firmware_v6.4.0.bin",
-      digest: "0ef1b51a450fafd8e0586103bda38526c5d012fc260618b8df5437cba7682c5b",
-      trezorDigest: "ade19db7c934a0fea7db563ed279c3937985fbd78f34c1c07f80aa875ee2ac72",
-      size: 478868,
-      timeStamp: "2020-02-20T20:39:52.346Z",
-      version: "6.4.0",
+      file: "firmware_v7.4.0.bin",
+      digest: "43472b6fc1a3c9a2546ba771af830005f5758acbd9ea0679d4f20d480f63a040",
+      trezorDigest: "b1841d4a659d87909030423cccb8b83133314fd72edceba5a72071636ea5cb11",
+      size: 529356,
+      timeStamp: "2022-08-07T12:31:00.000Z",
+      version: "7.4.0",
       isBootloaderUpdater: !1
     }]
   },
