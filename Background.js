@@ -15571,9 +15571,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e(e)
         {
-          var rev = buffer(e.revision.toBuffer());
+          var rev = buffer(e.revision ? e.revision.toBuffer() : 0);
           e.revision = rev.toString(rev.length > 20 ? '' : 'hex');
-          e.device_id = e.device_id.toLowerCase();
+          e.device_id = (e.device_id || '').toLowerCase();
           this.data = e
         }
         return Object.defineProperty(e.prototype, "version",
