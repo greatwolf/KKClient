@@ -8223,7 +8223,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 {
                   name: this.coinType.name.toLowerCase(),
                   pubkeyhash: this.coinType.pubkeyhash,
-                  scripthash: this.coinType.scripthash
+                  scripthash: this.coinType.scripthash,
+                  xpubkey: this.coinType.xpubkey
                 })),
                 this._network
             },
