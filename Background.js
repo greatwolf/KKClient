@@ -78410,6 +78410,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 return p.BlockbookDataTranslator.utxoSummary(unspentTx, self.coinType)
               })
+              return resp
+            }
+            var updateUsedAddresses = function(resp)
+            {
+              resp.filter(unspentTx => unspentTx.confirmations < 1)
+                  .filter(unspentTx => unspentTx.address in wallet.addresses)
+                  .map(unspentTx => unspentTx.address)
+                  .forEach(function(utxoAddress)
+                  {
+                    wallet.addresses[utxoAddress].hasTransactions = true
+                  })
+              return resp
             }
             var chainTasks = []
             chainTasks.push(
@@ -78425,7 +78437,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   .getUtxoUrl(wallet.xpub)
                   .then(m.BBapiThrottler.get)
                   .catch(handleBadUtxoResponse)
-                  .then(processUtxoSummary))
+                  .then(processUtxoSummary)
+                  .then(updateUsedAddresses))
 
             return Promise.all(chainTasks)
                           .then(function()
