@@ -8622,7 +8622,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return {
               address: r.get(e, "addr", void 0),
               outputIndex: e.coinbase ? -1 : r.get(e, "vout"),
-              value: Math.round(t.parseAmount(r.get(e, "value", 0)) * 1e8),
+              value: t.floatToAmount(r.get(e, "value", 0)),
               prevHash: i.fromHex(r.get(e, "txid", "0000000000000000000000000000000000000000000000000000000000000000")),
               script: i.fromHex(r.get(e, "scriptSig.hex", r.get(e, "coinbase", ""))),
               sequence: e.sequence
@@ -78682,7 +78682,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return {
               address: r.get(e, "addresses.0", void 0),
               outputIndex: e.coinbase ? -1 : r.get(e, "vout"),
-              value: Math.round(t.parseAmount(r.get(e, "value", 0)) * 1e8),
+              value: t.floatToAmount(r.get(e, "value", 0)),
               prevHash: i.fromHex(r.get(e, "txid", "0000000000000000000000000000000000000000000000000000000000000000")),
               script: i.fromHex(r.get(e, "scriptSig.hex", r.get(e, "coinbase", ""))),
               sequence: e.sequence
