@@ -7182,7 +7182,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         {}
         return e.responseFilter = function(t)
           {
-            var n = t.replace(/:[^\w\"]*((\d+(\.\d*)?)|(\.\d+))/g, function(e, t)
+            var n = t.replace(/:[^\w\"]*(((\d+(\.\d*)?)|(\.\d+))(e[+-]\d\d)?)/g, function(e, t)
             {
               return 12 >= t.length ? e : ": \"BigNumber:" + t + "\""
             });
