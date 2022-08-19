@@ -3940,6 +3940,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               e.highConfidenceBalance = t.highConfidenceBalance,
                 e.lowConfidenceBalance = t.lowConfidenceBalance,
                 e.hasTransactionHistory = t.hasTransactionHistory
+              if (t.instantLockBalance)
+                e.instantLockBalance = t.instantLockBalance
             });
             if (n.push(o),
               this.subAccounts)
@@ -4659,6 +4661,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             enumerable: !0,
             configurable: !0
           }),
+          Object.defineProperty(t.prototype, "instantLockBalance",
+          {
+            get: function e()
+            {
+              var balance = this.wallet.data.instantLockBalance
+              return balance && !balance.isZero()
+                   ? new h.BigNumber(balance)
+                   : undefined
+            },
+            enumerable: !0,
+            configurable: !0
+          }),
           t.prototype.initialize = function()
           {
             this._externalAddressChain = new c.ChainedAddressStrategy(this.nodePathPromise, this.wallet, o.Subchain.EXTERNAL),
@@ -4873,10 +4887,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           t.prototype.extractTransactionHistory = function(e)
           {
             var t = this,
+              instantLockTxs = t.wallet.data.unconfirmedTxs
+                                .filter(n => n.instantLocked)
+                                .map(n => n.hash.toHex()),
               n = i.map(e, function(e)
               {
-                return console.assert(0 !== e.inputs.length, "There must be inputs to a transaction"),
-                  g.HistoryTransaction.fromDetailedTransaction(e, t.wallet.data.addresses, t.wallet.api.getTransactionExplorerUrl(e.hash))
+                console.assert(0 !== e.inputs.length, "There must be inputs to a transaction")
+                var result = g.HistoryTransaction
+                              .fromDetailedTransaction (e, t.wallet.data.addresses,
+                                                        t.wallet.api.getTransactionExplorerUrl(e.hash))
+                if (i.includes(instantLockTxs, e.hashHex))
+                {
+                  result.instantLocked = true
+                  result.confidence = 1
+                  result.pending = false
+                }
+                return result
               });
             return n
           },
@@ -6978,17 +7004,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             },
             e.prototype.serialize = function()
             {
-              return {
-                date: this.timestamp.toISOString(),
-                confidence: this.confidence,
-                amountReceived: this.amountReceived,
-                amountSent: this.amountSent,
-                fee: this.fee,
-                addresses: this.addresses,
-                pending: this.pending,
-                link: this.link,
-                netAmount: this.netAmount
-              }
+              var serialized = r.assign({ date: this.timestamp.toISOString() }, this)
+              delete serialized.timestamp
+              return serialized
             },
             e)
       }();
@@ -9898,7 +9916,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           }),
           e.prototype.update = function(e)
           {
-            this._data ? r.merge(this._data, e) : this._data = e
+            if (this._data)
+            {
+              r.merge(this._data, e)
+              this._data.unconfirmedTxs = r.clone(e.unconfirmedTxs)
+            }
+            else this._data = e
           },
           e
       }();
@@ -14696,6 +14719,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           this.insight = e.insight,
           this.txUrlExplorer = e.txUrlExplorer,
           this.feeProfile = e.feeProfile || {},
+          this.supportsInstantSend = e.supportsInstantSend,
           this.exchangeForbidden = !!this.configuration.exchangeForbidden
         }
         var b58regex = function(prefix, len)
@@ -15022,6 +15046,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: b58regex('[X7]', 1),
             dust: e.oldDustCalculation(10000),
             defaultDecimals: 8,
+            supportsInstantSend: true,
             blockbook:
             [
               "https://dash.atomicwallet.io",
@@ -78403,6 +78428,66 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               wallet.txHist = p.BlockbookDataTranslator.hashFromTxids(resp.txids || [])
               return resp
             }
+            var fetchInstantSendFlag = function(txid, i)
+            {
+              return self.walletApi.urlGenerator
+                .getTransactionSpecificUrl(txid.hash.toHex())
+                .then(m.BBapiThrottler.get)
+                .then(function(resp)
+                {
+                  txid.instantLocked = resp.instantlock
+                })
+            }
+            var computeNetAmount = function(txid, i)
+            {
+              return self.walletApi.urlGenerator
+                .getTransactionUrl(txid.hash.toHex())
+                .then(m.BBapiThrottler.get)
+                .then(function(resp)
+                {
+                  var translator = p.BlockbookDataTranslator
+                  var criteria = function(str)
+                  {
+                    return function(n) { return r.get(n, str) in wallet.addresses }
+                  }
+                  resp.vin = resp.vin.filter(criteria('addresses[0]'))
+                  resp.vout = resp.vout.filter(criteria('scriptPubKey.addresses[0]'))
+                  var inputAmount = translator.transactionInputs(resp.vin, self.coinType).value
+                  var outputAmount = translator.transactionOutputs(resp.vout, self.coinType).value
+                  txid.netAmount = outputAmount.minus(inputAmount)
+                })
+            }
+            var processInstantSend = function(resp, resolve)
+            {
+              if (!self.coinType.supportsInstantSend) return resolve(), resp
+              var isInstantSend, netAmounts
+              var cachedUnconfirmedTxs = r.get(self.walletDataCache, [wallet.id, 'unconfirmedTxs'], [])
+              var unconfirmedTxs = wallet.unconfirmedTxs
+              var hashStr = function(txid) { return txid.hash.toHex() }
+              unconfirmedTxs = r.unionBy (r.intersectionBy(cachedUnconfirmedTxs,
+                                                          unconfirmedTxs, hashStr),
+                                          unconfirmedTxs, hashStr)
+              isInstantSend = unconfirmedTxs.filter(n => !n.instantLocked).map(fetchInstantSendFlag)
+              netAmounts = unconfirmedTxs.filter(n => !n.netAmount).map(computeNetAmount)
+              wallet.unconfirmedTxs = unconfirmedTxs
+              Promise.all(r.union(isInstantSend, netAmounts))
+                .then(function()
+                {
+                  var sumInstantLocked = function(sum, n)
+                  {
+                    return sum.plus(n.netAmount)
+                  }
+                  var total = wallet.unconfirmedTxs
+                                    .filter(n => n.instantLocked)
+                                    .reduce(sumInstantLocked,
+                                            self.coinType.floatToAmount(0))
+                  wallet.highConfidenceBalance = wallet.highConfidenceBalance.plus(total)
+                  wallet.lowConfidenceBalance = wallet.lowConfidenceBalance.minus(total)
+                  wallet.instantLockBalance = total
+                })
+                .then(resolve)
+              return resp
+            }
             var processUtxoSummary = function(resp)
             {
               if (!resp.length && resp.utxos) resp = resp.utxos
@@ -78423,6 +78508,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   })
               return resp
             }
+            var taskWrap = function(func, taskList)
+            {
+              var resolve
+              taskList.push(new Promise(r => resolve = r))
+              return function(parm)
+              {
+                return func(parm, resolve)
+              }
+            }
             var chainTasks = []
             chainTasks.push(
               this.walletApi.urlGenerator
@@ -78431,7 +78525,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   .catch(handleBadXpubResponse)
                   .then(processDerived)
                   .then(processUnconfirmedTxs)
-                  .then(processTxHist))
+                  .then(processTxHist)
+                  .then(taskWrap(processInstantSend, chainTasks)))
             chainTasks.push(
               this.walletApi.urlGenerator
                   .getUtxoUrl(wallet.xpub)
@@ -78797,6 +78892,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.getTransactionUrl = function(e)
           {
             return Promise.resolve(this.rootUrl + "/tx/" + e)
+          },
+          e.prototype.getTransactionSpecificUrl = function(e)
+          {
+            return Promise.resolve(this.rootUrl + "/tx-specific/" + e)
           },
           e.prototype.getWebsiteTransactionUrl = function(e)
           {
