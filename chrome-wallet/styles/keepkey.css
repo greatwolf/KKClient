@@ -409,6 +409,13 @@ th
   content: "\f054\f054"
 }
 
+.fa-instantsend:before
+{
+  color: skyblue;
+  padding-right: 5px;
+  content: "\f0e7"
+}
+
 @font-face
 {
   font-family: "Glyphicons Halflings";

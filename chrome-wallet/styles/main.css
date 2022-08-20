@@ -13433,6 +13433,14 @@ a:hover {
   margin: 0 20px
 }
 
+.account-balance-component .unconfirmed-balance .instantsend-icon{
+  color: skyblue
+}
+
+.account-balance-component .unconfirmed-balance .instantsend-balance{
+  padding: 0 5px
+}
+
 .account-balance-component .unconfirmed-balance .wallet-currency {
   display: none
 }
