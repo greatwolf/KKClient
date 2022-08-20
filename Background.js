@@ -15044,7 +15044,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             name: s.CoinName[s.CoinName.Dash = 5] = "Dash",
             addressFormat: b58regex('[X7]', 1),
-            dust: e.oldDustCalculation(10000),
+            dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
             supportsInstantSend: true,
             blockbook:
