@@ -14780,6 +14780,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 loadable_coins = r.intersection(firmware_coins, client_coins);
             var configByName  = r.keyBy(e.config, 'name'),
                 featureByName = r.keyBy(featureCoins, 'coin_name');
+            e.clearList()
             loadable_coins.forEach(function(i)
             {
               e.makeInstance(featureByName[i], configByName[i])
