@@ -12100,7 +12100,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   {
     t.exports = {
       name: "KeepKey Client",
-      version: "6.6.5",
+      version: "6.7.5",
       description: "A simple cryptocurrency wallet that integrates with the KeepKey device",
       manifest_version: 2,
       icons:
