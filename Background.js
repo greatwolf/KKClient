@@ -388,12 +388,14 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       value: !0
     });
     var r = e("lodash"),
-      i = function()
+      i = e("../services/transaction-cache-registry"),
+      a = function()
       {
         function e()
         {}
         return e.clearAccountList = function()
           {
+            i.TransactionCacheRegistry.clearCache()
             e.accountList.length = 0,
               e._loaded = !1
           },
@@ -470,9 +472,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e._loaded = !1,
           e
       }();
-    n.AccountListManager = i
+    n.AccountListManager = a
   },
   {
+    "../services/transaction-cache-registry": 121,
     lodash: 368
   }],
   3: [function(e, t, n)
@@ -11997,6 +12000,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         e.registerInstance = function(t, n)
         {
           e._instances[t] ? console.log("new txCache not registered, one is already registered") : e._instances[t] = n
+        },
+        e.clearCache = function()
+        {
+          for (var k in e._instances) delete e._instances[k]
         },
         e._instances = {},
         e
