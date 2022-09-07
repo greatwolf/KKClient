@@ -4846,7 +4846,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 return e.translateAddressToNodeVector(t.address).then(function(e)
                 {
-                  t.nodePath = e
+                  // `translateAddressToNodeVector` only knows about 'SPENDADDRESS'
+                  // this is undefined if `t.address` is any other `script_type`
+                  if (e) t.nodePath = e
                 })
               }))
             }).then(function() {})
@@ -5712,6 +5714,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               txHash: e.hash,
               outputIndex: e.outputIndex,
               addressN: e.nodePath,
+              script_type: e.script_type,
               transaction: t,
               value: t.outputs[e.outputIndex].amount
             }
@@ -8136,11 +8139,38 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             var n = this,
               c = d.NodeVector.join([this.rootNodeVector, "m/" + t + "'"]),
-              p;
-            return this.getXpub(e, c, t).then(function(e)
+              xpubkeys = {};
+            var coinType = a.WalletApiFactory
+                            .getInstance(this.coinName)
+                            .apiHelper
+                            .coinType
+            const mask_harden = 0x7fffffff
+            var addXPubTask = function(tasks, nodevector, xpubkeys)
             {
-              p = e
-            }).then(function()
+              if (!nodevector) return
+              if (typeof nodevector === 'string')
+                nodevector = d.NodeVector.fromString(nodevector)
+              console.assert(nodevector instanceof d.NodeVector)
+              var purpose_lookup =
+              {
+                44: 'xpub',
+                49: 'ypub',
+                84: 'zpub'
+              }
+              var purpose = purpose_lookup[nodevector._value[0] & mask_harden]
+              var pending = n.getXpub(e, nodevector, t)
+                            .then(function(xpubstr)
+                            {
+                              xpubkeys[purpose] = xpubstr
+                            })
+              tasks.push(pending)
+            }
+            const slip044 = n.rootNodeVector._value[1] & mask_harden
+            var pendingXPub = []
+            addXPubTask(pendingXPub, c, xpubkeys)
+            addXPubTask(pendingXPub, coinType.ypubkey && `m/49'/${slip044}'/${t}'`, xpubkeys)
+            addXPubTask(pendingXPub, coinType.zpubkey && `m/84'/${slip044}'/${t}'`, xpubkeys)
+            return Promise.all(pendingXPub).then(function()
             {
               return e.encryptNodeVector(c)
             }).then(function(e)
@@ -8150,7 +8180,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               var t = e.toString(),
                 r = a.WalletApiFactory.getInstance(n.coinName);
-              return o.InsightXpubRegistry.instance.registerXpub(t, p),
+              return o.InsightXpubRegistry.instance.registerXpub(t, xpubkeys),
                 r.getExistingWallet(t)
             }).catch(function(e)
             {
@@ -8255,12 +8285,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.loadWallet = function(e)
           {
             var t = this,
-              n = this.xpubRegistry.getXpub(e),
-              r;
+              n = this.xpubRegistry.getXpub(e, {xpub: t.coinType.xpubkey}),
+              w;
             return n ? h.BlockcypherMetadataApi.get(e, this.coinType).then(function(a)
             {
               var o = {};
-              return a.encrypted_name ? (o.xpub = n,
+              return a.encrypted_name ? (r.assign(o, n),
                 o.id = e,
                 o.hasTransactionHistory = !1,
                 o.highConfidenceBalance = t.coinType.parseAmount(0),
@@ -8270,8 +8300,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 o.unconfirmedTxs = [],
                 o.unspentTxs = [],
                 t.walletApi.setWalletMetadata(o, a),
-                r = new i.Wallet(o, t.walletApi),
-                r) : void console.warn("encrypted name not set for insight wallet id " + e)
+                w = new i.Wallet(o, t.walletApi),
+                w) : void console.warn("encrypted name not set for insight wallet id " + e)
             }).then(function(e)
             {
               if (e)
@@ -8280,7 +8310,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               if (e)
                 e.txHist.sort(byConfirmations)
-              return r
+              return w
             }) : Promise.reject("the xpub for " + e + " is not registered.")
           },
           e.prototype.getBlockHeightFromBlockchainData = function(e)
@@ -8308,9 +8338,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.createWallet = function(e, t)
           {
             var n = this,
-              r = s.PayloadFactory.createWalletMetaDataPayload(t);
-            return this.xpubRegistry.registerXpub(e, t.xpub),
-              r.then(function(r)
+              metaPayload = s.PayloadFactory.createWalletMetaDataPayload(t);
+            return this.xpubRegistry.registerXpub(e, r.pick(t, ['xpub'])),
+              metaPayload.then(function(r)
               {
                 return n.walletApi.updateStoredMetadata(e, r).then(function()
                 {
@@ -10823,8 +10853,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       {
         function e(e, t)
         {
-          this.feeService = e,
-            this.candidateTransactions = t
+          this.feeService = e
+          this.candidateTransactions = t
+          this.candidateTransactions
+              .forEach(function(tx)
+              {
+                tx.tx_hash = tx.hash.toHex()
+                tx.tx_output_n = tx.outputIndex
+                !tx.script_type && (tx.script_type = 'SPENDADDRESS')
+              })
         }
         return e.prototype.selectTransactions = function(e, t)
           {
@@ -10832,9 +10869,16 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var n = this.sortTransactionsByAge(i.clone(this.candidateTransactions));
             return this.selectNextInput([], n, e, t)
           },
-          e.prototype.txAgeComparison = function(e, t)
+          e.prototype.txAgeComparison = function(lhs, rhs)
           {
-            return void 0 === t ? 1 : e.confirmations === t.confirmations ? e.tx_hash > t.tx_hash ? -1 : e.tx_hash < t.tx_hash ? 1 : t.tx_output_n === e.tx_output_n ? 0 : t.tx_output_n - e.tx_output_n : t.confirmations - e.confirmations
+            if (void 0 === rhs) return 1
+            // default string lexical comparison happens to have the desired behavior.
+            // order by script_type: SPENDWITNESS > SPENDP2SHWITNESS > SPENDADDRESS
+            if (lhs.script_type !== rhs.script_type)      return rhs.script_type > lhs.script_type ? 1 : -1
+            if (lhs.confirmations !== rhs.confirmations)  return rhs.confirmations - lhs.confirmations
+            if (lhs.tx_hash === rhs.tx_hash)              return rhs.tx_output_n - lhs.tx_output_n
+            if (lhs.tx_hash < rhs.tx_hash)                return 1
+            return -1
           },
           e.prototype.sortTransactionsByAge = function(e)
           {
@@ -11132,7 +11176,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             return t.setAddressN(e.addressN.toArray()),
               t.setPrevHash(e.txHash),
               t.setPrevIndex(e.outputIndex),
-              t.setScriptType(0),
+              t.setScriptType(e.script_type || 0),
               t.setAmount(e.value.toNumber()),
               t
           },
@@ -11951,6 +11995,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       value: !0
     });
+    var _ = e("lodash")
     var r = function()
     {
       function e()
@@ -11969,17 +12014,24 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         }),
         e.prototype.registerXpub = function(e, t)
         {
-          this.registeredXpubs[e] = t
+          if (!this.registeredXpubs[e])
+            this.registeredXpubs[e] = t
+          else _.assign(this.registeredXpubs[e], t)
         },
-        e.prototype.getXpub = function(e)
+        e.prototype.getXpub = function(e, xpub_fields)
         {
-          return this.registeredXpubs[e]
+          xpub_fields = _.keys(_.pickBy(xpub_fields))
+          return xpub_fields
+              ? _.pick(this.registeredXpubs[e], xpub_fields)
+              : this.registeredXpubs[e]
         },
         e
     }();
     n.InsightXpubRegistry = r
   },
-  {}],
+  {
+    lodash: 368
+  }],
   121: [function(e, t, n)
   {
     "use strict";
@@ -12740,6 +12792,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 var o = i.DeviceMessageHelper.factory("GetPublicKey");
                 o.setAddressN(r.NodeVector.fromString(t).toArray());
                 coinName && o.setCoinName(coinName);
+                switch (o.address_n[0] & mask_harden)
+                {
+                  case 49: o.setScriptType('SPENDP2SHWITNESS'); break;
+                  case 84: o.setScriptType('SPENDWITNESS'); break;
+                  default: o.setScriptType(null)
+                }
                 switch ((o.address_n[1] || 0) & mask_harden)
                 {
                   // identify altcoins by SLIP0044 index
@@ -14820,6 +14878,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 a.pubkeyhash = t.address_type,
                 a.scripthash = t.address_type_p2sh,
                 a.xpubkey = t.xpub_magic,
+                a.ypubkey = t.xpub_magic_segwit_p2sh,
+                a.zpubkey = t.xpub_magic_segwit_native,
                 !t.contract_address || (a.isToken = !0,
                   a.contractAddressString = "0x" + t.contract_address.toHex(),
                   t.gas_limit = t.gas_limit || i.fromHex("000000000000000000000000000000000000000000000000000000000001e848"),
@@ -35011,6 +35071,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           privatekey: e.privatekey,
           scripthash: e.scripthash,
           xpubkey: e.xpubkey,
+          ypubkey: e.ypubkey,
+          zpubkey: e.zpubkey,
           xprivkey: e.xprivkey
         }),
         e.networkMagic && d.defineImmutable(t,
@@ -78243,7 +78305,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   name: this.coinType.name.toLowerCase(),
                   pubkeyhash: this.coinType.pubkeyhash,
                   scripthash: this.coinType.scripthash,
-                  xpubkey: this.coinType.xpubkey
+                  xpubkey: this.coinType.xpubkey,
+                  ypubkey: this.coinType.ypubkey,
+                  zpubkey: this.coinType.zpubkey
                 })),
                 this._network
             },
@@ -78253,12 +78317,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.loadWallet = function(e)
           {
             var t = this,
-              n = this.xpubRegistry.getXpub(e),
-              r;
+              n = this.xpubRegistry
+                      .getXpub(e,
+                      {
+                        xpub: t.coinType.xpubkey,
+                        ypub: t.coinType.ypubkey,
+                        zpub: t.coinType.zpubkey
+                      }),
+              w;
             return n ? h.BlockcypherMetadataApi.get(e, this.coinType).then(function(a)
             {
               var o = {};
-              return a.encrypted_name ? (o.xpub = n,
+              return a.encrypted_name ? (r.assign(o, n),
                 o.id = e,
                 o.hasTransactionHistory = !1,
                 o.highConfidenceBalance = t.coinType.parseAmount(0),
@@ -78268,15 +78338,15 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 o.unconfirmedTxs = [],
                 o.unspentTxs = [],
                 t.walletApi.setWalletMetadata(o, a),
-                r = new i.Wallet(o, t.walletApi),
-                r) : void console.warn("encrypted name not set for blockbook wallet id " + e)
+                w = new i.Wallet(o, t.walletApi),
+                w) : void console.warn("encrypted name not set for blockbook wallet id " + e)
             }).then(function(e)
             {
               if (e)
                 return t.extendChains(e.data, [a.Subchain.EXTERNAL, a.Subchain.CHANGE])
             }).then(function()
             {
-              return r
+              return w
             }) : Promise.reject("the xpub for " + e + " is not registered.")
           },
           e.prototype.getBlockHeightFromBlockchainData = function(e)
@@ -78304,9 +78374,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e.prototype.createWallet = function(e, t)
           {
             var n = this,
-              r = s.PayloadFactory.createWalletMetaDataPayload(t);
-            return this.xpubRegistry.registerXpub(e, t.xpub),
-              r.then(function(r)
+              metaPayload = s.PayloadFactory.createWalletMetaDataPayload(t);
+            return this.xpubRegistry.registerXpub(e, r.pick(t, ['xpub'])),
+              metaPayload.then(function(r)
               {
                 return n.walletApi.updateStoredMetadata(e, r).then(function()
                 {
@@ -78516,6 +78586,30 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   })
               return resp
             }
+            var processUtxoExtra = function(script_type)
+            {
+              return function(resp)
+              {
+                if (!resp.length && resp.utxos) resp = resp.utxos
+                var unspentTxSegshit = resp.map(function(unspentTxRaw)
+                {
+                  var unspentTx         = p.BlockbookDataTranslator.utxoSummary(unspentTxRaw, self.coinType)
+                  unspentTx.script_type = script_type
+                  unspentTx.nodePath    = g.NodeVector.fromString(unspentTxRaw.path)
+                  return unspentTx
+                })
+                var unspentTxSum =
+                unspentTxSegshit.filter(unspentTx => unspentTx.isConfirmed)
+                                .map(unspentTx => unspentTx.value)
+                                .reduce(function(a, b)
+                                {
+                                  return a.plus(b)
+                                }, wallet.highConfidenceBalance)
+                wallet.unspentTxs = r.concat(unspentTxSegshit, wallet.unspentTxs)
+                wallet.highConfidenceBalance = unspentTxSum
+                return resp
+              }
+            }
             var taskWrap = function(func, taskList)
             {
               var resolve
@@ -78542,6 +78636,20 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   .catch(handleBadUtxoResponse)
                   .then(processUtxoSummary)
                   .then(updateUsedAddresses))
+            wallet.ypub &&
+            chainTasks.push(
+              this.walletApi.urlGenerator
+                  .getUtxoUrl(wallet.ypub)
+                  .then(m.BBapiThrottler.get)
+                  .catch(handleBadUtxoResponse)
+                  .then(processUtxoExtra('SPENDP2SHWITNESS')))
+            wallet.zpub &&
+            chainTasks.push(
+              this.walletApi.urlGenerator
+                  .getUtxoUrl(wallet.zpub)
+                  .then(m.BBapiThrottler.get)
+                  .catch(handleBadUtxoResponse)
+                  .then(processUtxoExtra('SPENDWITNESS')))
 
             return Promise.all(chainTasks)
                           .then(function()
