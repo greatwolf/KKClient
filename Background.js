@@ -10346,7 +10346,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           t.prototype.getFeeLevels = function()
           {
-            return Promise.resolve([a.FeeLevel.fast])
+            return Promise.resolve([a.FeeLevel.medium])
           },
           t
       }(i.AbstractChainedTransactionFeeService);

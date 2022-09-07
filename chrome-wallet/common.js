@@ -757,7 +757,7 @@ angular.module('kkCommon').constant('supportsEthereum', !0).constant('confidence
     }
 }).constant('environmentConfig', {
     showFeeSelector: !0,
-    regularFeeLevel: 'fast',
+    regularFeeLevel: 'medium',
     maxReceiveAddresses: 10,
     notificationInterval: 12e4,
     showFiatBalance: !0
