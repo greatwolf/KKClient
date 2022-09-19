@@ -124,8 +124,8 @@ export const CONFIG =
       url: "https://etherchain.org/api/gasnow",
       gasPaths:
       {
-        fast: "data.fast",
-        medium: "data.standard",
+        fast: "data.rapid",
+        medium: "data.fast",
         slow: "data.slow",
       }
     },
