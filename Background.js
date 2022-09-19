@@ -4498,20 +4498,23 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.transferTransactionBuilder = s.TransactionBuilderFactory.ethereumTransactionTransfer(this),
               this.exchangeTransactionBuilder = s.TransactionBuilderFactory.ethereumTransactionExchange(this)
           },
-          t.prototype.getTransactions = function(page, pageSize)
+          t.prototype.getTransactions = function(page = 1, pageSize = 0)
           {
             var e = this;
             var txStart = pageSize * (page - 1),
-                txEnd = txStart + pageSize;
-            return this.wallet.api.getTransactionSummaries(this.id, page > 1).then(function(t)
-            {
-              return e.wallet.update(t),
-                e.wallet.data.txHist = i.uniqBy(e.wallet.data.txHist, function(e)
-                {
-                  return e.hash.toHex()
-                }),
-                e.wallet.data.txHist.slice(txStart, txEnd)
-            })
+                txEnd = (txStart + pageSize) || undefined;
+            return this.wallet
+                    .api
+                    .getTransactionSummaries(this.id, page > 1)
+                    .then(function(t)
+                    {
+                      return e.wallet.update(t),
+                        e.wallet.data.txHist = i.uniqBy(e.wallet.data.txHist, function(e)
+                        {
+                          return e.hash.toHex()
+                        }),
+                        e.wallet.data.txHist.slice(txStart, txEnd)
+                    })
           },
           t.prototype.extractTransactionHistory = function(e)
           {
@@ -7897,8 +7900,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               timestamp: new Date(1e3 * parseInt(t.timeStamp)),
               data: i.fromHex(e.removeHexPrefix(t.input)),
               contractAddress: t.contractAddress,
-              isIncoming: e.removeHexPrefix(t.to) === n,
-              isOutgoing: e.removeHexPrefix(t.from) === n,
+              isIncoming: t.to === n.toLowerCase(),
+              isOutgoing: t.from === n.toLowerCase(),
               isError: parseInt(t.isError)
             };
             return r
@@ -80289,20 +80292,22 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           },
           e.transaction = function(t, n)
           {
+            var from = t.vin[0].addresses[0].toLowerCase(),
+                to = t.vout[0].addresses[0].toLowerCase();
             var r = {
               blockHeight: parseInt(t.blockHeight),
               hash: i.fromHex(e.removeHexPrefix(t.txid)),
-              from: e.removeHexPrefix(t.vin[0].addresses[0].toLowerCase()),
-              to: e.removeHexPrefix(t.vout[0].addresses[0].toLowerCase()),
+              from: e.removeHexPrefix(from),
+              to: e.removeHexPrefix(to),
               value: new a.BigNumber(t.value),
               gas: new a.BigNumber(t.ethereumSpecific.gasLimit),
               timestamp: new Date(1e3 * parseInt(t.blockTime)),
               data: i.fromHex(e.removeHexPrefix(t.ethereumSpecific.data)),
               contractAddress: t.contractAddress,
+              isIncoming: to === n.toLowerCase(),
+              isOutgoing: from === n.toLowerCase(),
               isError: parseInt(t.isError)
             };
-            r.isIncoming = r.to === n;
-            r.isOutgoing = r.from === n;
             return r
           },
           e.externalTransaction = function(t, n)
