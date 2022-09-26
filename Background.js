@@ -15087,7 +15087,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://blockbook-dogecoin.binancechain.io",
+              "https://doge1.blockbook.bitaccess.net",
             ],
             txUrlExplorer: "https://blockchair.com/dogecoin/transaction/",
             feeProfile:
@@ -15175,7 +15175,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://vtcblocks.com",
+              "https://blockbook.javerity.com",
             ],
             txUrlExplorer: "http://insight.vertcoin.org/tx/",
             feeProfile: { MIN_FEE: 1e5 }
@@ -15240,7 +15240,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://zecblockexplorer.com",
+              "https://blockbook-zcash.binancechain.io",
             ],
             txUrlExplorer: "https://blockchair.com/zcash/transaction/",
             feeProfile:
@@ -15279,7 +15279,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: "(^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$)|(^bitcoincash:[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{25,55}$)|(^bitcoincash:[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{25,55}$)",
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
-            blockbook: ["https://bchblockexplorer.com"],
+            blockbook: ["https://bch1.heatwallet.com"],
             txUrlExplorer: "https://explorer.bitcoin.com/bch/tx/",
             feeProfile:
             {
@@ -15341,7 +15341,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: b58regex('[QM]', 1),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
-            blockbook: ["https://qtumbook.guarda.co"],
+            blockbook: ["https://blockv3.qtum.info"],
             txUrlExplorer: "https://qtum.info/tx/",
             feeProfile:
             {
