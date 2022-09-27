@@ -15122,7 +15122,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             [
               "https://dash.atomicwallet.io",
             ],
-            txUrlExplorer: "https://explorer.mydashwallet.org/insight/tx/",
+            txUrlExplorer: "https://insight.dash.org/insight/tx/",
             feeProfile:
             {
               MIN_FEE: 1e3,
@@ -15138,7 +15138,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             [
               "https://nmc1.trezor.io",
             ],
-            txUrlExplorer: "https://nmc.tokenview.com/en/tx/",
+            txUrlExplorer: "https://nmc.tokenview.io/en/tx/",
             feeProfile:
             {
               MIN_FEE: 1e5,
