@@ -52,6 +52,7 @@ Altcoin Support:
  - Ravencoin
  - Qtum
  - Groestlcoin
+ - Monacoin
  - Vertcoin
  - Fujicoin
  - Syscoin*
