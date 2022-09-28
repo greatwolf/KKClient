@@ -32,6 +32,7 @@
      "https://*.qtum.info/*",
      "https://pivx.flitswallet.app/*",
      "https://blockbook.firo.org/*",
+     "https://blockbook.electrum-mona.org/*",
      "https://blockbook.ravencoin.org/*",
      "https://blockbook.javerity.com/*",
      "https://keepkey-wallet.keepkey.com/*",

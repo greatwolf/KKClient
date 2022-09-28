@@ -15169,6 +15169,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
           },
           {
+            name: s.CoinName[s.CoinName.Monacoin = 22] = "Monacoin",
+            addressFormat: b58regex('[MP]', 1),
+            dust: e.newDustCalculation(3000),
+            defaultDecimals: 8,
+            blockbook:
+            [
+              "https://blockbook.electrum-mona.org",
+            ],
+            txUrlExplorer: "http://chaintools.mona-coin.de/tx/",
+            feeProfile: { MIN_FEE: 2e3 }
+          },
+          {
             name: s.CoinName[s.CoinName.Vertcoin = 28] = "Vertcoin",
             addressFormat: b58regex('[V3]', 1),
             dust: e.newDustCalculation(3000),

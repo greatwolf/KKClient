@@ -114,6 +114,18 @@ angular.module('kkTransactions', ['ngRoute', 'kkCommon', 'ui.bootstrap']).config
       }
     },
     {
+      name: 'Monacoin',
+      currencySymbol: 'MONA',
+      coinTypeCode: '22\'',
+      coinType: 22,
+      dust: 546,
+      decimals: 8,
+      amountParameters:
+      {
+        DECIMAL_PLACES: 8
+      }
+    },
+    {
       name: 'Vertcoin',
       currencySymbol: 'VTC',
       coinTypeCode: '28\'',
