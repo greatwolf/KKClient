@@ -15071,7 +15071,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://litecoin.blockbook.chains.klever.io",
+              "https://blockbook.ltc.zelcore.io",
             ],
             txUrlExplorer: "https://blockchair.com/litecoin/transaction/",
             feeProfile:
@@ -15087,7 +15087,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://doge1.blockbook.bitaccess.net",
+              "https://dogecoin.blockbook.chains.klever.io",
             ],
             txUrlExplorer: "https://blockchair.com/dogecoin/transaction/",
             feeProfile:

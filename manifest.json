@@ -21,6 +21,7 @@
      "https://*.trezor.io/*",
      "https://*.atomicwallet.io/*",
      "https://*.guarda.co/*",
+     "https://*.zelcore.io/*",
      "https://*.binancechain.io/*",
      "https://*.chains.klever.io/*",
      "https://*.blockbook.bitaccess.net/*",
