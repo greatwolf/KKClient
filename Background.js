@@ -7069,7 +7069,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   console.log("HTTP " + method + " " + aUrl + " (" + l.status + ")")
                   if (0 === l.status || 404 === l.status || 503 === l.status)
                   {
-                    return c("HTTP " + method + " " + aUrl + " (" + l.status + ")")
+                    return c({httpStatus: l.status, error: "HTTP " + method + " " + aUrl + " (" + l.status + ")"})
                   }
                   else if (-1 !== r.indexOf(resolveStatuses, l.status))
                     l.response ? d(decode(l.response)) : d("");
@@ -78488,16 +78488,44 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     wallet.addresses[name].hasTransactions = true
                   })
             }
+            var checkBlockbookResponse = function(resp)
+            {
+              // for regular '/api/v2/utxo' response
+              if (r.isArray(resp)) return resp
+              // for syscoin '/api/v2/utxo'
+              if (r.isObjectLike(resp) && resp.utxos) return resp.utxos
+
+              // for '/api/v2/xpub' response
+              var checkXpubResponse = r.conforms(
+              {
+                page: r.isNumber,
+                totalPages: r.isNumber,
+                address: r.isString,
+                balance: r.isString
+              })
+              if (checkXpubResponse(resp)) return resp
+
+              throw {httpStatus: 'Unexpected response', error: JSON.stringify(resp)}
+            }
+            var logBadResponse = function(endPoint, coinName, err)
+            {
+              new Notification(`${endPoint} problem loading ${coinName} wallet`,
+                              {body: 'status ' + err.httpStatus, icon: "/images/icon.png"})
+              console.error(err)
+            }
             var handleBadXpubResponse = function(err)
             {
-              new Notification(`Failed to load ${self.coinType.name} wallet`,
-                              {body: JSON.stringify(err), icon: "/images/icon.png"})
-              return JSON.parse(`{"page":1,"totalPages":1,"address":"${wallet.xpub}","balance":"0","unconfirmedBalance":"0","unconfirmedTxs":0}`)
+              return logBadResponse('Xpub endpoint', self.coinType.name, err),
+              {
+                page: 1, totalPages: 1,
+                address: wallet.xpub,
+                balance: "0", unconfirmedBalance: "0",
+                unconfirmedTxs: 0
+              }
             }
             var handleBadUtxoResponse = function(err)
             {
-              new Notification(`Failed to load ${self.coinType.name} wallet`,
-                              {body: JSON.stringify(err), icon: "/images/icon.png"})
+              logBadResponse('Utxo endpoint', self.coinType.name, err)
               return []
             }
             var processDerived = function(resp)
@@ -78583,7 +78611,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             }
             var processUtxoSummary = function(resp)
             {
-              if (!resp.length && resp.utxos) resp = resp.utxos
               wallet.unspentTxs = resp.map(function(unspentTx)
               {
                 return p.BlockbookDataTranslator.utxoSummary(unspentTx, self.coinType)
@@ -78605,7 +78632,6 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             {
               return function(resp)
               {
-                if (!resp.length && resp.utxos) resp = resp.utxos
                 var unspentTxSegshit = resp.map(function(unspentTxRaw)
                 {
                   var unspentTx         = p.BlockbookDataTranslator.utxoSummary(unspentTxRaw, self.coinType)
@@ -78639,6 +78665,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.walletApi.urlGenerator
                   .deriveAddressesUrl(wallet.xpub)
                   .then(m.BBapiThrottler.get)
+                  .then(checkBlockbookResponse)
                   .catch(handleBadXpubResponse)
                   .then(processDerived)
                   .then(processUnconfirmedTxs)
@@ -78648,6 +78675,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.walletApi.urlGenerator
                   .getUtxoUrl(wallet.xpub)
                   .then(m.BBapiThrottler.get)
+                  .then(checkBlockbookResponse)
                   .catch(handleBadUtxoResponse)
                   .then(processUtxoSummary)
                   .then(updateUsedAddresses))
@@ -78656,6 +78684,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.walletApi.urlGenerator
                   .getUtxoUrl(wallet.ypub)
                   .then(m.BBapiThrottler.get)
+                  .then(checkBlockbookResponse)
                   .catch(handleBadUtxoResponse)
                   .then(processUtxoExtra('SPENDP2SHWITNESS')))
             wallet.zpub &&
@@ -78663,6 +78692,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               this.walletApi.urlGenerator
                   .getUtxoUrl(wallet.zpub)
                   .then(m.BBapiThrottler.get)
+                  .then(checkBlockbookResponse)
                   .catch(handleBadUtxoResponse)
                   .then(processUtxoExtra('SPENDWITNESS')))
 
