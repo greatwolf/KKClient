@@ -3943,7 +3943,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               e.highConfidenceBalance = t.highConfidenceBalance,
                 e.lowConfidenceBalance = t.lowConfidenceBalance,
                 e.hasTransactionHistory = t.hasTransactionHistory
-              if (t.instantLockBalance)
+              if (!r.isUndefined(t.instantLockBalance))
                 e.instantLockBalance = t.instantLockBalance
             });
             if (n.push(o),
@@ -4671,10 +4671,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           {
             get: function e()
             {
-              var balance = this.wallet.data.instantLockBalance
-              return balance && !balance.isZero()
-                   ? new h.BigNumber(balance)
-                   : undefined
+              var coinConfig = b.CoinType.get(this.coinType)
+              if (coinConfig.supportsInstantSend)
+              {
+                var balance = this.wallet.data.instantLockBalance
+                return new h.BigNumber(balance)
+              }
             },
             enumerable: !0,
             configurable: !0

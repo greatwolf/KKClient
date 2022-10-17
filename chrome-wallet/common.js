@@ -529,7 +529,7 @@ angular.module('kkCommon').factory('WalletNodeService', ['$rootScope', '$timeout
             id: a.id,
             coinType: a.coinType
         });
-        c ? c !== a && angular.copy(a, c) : i.push(a)
+        c ? c !== a && _.merge(c, a) : i.push(a)
     }
     function g(a, b) {
         var c = _.find(i, {

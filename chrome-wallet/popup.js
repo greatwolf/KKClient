@@ -1514,11 +1514,11 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       {
         e.$watch('pending', function()
         {
-          e.showPending = e.pending && !new BigNumber(e.pending).eq(new BigNumber(0))
+          e.showPending = e.pending && !new BigNumber(e.pending).isZero()
         })
         e.$watch('instantsend', function()
         {
-          e.showInstantSend = e.instantsend && !new BigNumber(e.instantsend).eq(new BigNumber(0))
+          e.showInstantSend = e.instantsend && !new BigNumber(e.instantsend).isZero()
         })
       }],
       templateUrl: 'app/popup/directives/walletBalance.tpl.html'
