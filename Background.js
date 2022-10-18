@@ -2577,6 +2577,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                           var cancelledLoad = function(p)
                           {
                             return p.status === 'rejected'
+                                && typeof p.reason === 'string'
                                 && p.reason.endsWith('Cancel request')
                           }
                           var isCancel = loadStatus.findIndex(cancelledLoad) !== -1
