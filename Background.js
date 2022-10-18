@@ -15040,7 +15040,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://bitcoinblockexplorers.com",
+              "https://mainnet-explorer.wakiyamap.dev",
             ],
             txUrlExplorer: "https://explorer.bitcoin.com/btc/tx/",
             feeProfile:
@@ -15254,7 +15254,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             defaultDecimals: 8,
             blockbook:
             [
-              "https://blockbook-zcash.binancechain.io",
+              "https://zecblockexplorer.com",
             ],
             txUrlExplorer: "https://blockchair.com/zcash/transaction/",
             feeProfile:
@@ -15280,7 +15280,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             addressFormat: b58regex('R'),
             dust: e.newDustCalculation(3000),
             defaultDecimals: 8,
-            blockbook: ["https://kmdbook.guarda.co"],
+            blockbook: ["https://komodoblockexplorer.com"],
             txUrlExplorer: "https://kmdexplorer.io/tx/",
             feeProfile:
             {
