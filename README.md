@@ -43,7 +43,7 @@ This fork contains numerous improvements and bugfixes over the original client. 
 Altcoin Support:
 
  - Bitcoin TESTNET
- - BitcoinSV
+ - ~~BitcoinSV~~
  - BitcoinGold
  - DigiByte
  - Namecoin

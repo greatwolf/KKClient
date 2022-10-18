@@ -15338,18 +15338,18 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               servicer: 'roundup-per-kb-fee-service'
             }
           },
-          {
-            name: s.CoinName[s.CoinName.BitcoinSV = 236] = "BitcoinSV",
-            addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
-            dust: e.newDustCalculation(3000),
-            defaultDecimals: 8,
-            blockbook: ["https://bsvbook.guarda.co"],
-            txUrlExplorer: "https://blockchair.com/bitcoin-sv/transaction/",
-            feeProfile:
-            {
-              MIN_FEE: 1e3
-            }
-          },
+          // {
+            // name: s.CoinName[s.CoinName.BitcoinSV = 236] = "BitcoinSV",
+            // addressFormat: "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$",
+            // dust: e.newDustCalculation(3000),
+            // defaultDecimals: 8,
+            // blockbook: ["https://bsvbook.guarda.co"],
+            // txUrlExplorer: "https://blockchair.com/bitcoin-sv/transaction/",
+            // feeProfile:
+            // {
+              // MIN_FEE: 1e3
+            // }
+          // },
           {
             name: s.CoinName[s.CoinName.Qtum = 2301] = "Qtum",
             addressFormat: b58regex('[QM]', 1),
