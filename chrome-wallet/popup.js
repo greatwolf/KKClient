@@ -2039,11 +2039,12 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.goToPrevious('slideRight')
       }]
     }
-    e.when('disconnected', ['$injector', 'WalletNodeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', 'PinLockService', function(e, n, a, o, pinLock)
+    e.when('disconnected', ['$injector', 'WalletNodeService', 'DeviceFeatureService', 'ShapeShiftAuthTokenService', 'SpotPriceService', 'PinLockService', function(e, n, a, o, spot, pinLock)
       {
         n.clear(),
           a.clear(),
           o.clearCachedToken(),
+          spot.clearSession(),
           pinLock.reset(),
           e.invoke(t('/connect'), this)
       }]),
@@ -2216,8 +2217,17 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.set(this.request.message)
       }]),
       e.when('ping', function() {}),
-      e.when('WalletNodes', ['WalletNodeService', function(e)
+      e.when('WalletNodes', ['WalletNodeService', 'SpotPriceService', function(e, spot)
       {
+        var coins = this.request.message.map(n => n.coinType)
+        var subcoins = _.flatten(this.request
+                        .message
+                        .filter(n => n.subAccounts.length > 0)
+                        .map(n => n.subAccounts))
+                        .map(n => n.coinType)
+
+        spot.clearCache()
+        spot.setAssets(_.concat(coins, subcoins))
         e.updateWalletNodes(this.request.message, this.request.messageIsFresh)
       }]),
       e.when('ValidatedExchangeRegion', ['ExchangeValidityService', function(e)

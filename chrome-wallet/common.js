@@ -34,7 +34,7 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
             hasExchangeRate: '=?',
             exchangeFormattedAmount: '=?'
         },
-        controller: ['$scope', 'CurrencyLookupService', 'environmentConfig', function(a, b, c) {
+        controller: ['$scope', 'CurrencyLookupService', 'environmentConfig', 'SpotPriceService', function(a, b, c, spot) {
             a.currencySymbol = b.getCurrencySymbol(a.currency),
             angular.isDefined(a.exchangeFormattedAmount) || (a.exchangeFormattedAmount = '...'),
             angular.isDefined(a.exchangeCurrencySymbol) || (a.exchangeCurrencySymbol = 'USD');
@@ -42,37 +42,17 @@ angular.module('kkCommon').directive('exchangeFormattedAmount', function() {
             {
                 if (void 0 === fiat || void 0 === crypto) return
 
-                var assetIds =
-                {
-                  "BitcoinCash" : "bitcoin-cash",
-                  "BitcoinSV" : "bitcoin-cash-sv",
-                  "BitcoinGold" : "bitcoin-gold",
-                  "Firo" : "zcoin",
-                  "BAT" : "basic-attention-token",
-                  "FOX" : "shapeshift-fox-token",
-                }
-                var asset = assetIds[crypto] || crypto.toLowerCase()
-                fiat = fiat.toLowerCase()
-                var f = new XMLHttpRequest;
-                f.onreadystatechange = function()
-                {
-                    if (4 == f.readyState && 200 == f.status)
+                spot.get(fiat, crypto)
+                    .then(function(price)
                     {
-                        var e = b.formatAmount(a.currency, a.amount)
-                          , g = JSON.parse(f.responseText)[asset];
-                        if (g)
-                        {
-                          e *= g[fiat]
-                          a.exchangeFormattedAmount = e.toFixed(e < 0.01 ? 4 : 2)
-                        }
-                        else a.exchangeFormattedAmount = '??'
-                        a.hasExchangeRate = c.showFiatBalance,
-                        a.$digest()
-                    }
-                }
-                ,
-                f.open('GET', 'https://api.coingecko.com/api/v3/simple/price?ids=' + asset + '&vs_currencies=' + fiat, !0),
-                f.send(null)
+                      if (!price) return
+
+                      var e = b.formatAmount(a.currency, a.amount)
+                      e *= price
+                      a.exchangeFormattedAmount = e.toFixed(e < 0.01 ? 4 : 2)
+                      a.hasExchangeRate = c.showFiatBalance,
+                      a.$digest()
+                    })
             }
             a.$watch('amount', d.bind(null, a.exchangeCurrencySymbol, a.currency))
         }
@@ -707,6 +687,70 @@ angular.module('kkCommon').factory('CurrencyLookupService', function() {
             return new BigNumber(c).shiftedBy(d.decimals).integerValue()
         }
     }
+}),
+angular.module('kkCommon').factory('SpotPriceService', function()
+{
+  const geckoAlias =
+  {
+    "BitcoinCash" : "bitcoin-cash",
+    "BitcoinSV" : "bitcoin-cash-sv",
+    "BitcoinGold" : "bitcoin-gold",
+    "Firo" : "zcoin",
+    "BAT" : "basic-attention-token",
+    "FOX" : "shapeshift-fox-token",
+  }
+  const fiatIds = ['usd', 'eur']
+  var assetIds = []
+  var spotPromise
+  var adjustSym = n => geckoAlias[n] || n.toLowerCase()
+  var spotService = {}
+
+  spotService.setAssets = function(assets)
+  {
+    if (!_.isArray(assets)) return false
+    if (assets.length < 1) return false
+
+    assetIds = _.union(assetIds, assets.map(adjustSym))
+    return true
+  }
+  spotService.get = function(fiat, crypto)
+  {
+    if (!assetIds) return Promise.reject('SpotPriceService assetIds not set!')
+    if (!spotPromise)
+    {
+      let url = 'https://api.coingecko.com/api/v3/simple/price?'
+              + 'ids=' + assetIds.join(',') + '&'
+              + 'vs_currencies=' + fiatIds.join(',')
+      spotPromise = fetch(url)
+        .then(function(resp)
+        {
+          if (resp.ok) return resp.json()
+
+          spotService.clearCache()
+          return undefined
+        })
+        .catch(spotService.clearCache)
+    }
+    fiat = adjustSym(fiat)
+    crypto = adjustSym(crypto)
+    return spotPromise.then(resp => _.get(resp, [crypto, fiat], undefined))
+      .then(function(resp)
+      {
+        console.debug(`CoinGecko Spot: ${crypto} - ${resp}`)
+        return resp
+      })
+  }
+  spotService.clearCache = function()
+  {
+    spotPromise = null
+  }
+  spotService.clearSession = function()
+  {
+    assetIds = []
+    spotPromise = null
+  }
+
+  return spotService
 }),
 angular.module('kkCommon').run(['$templateCache', function(a) {
     a.put('app/common/common.tpl.html', ''),
