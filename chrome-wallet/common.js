@@ -696,8 +696,14 @@ angular.module('kkCommon').factory('SpotPriceService', function()
     "BitcoinSV" : "bitcoin-cash-sv",
     "BitcoinGold" : "bitcoin-gold",
     "Firo" : "zcoin",
+    "0xBitcoin" : "oxbitcoin",
     "BAT" : "basic-attention-token",
+    "Crypto.com" : "monaco",
     "FOX" : "shapeshift-fox-token",
+    "iExec" : "iexec-rlc",
+    "RCN" : "ripio-credit-network",
+    "SwarmCity" : "swarm-city",
+    "TrueUSD" : "true-usd",
   }
   const fiatIds = ['usd', 'eur']
   var assetIds = []
