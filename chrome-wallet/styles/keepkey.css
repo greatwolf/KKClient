@@ -409,6 +409,18 @@ th
   content: "\f054\f054"
 }
 
+.fa-angle-up:before
+{
+  color: #999;
+  content: "\f106"
+}
+
+.fa-angle-down:before
+{
+  color: #999;
+  content: "\f107"
+}
+
 .fa-instantsend:before
 {
   color: skyblue;
@@ -9985,8 +9997,26 @@ a:hover
 
 .transaction-list .table .address
 {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
   flex-grow: 1;
   width: 310px
+}
+
+.transaction-list .table .address.foldable
+{
+  max-height: 63.42px;
+  overflow: hidden;
+  transition: max-height 0.25s ease-in-out;
+}
+
+.transaction-list .table .address.foldable .foldslider
+{
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .transaction-list .table .amount
