@@ -12264,6 +12264,20 @@ button.fa:focus {
   padding-inline-start: 20px
 }
 
+#about .content .features ul li {
+  user-select: all;
+}
+
+#about .content .features ul li > span.shortwidth {
+  display: inline-block;
+  width: 90px;
+}
+
+#about .content .features ul li > span.longwidth {
+  display: inline-block;
+  width: 120px;
+}
+
 #about .content,
 #add-account .content,
 #bip44-account-gap-violation .content,
@@ -12310,6 +12324,11 @@ button.fa:focus {
   padding-inline-start: initial;
   text-align: left;
   font-size: 11px
+}
+
+#about .content .applogo-features ul li > span {
+  display: inline-block;
+  width: 60px;
 }
 
 #character-request .content,
