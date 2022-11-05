@@ -977,7 +977,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         e.message = '',
           e.showMessage = !1,
           angular.isUndefined(e.canNotify) && (e.canNotify = !0),
-          e.$watch('notificationMessageService.get()', function()
+          e.$watch(n.get, function()
           {
             var t = n.get();
             '' !== t && e.canNotify && (a(n.get()),
@@ -2117,6 +2117,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
             break;
           case 'Account name updated':
             e.invoke(n(), this);
+            break;
+          case 'Account deleted':
+            a.set('Account successfully deleted!'),
+            o.removeAccount(this.request.message.accountId)
             break;
           default:
             a.set(this.request.message.message) && (c = '/success/:message');

@@ -592,9 +592,9 @@ angular.module('kkCommon').factory('WalletNodeService', ['$rootScope', '$timeout
         },
         getTransactionHistory: c.getTransactionHistory,
         loadAccounts: c.getWalletNodes,
-        removeAccount: function(a) {
+        removeAccount: function(walletId) {
             _.remove(i, {
-                id: a
+                id: walletId
             })
         },
         setUnfresh: function() {

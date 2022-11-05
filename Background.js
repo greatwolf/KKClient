@@ -1587,6 +1587,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     });
     var r = e("../MessageDispatcher"),
       i = e("../../account-list-manager"),
+      ui = e("../../ui-messenger"),
       a = function()
       {
         function e()
@@ -1597,11 +1598,24 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         return e.prototype.action = function(e, t)
           {
             var n = i.AccountListManager.findAccount(e.accountId);
+            if (!n)
+              return Promise.reject("deleteAccount: " + e.accountId + " not found")
+            if (i.AccountListManager.accountList.length === 1)
+              return Promise.reject("deleteAccount: deleting results in an empty wallet list")
             return n.wallet.api.deleteWallet(n.id).then(function()
             {
               i.AccountListManager.removeAccount(e.accountId),
                 t(!0)
-            }).catch(function()
+            })
+            .then(function()
+            {
+              ui.UiMessenger.sendMessageToUI("Success",
+              {
+                message: "Account deleted",
+                accountId: e.accountId
+              })
+            })
+            .catch(function()
             {
               t(!1)
             })
@@ -1612,7 +1626,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
   },
   {
     "../../account-list-manager": 2,
-    "../MessageDispatcher": 6
+    "../MessageDispatcher": 6,
+    "../../ui-messenger": 122
   }],
   17: [function(e, t, n)
   {
