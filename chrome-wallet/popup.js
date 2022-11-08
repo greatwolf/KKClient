@@ -199,11 +199,19 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
   }]),
   angular.module('kkWallet').controller('SignTxController', ['$scope', '$routeParams', 'TransactionService', 'NavigationService', function(e, t, n, a)
   {
-    '/buttonRequest/button_request_sign_tx' === a.getCurrentRoute() ? a.setNextTransition('slideRight') : a.setNextTransition('slideLeft'),
-      e.buttonRequestType = t.code,
-      e.amount = n.transactionInProgress.amount,
-      e.destination = n.transactionInProgress.address,
-      e.fee = 'TBD'
+    let req_signtx = '/buttonRequest/button_request_sign_tx' === a.getCurrentRoute()
+    if (req_signtx)
+    {
+      e.$on('Processed', function()
+      {
+        a.goToPrevious()
+      })
+    }
+    a.setNextTransition(req_signtx ? 'slideRight' : 'slideLeft')
+    e.buttonRequestType = t.code,
+    e.amount = n.transactionInProgress.amount,
+    e.destination = n.transactionInProgress.address,
+    e.fee = 'TBD'
   }]),
   angular.module('kkWallet').controller('CharacterRequestController', ['$scope', '$routeParams', '$timeout', 'RecoveryCipherModel', function(e, t, n, a)
   {
@@ -1864,7 +1872,10 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
         feeLevel: e.config.regularFeeLevel
       },
       e.destinationCurrency = '',
-      e.accountCurrencyUrl = 'assets/currency-logos/' + e.currency.toLowerCase() + '.png',
+      e.accountCurrencyUrl = 'assets/currency-logos/' + e.currency.toLowerCase() + '.png';
+
+      if (e.preparingTransaction) return
+
       e.buildTransaction = function()
       {
         if (e.form.$submitted = !0,
@@ -2063,6 +2074,8 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
           var n, a = _.get(this, 'request.message.data');
           if ('ButtonRequest_ConfirmOutput' === this.request.message.code)
             pinLock.reset();
+          if ('ButtonRequest_SignTx' === this.request.message.code)
+            pinLock.state = pinLock.verifying;  // So 'Preparing Transaction' overlay is shown
           a ? (n = a.split(':'),
             this.request.message.policy = n[0],
             this.request.message.state = n[1],

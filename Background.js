@@ -1476,10 +1476,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 current: e,
                 total: t
               })
-            }, 1e3,
+            }, 1e2,
             {
-              leading: !1,
-              trailing: !0
+              leading: !0,
+              trailing: !1
             })
         }
         return e.prototype.action = function(e)
@@ -3257,10 +3257,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 current: e,
                 total: t
               })
-            }, 1e3,
+            }, 1e2,
             {
-              leading: !1,
-              trailing: !0
+              leading: !0,
+              trailing: !1
             })
         }
         return e.prototype.action = function(e)
