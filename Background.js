@@ -2269,7 +2269,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                 address: i.address,
                 nodePath: i.nodePath.toString()
               })
-              return n ? t.deviceClient.getEthereumAddress(i.nodePath, !0) : t.deviceClient.getAddress(i.nodePath, i.coinType, !0);
+              return n ? t.deviceClient.getEthereumAddress(i.nodePath, !0).then(function(e)
+              {
+                r.UiMessenger.sendMessageToUI(e.$type.name, e)
+              }) : t.deviceClient.getAddress(i.nodePath, i.coinType, !0);
             })
           },
           e
@@ -7206,7 +7209,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           return this.sendMessageToUi(e.$type.name, e),
             null
         },
-        e.messageNames = ["Address", "EthereumAddress", "ButtonRequest", "CharacterRequest", "Failure", "PinMatrixRequest", "Success", "PassphraseRequest", "WordRequest"],
+        e.messageNames = ["Address", "ButtonRequest", "CharacterRequest", "Failure", "PinMatrixRequest", "Success", "PassphraseRequest", "WordRequest"],
         e
     }();
     n.MessageForwarder = r
