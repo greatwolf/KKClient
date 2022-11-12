@@ -4305,16 +4305,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   address: e.address
                 });
                 t || n.chain.chainAddresses.push(e)
-              }),
-              t && (!this.chain.unusedAddresses && (this.chain.unusedAddresses = []),
-                r.each(e.chainAddresses, function(e)
-                {
-                  var t = r.find(n.chain.unusedAddresses,
-                  {
-                    address: e.address
-                  });
-                  t || n.chain.unusedAddresses.push(e)
-                }))
+              })
+              if (t && !this.chain.unusedAddresses)
+              {
+                let unusedAddr = r.filter(e.chainAddresses, n => !n.hasTransactions)
+                this.chain.unusedAddresses = r.uniqBy(unusedAddr, n => n.address)
+              }
           },
           e
       }();
