@@ -80152,9 +80152,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       u = e("@keepkey/device-client/dist/global/coin-name"),
       f = function()
       {
-        function e(e)
+        function e(e, t)
         {
           this.walletApi = e,
+          this.coinType = t,
             this.addressRegistry = s.EthereumAddressRegistry.instance
         }
         return e.prototype.loadWallet = function(t, n, r)
@@ -80169,41 +80170,63 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               {
                 var d;
                 if (!r.encrypted_name)
-                  console.warn("encrypted name not set for etherscan wallet id " + t);
-                else
                 {
-                  var c = void 0;
-                    c = i.walletApi.urlGenerator.getWalletUrl(s);
-                  return c.then(function(t)
-                  {
-                    return e.EBapiThrottler.push_ttl(30000).get(t)
-                  }).then(function(e)
-                  {
-                    console.assert(e, "failed to get wallet balance from etherscan")
-                    !e.tokens && (e.tokens = [])
-                    e.tokens.forEach((each) => { each.contract = each.contract.toLowerCase() })
-                    if (n)
-                    {
-                      var needle = {contract: "0x" + n.toHex()}
-                      e = lodash.find(e.tokens, needle) || needle
-                      e.balance = e.balance || "0"
-                      e.transfers = e.transfers || 0
-                    }
-
-                    return d = a.EtherbookDataTranslator.balance(e),
-                      d.id = t,
-                      d.hasTransactionHistory = a.EtherbookDataTranslator.hasTransactions(d, e),
-                      d
-                  }).then(function(e)
-                  {
-                    return console.assert(e, "failed to get transaction count from etherscan"),
-                      i.walletApi.setWalletMetadata(d, r)
-                  }).then(function(e)
-                  {
-                    return console.assert(e, "failed to get a completed wallet from etherscan"),
-                      new o.Wallet(e, i.walletApi)
-                  })
+                  console.warn("encrypted name not set for etherscan wallet id " + t)
+                  return
                 }
+                var logBadResponse = function(endPoint, coinName, err)
+                {
+                  new Notification(`${endPoint} problem loading ${coinName} wallet`,
+                                  {body: 'status ' + err.httpStatus, icon: "/images/icon.png"})
+                  console.error(err)
+                }
+                var handleBadAddrResponse = function(err)
+                {
+                  let nontoken = !n
+                  // don't spam user with failed token notifications
+                  return nontoken && logBadResponse('Address endpoint', i.coinType.name, err),
+                  {
+                    page: 1, totalPages: 1,
+                    address: s,
+                    balance: "0", unconfirmedBalance: "0",
+                    unconfirmedTxs: 0, txs: 0,
+                    nonce: "0"
+                  }
+                }
+
+                return i.walletApi
+                        .urlGenerator
+                        .getWalletUrl(s)
+                        .then(url => e.EBapiThrottler.push_ttl(30000).get(url))
+                        .catch(handleBadAddrResponse)
+                        .then(function(e)
+                        {
+                          console.assert(e, "failed to get wallet balance from etherscan")
+                          !e.tokens && (e.tokens = [])
+                          e.tokens.forEach((each) => { each.contract = each.contract.toLowerCase() })
+                          if (n)
+                          {
+                            var needle = {contract: "0x" + n.toHex()}
+                            e = lodash.find(e.tokens, needle) || needle
+                            e.balance = e.balance || "0"
+                            e.transfers = e.transfers || 0
+                          }
+
+                          return d = a.EtherbookDataTranslator.balance(e),
+                            d.id = t,
+                            d.hasTransactionHistory = a.EtherbookDataTranslator.hasTransactions(d, e),
+                            d
+                        })
+                        .then(function(e)
+                        {
+                          return console.assert(e, "failed to get transaction count from etherscan"),
+                            i.walletApi.setWalletMetadata(d, r)
+                        })
+                        .then(function(e)
+                        {
+                          return console.assert(e, "failed to get a completed wallet from etherscan"),
+                            new o.Wallet(e, i.walletApi)
+                        })
               })
           },
           e.prototype.getBlockHeightFromBlockchainData = function(e)
