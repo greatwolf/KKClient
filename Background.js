@@ -7122,21 +7122,20 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           e
       }();
     n.HttpClient = i
-    var cached_promises = {},
-        cached_responses = {},
+    var cached_responses = {},
         ttl_queue = []
     var expire_cache = (url) => delete cached_responses[url]
-    var cache_response = function(url, resp, ttl)
+    var store_cache = function(url, resp, ttl = 999999)
     {
-      delete cached_promises[url];
-      cached_responses[url] = { result: resp, expires: ttl && (Date.now() + ttl) }
+      expire_cache(url)
+      cached_responses[url] = { result: resp, expires: Date.now() + ttl }
       return resp
     }
-    var fetch_response = function(url)
+    var fetch_cache = function(url)
     {
       var resp = cached_responses[url]
       if (!resp) return
-      if (resp.expires && (resp.expires < Date.now()))
+      if (resp.expires < Date.now())
       {
         expire_cache(url)
         return
@@ -7148,15 +7147,9 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       get: function(url, responseDecode)
       {
         var ttl = ttl_queue.pop()
-        var response = fetch_response(url)
-        if (response)
-          return Promise.resolve(response)
 
-        if (!cached_promises[url]) 
-          cached_promises[url] = i.get(url, responseDecode)
-                                  .then((resp) => cache_response(url, resp, ttl))
-
-        return cached_promises[url]
+        return fetch_cache(url)
+            || store_cache(url, i.get(url, responseDecode), ttl)
       },
       put: function(url, payload, contentType)
       {
@@ -7179,7 +7172,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       clear_urlcache: expire_cache,
       push_ttl: function(msec)
       {
-        msec && ttl_queue.push(msec)
+        r.isInteger(msec) && ttl_queue.push(msec)
         return n.CachedHttpClient
       }
     }
