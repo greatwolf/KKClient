@@ -13607,7 +13607,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           var a = new(Function.prototype.bind.apply(e, arguments));
           i.each(e.messageNames, function(e)
           {
-            console.log(e + " message handler added."),
+            console.debug(e + " message handler added."),
               t.addListener(e, t.messageHandlerWrapper(a))
           })
         },
@@ -13616,7 +13616,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
           var t = this;
           i.each(e.messageNames, function(e)
           {
-            console.log(e + " message handler removed."),
+            console.debug(e + " message handler removed."),
               t.removeAllListeners(e)
           })
         },
