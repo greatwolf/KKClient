@@ -2037,9 +2037,11 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       return ['NavigationService', function(t)
       {
         var n = e;
+        let loading = (n.startsWith('/pin') || n === '/passphrase')
+                    && t.getCurrentRoute() === '/walletlist'
         for (var a in this.request.message)
           this.request.message.hasOwnProperty(a) && (n = n.replace(':' + a, encodeURIComponent(_.snakeCase(this.request.message[a]))));
-        t.go(n, transit)
+        t.go(n, loading ? 'slideRight' : transit)
       }]
     }
 
@@ -2399,6 +2401,7 @@ angular.module('kkWallet', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'monospaced.
       goToTop: async function s(i)
       {
         var c = await a.get();
+        if (e.getCurrentRoute() === '/lifeboat') e.setNextTransition('slideRight')
         e.dumpHistory(),
           t.get('deviceCapabilities.prereleaseDevice') ? e.go('/prerelease-device') : t.get('bootloader_mode') ? e.go('/bootloader') : t.get('deviceCapabilities.newKeepKey') ? e.go('/verify-device') : function()
           {
