@@ -5673,14 +5673,19 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
         }),
         t.prototype.estimateSignatureActions = function()
         {
-          var e = 0;
-          return e += this.outputs.length,
-            e += 2 * this.inputs.length,
+          let bip143 = f.CoinType.get(this.coinName).force_bip143
+          let outputs = this.outputs.length,
+              inputs  = this.inputs.length
+          let sum = 2 * outputs + 2 * inputs
+          if (!bip143)
+          {
             this.inputs.list.forEach(function(t)
             {
-              e += t.transaction.inputs.length + t.transaction.outputs.length
-            }),
-            e
+              sum += t.transaction.inputs.length + t.transaction.outputs.length
+            })
+            sum += (inputs + outputs) * inputs
+          }
+          return sum + 1  // so [TXFINISHED] is counted
         },
         t.prototype.serialize = function()
         {
@@ -14888,6 +14893,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                   DECIMAL_PLACES: a.decimals,
                   EXPONENTIAL_AT: [-(a.decimals + 1), 40]
                 },
+                a.force_bip143 = t.force_bip143,
                 a.pubkeyhash = t.address_type,
                 a.scripthash = t.address_type_p2sh,
                 a.xpubkey = t.xpub_magic,
