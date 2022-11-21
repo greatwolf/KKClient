@@ -14678,12 +14678,12 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
       isBootloaderUpdater: !0
     },
     {
-      file: "firmware_v7.4.0.bin",
-      digest: "43472b6fc1a3c9a2546ba771af830005f5758acbd9ea0679d4f20d480f63a040",
-      trezorDigest: "b1841d4a659d87909030423cccb8b83133314fd72edceba5a72071636ea5cb11",
-      size: 529356,
-      timeStamp: "2022-08-07T12:31:00.000Z",
-      version: "7.4.0",
+      file: "firmware_v7.5.0.bin",
+      digest: "08b1153a6e9ba5f45776094d62c8d055632d414a38f0c70acd1e751229bf097c",
+      trezorDigest: "b4366a51e13e30e9a4167429f4ee8a79b6cd455f02f5238255383c3d6fa7432e",
+      size: 551792,
+      timeStamp: "2022-11-17T11:18:00.000Z",
+      version: "7.5.0",
       isBootloaderUpdater: !1
     }]
   },
