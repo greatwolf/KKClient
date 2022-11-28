@@ -78234,9 +78234,10 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
             var o = [];
             return r.each(t.vin, function(e)
               {
-                n[e.addresses[0]] && o.push(
+                let addr = r.get(e.addresses, 0)
+                n[addr] && o.push(
                 {
-                  address: e.addresses[0],
+                  address: addr,
                   hash: i.fromHex(t.txid),
                   blockHeight: t.blockheight,
                   value: a.floatToAmount(e.value).negated(),
@@ -78270,7 +78271,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     spent: s.spent,
                     vin: r.map(t.vin, function(e)
                     {
-                      if (!e.coinbase)
+                      let coinbase = e.coinbase || (!e.addresses && !e.txid)
+                      if (!coinbase)
                         return {
                           address: e.addresses[0],
                           hash: i.fromHex(e.txid),
