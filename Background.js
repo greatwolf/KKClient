@@ -2246,7 +2246,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     {
       value: !0
     });
-    var r = e("../../ui-messenger"),
+    var _ = e("lodash"),
+      r = e("../../ui-messenger"),
       i = e("../MessageDispatcher"),
       a = e("../../account-list-manager"),
       o = e("@keepkey/device-client/dist/global/coin-name"),
@@ -2272,6 +2273,7 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
               })
               return n ? t.deviceClient.getEthereumAddress(i.nodePath, !0).then(function(e)
               {
+                if (!_.get(e, "$type.name")) return
                 r.UiMessenger.sendMessageToUI(e.$type.name, e)
               }) : t.deviceClient.getAddress(i.nodePath, i.coinType, !0);
             })
@@ -2284,7 +2286,8 @@ var _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
     "../../account-list-manager": 2,
     "../../ui-messenger": 122,
     "../MessageDispatcher": 6,
-    "@keepkey/device-client/dist/global/coin-name": 160
+    "@keepkey/device-client/dist/global/coin-name": 160,
+    lodash: 368
   }],
   28: [function(e, t, n)
   {
