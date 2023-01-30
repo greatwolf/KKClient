@@ -176,7 +176,7 @@ export default function(confighelper)
       defaultDecimals: 8,
       blockbook:
       [
-        "https://sys1.bcfn.ca",
+        "https://blockbook.elint.services",
       ],
       txUrlExplorer: "https://chainz.cryptoid.info/sys/tx.dws?",
       feeProfile: { MIN_FEE: 1e4 }
